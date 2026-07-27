@@ -1,0 +1,145 @@
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:mahaliii/common/params/sign_up_params.dart';
+import 'package:mahaliii/features/sign_up_feature/presentation/bloc/region_status.dart';
+import 'package:mahaliii/features/sign_up_feature/presentation/bloc/register_status.dart';
+
+import '../../../../common/params/validation_params.dart';
+import '../../../../common/utils/data_state.dart';
+import '../../../../common/utils/use_case.dart';
+import '../../domain/entity/area_entity.dart';
+import '../../domain/entity/region_entity.dart';
+import '../../domain/usecase/area_usecase.dart';
+import '../../domain/usecase/first_sign_up.dart';
+import '../../domain/usecase/region_usecase.dart';
+import '../../domain/usecase/register_usecase.dart';
+import 'area_status.dart';
+import 'first_level_status.dart';
+
+part 'sign_up_event.dart';
+part 'sign_up_state.dart';
+
+class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
+  RegisterUseCase registerUseCase;
+  // AgainSendValidationCodeUseCase againSendValidationCodeUseCase;
+  FirstSignupUseCase firstSignupUseCase;
+  // ValidationUseCase validationUseCase;
+  AreaUseCase areaUseCase;
+  RegionUseCase regionUseCase;
+  SignUpBloc(
+      this.registerUseCase,
+      this.firstSignupUseCase,
+      this.areaUseCase,
+      this.regionUseCase,
+
+      ) : super(SignUpState(
+      firstLevelSendStatus: FirstLevelInitial(),
+      registerStatus: RegisterInitial(),
+      signUpParams: SignUpParams(),
+      mobile: "" ,
+    areaStatus: AreaLoading(),
+    regionStatus: RegionLoading(),
+    oneRegionEntity: null,
+    oneAreaEntity: null,
+    ignoreArea: true,
+    step: 0,
+    serverId: 0
+
+  )) {
+
+    on<FirstSignUpButtonClicked>((event, emit) async {
+      emit(state.copyWith(
+        newFirstLevelSendStatus: FirstLevelLoading(),
+      ));
+
+      DataState dataState = await firstSignupUseCase(event.signUpParams);
+
+      if (dataState is DataSuccess) {
+         int serverId = dataState.data;
+        emit(state.copyWith(
+          newSignUpParams: event.signUpParams,
+          newFirstLevelSendStatus: FirstLevelSuccess(dataState.data),
+          // newMobile: event.signUpParams.mobile,
+          newStep: event.signUpParams.step,
+          newServerId: serverId
+
+        ));
+      }
+      if (dataState is DataFailed) {
+        emit(state.copyWith(
+            newFirstLevelSendStatus:
+            FirstLevelError(dataState.error!)));
+      }
+    });
+
+
+    on<RegisterClicked>((event, emit) async {
+      emit(state.copyWith(newRegisterStatus: RegisterLoading()));
+      DataState dataState = await registerUseCase(event.signUpParams);
+
+      if (dataState is DataSuccess) {
+        // AuthEntity authEntity = dataState.data;
+
+        ///save token
+        // await locator<SharedPrefOperator>().setUserToken( "", dataState.data["type"] ?? 0);
+
+        emit(state.copyWith(
+            newSignUpParams: event.signUpParams,
+            newRegisterStatus: RegisterComplete()));
+      }
+      if (dataState is DataFailed) {
+        emit(
+            state.copyWith(newRegisterStatus: RegisterError(dataState.error!)));
+      }
+    });
+    on<SaveServerId>((event, emit) async {
+      emit(state.copyWith(newSignUpParams: event.signUpParams));
+
+
+    });
+
+    on<GetRegion>((event, emit) async {
+      emit(state.copyWith(newRegionStatus: RegionLoading()));
+      DataState dataState = await regionUseCase(NoParams());
+      // ۱. چک کنید که اگر بلاک بسته شده، بقیه کد اجرا نشود
+      if (isClosed) return;
+
+      if (dataState is DataSuccess) {
+        RegionEntity regionEntity=dataState.data[0];
+        emit(state.copyWith(newRegionStatus: RegionSuccess(dataState.data),
+            newOneRegionEntity: regionEntity));
+        // ۲. خط ۱۰۹ را با این شرط بپوشانید
+        if (!isClosed) {
+          add(GetArea(dataState.data[0].id!));
+        }
+
+        add(GetArea(1));
+      }
+      if (dataState is DataFailed) {
+        // ۳. اینجا هم چک کنید چون ممکن است در لحظه خطا هم بلاک بسته شده باشد
+        if (!isClosed) {
+          emit(state.copyWith(newRegionStatus: RegionError(dataState.error!)));
+        }
+      }    });
+
+    on<OneRegionClicked>((event, emit) async {
+      emit(state.copyWith(newOneRegionEntity: event.regionEntity));
+      add(GetArea(event.regionEntity.id!));
+    });
+
+    on<GetArea>((event, emit) async {
+      emit(state.copyWith(newAreaStatus: AreaLoading()));
+      DataState dataState = await areaUseCase(event.id);
+      if (dataState is DataSuccess) {
+        emit(state.copyWith(newAreaStatus:  AreaSuccess(dataState.data), newOneAreaEntity: dataState.data[0]));
+
+      }
+      if (dataState is DataFailed) {
+        emit(state.copyWith(newAreaStatus: AreaError(dataState.error!)));}});
+
+    on<OneAreaClicked>((event, emit) async {
+      emit(state.copyWith(newOneAreaEntity: event.areaEntity));
+
+    });
+  }
+}

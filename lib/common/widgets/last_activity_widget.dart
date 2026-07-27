@@ -1,0 +1,93 @@
+import 'package:flutter/material.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
+
+import '../../config/color_palette.dart';
+import '../../config/texts_style.dart';
+import '../../features/status_summary_feature/domain/entity/last_activity_entity.dart';
+import '../utils/constants.dart';
+
+class LastActivityWidget extends StatelessWidget {
+  const LastActivityWidget({
+    super.key,
+    required this.lastActivityEntity,
+  });
+
+  final LastActivityEntity lastActivityEntity;
+
+  @override
+  Widget build(BuildContext context) {
+    List<LastActivitySlot> flatList = [];
+    for (var park in lastActivityEntity.data!) {
+      // چک کردن اینکه آیا لیست تاریخ‌ها وجود دارد و خالی نیست
+      if (park.dates == null || (park.dates as List).isEmpty) continue;
+      for (var dateItem in park.dates!) {
+        // چک کردن اینکه آیا لیست ساعت‌ها وجود دارد و خالی نیست
+        if (dateItem.hours == null || (dateItem.hours as List).isEmpty) continue;
+        for (var time in dateItem.hours!) {
+          flatList.add(LastActivitySlot(park.name ?? "نامشخص",
+              dateItem.date ?? "بدون تاریخ",
+              time.time ?? "-",
+              time.name??"-",
+              time.status??"-",
+              time.type??"-"));
+        }
+      }
+    }
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+
+      child: Container(
+        width: 500,
+        decoration: BoxDecoration(
+            border: Border.all(color: ColorPalette.grey),
+            borderRadius: BorderRadius.circular(5)
+
+        ),
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          itemCount: flatList.length+1,
+          itemBuilder: (context, index) {
+            return
+              index==0? Container(
+                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+
+                decoration: BoxDecoration(
+                  color: ColorPalette.lightGrey,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(flex: 2,child: Text("نام چاه",style: TextStyleP.f10Regular)),
+
+                    Expanded(flex: 1,child: Text("وضعیت",style: TextStyleP.f10Regular)),
+                    Expanded(flex: 3,child: Text("توسط",style: TextStyleP.f10Regular)),
+                    Expanded(flex: 2,child: Text("تاریخ",style: TextStyleP.f10Regular)),
+                    Expanded(child: Text("ساعت",style: TextStyleP.f10Regular)),
+                    // Expanded(child: Text("نوع دستور",style: TextStyleP.f10Regular)),
+                  ],
+                ),
+              ):
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+                decoration: BoxDecoration(
+                    border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width:index==flatList.length-1?0:1))
+                ),
+                child: Row(
+                  children: [
+                    Expanded(flex: 2,child: Text(flatList[index-1].wellName)),
+                    Expanded(flex: 1,child: Text(flatList[index-1].status)),
+                    Expanded(flex: 3,child: Text(flatList[index-1].name)),
+                    Expanded(flex: 2,child: Text(flatList[index-1].date.toPersianDigit())),
+                    Expanded(child: Text(flatList[index-1].time.toPersianDigit())),
+                    // Expanded(child: Text(flatList[index-1].type)),
+
+                  ],
+                ),
+              );
+          },
+        ),
+      ),
+    );
+  }
+}
