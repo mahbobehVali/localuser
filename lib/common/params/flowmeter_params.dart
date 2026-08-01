@@ -1,6 +1,7 @@
 
 class FlowMeterParams {
 
+  int? status;
   int? type;
   int? limit;
   int? time;
@@ -14,6 +15,7 @@ class FlowMeterParams {
 
 
   FlowMeterParams({
+     this.status,
      this.limit,
      this.type,
      this.time,
@@ -28,6 +30,7 @@ class FlowMeterParams {
 
   FlowMeterParams copyWith(
       {
+        int? newStatus,
         int? newType,
         int? newLimit,
         int? newTime,
@@ -41,6 +44,7 @@ class FlowMeterParams {
 
       }) {
     return FlowMeterParams(
+        status: newStatus ?? status,
         type: type ?? type,
         time: time??time,
         page: newPage??page,

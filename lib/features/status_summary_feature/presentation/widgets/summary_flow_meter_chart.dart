@@ -39,7 +39,6 @@ class SummaryFlowMeterChart extends StatelessWidget {
                     current.selectedChartTab!=previous.selectedChartTab,
                     builder: (context, state) {
                       return SegmentedButton(
-                        selectedIcon: SizedBox(),
 
                           onSelectionChanged: (Set<int> newSelected) {
                             BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(

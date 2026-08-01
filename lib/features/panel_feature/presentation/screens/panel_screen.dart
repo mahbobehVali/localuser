@@ -5,6 +5,7 @@ import 'package:mahaliii/common/widgets/show_dialogs.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/panel_feature/presentation/cubit/logout_cubit.dart';
 import 'package:mahaliii/features/panel_feature/presentation/screens/account_screen.dart';
+import 'package:mahaliii/features/support_feature/presentation/screens/support_screen.dart';
 
 import '../../../../common/widgets/icon_container.dart';
 
@@ -68,6 +69,45 @@ class _PanelScreenState extends State<PanelScreen> {
                   ),
                 ),
                 SizedBox(height: 32),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                      return SupportScreen();
+                    },));
+                  },
+                  child: Container(
+                    height: 40.h,
+                    padding: EdgeInsets.symmetric(horizontal: 18),
+                    decoration: BoxDecoration(
+                      color: Color(0xffD3D9E0),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                      children: [
+                        Row(
+                          children: [
+                            IconContainer(
+                              icon: Image.asset("assets/icons/user.png"),
+                              color: Colors.transparent,
+                              width: 24,
+                              height: 24,
+                            ),
+                            SizedBox(width: 9),
+
+                            Text("پشتیبانی"),
+                          ],
+                        ),
+
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 32),
+
+
 
                 BlocProvider<LogoutCubit>(
                   create: (context) => LogoutCubit(),

@@ -59,16 +59,19 @@ class _MyAppState extends State<MyApp> {
 
                     fillColor: WidgetStateProperty.all(ColorPalette.darkBlue), // رنگی که می‌خوای (مثلاً قرمز)
                   ),
-                segmentedButtonTheme: SegmentedButtonThemeData(
-                    style: SegmentedButton.styleFrom(
+
+                  segmentedButtonTheme: SegmentedButtonThemeData(
+
+                      selectedIcon: SizedBox(),
+
+                      style: SegmentedButton.styleFrom(
                         foregroundColor: Colors.black,
                         selectedForegroundColor: Colors.black,
                         selectedBackgroundColor: ColorPalette.darkBlue,
-                        side:  BorderSide(
-                            color: ColorPalette.inverseGrey
-                        ),
+                        side: BorderSide.none,
+
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: BorderRadius.circular(3),
                         ))
                 ),
 

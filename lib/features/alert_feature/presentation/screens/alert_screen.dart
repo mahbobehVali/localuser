@@ -28,7 +28,6 @@ class AlertScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffEDEDED),
         body: BlocProvider<AlertBloc>(
     create: (context) {
     AlertBloc alertBloc=AlertBloc(
@@ -152,7 +151,7 @@ class AlertScreen extends StatelessWidget {
                                                       ),
                                                       child: Text(data[index-1].status==0 ?"جدید":
                                                       data[index-1].status==1?"در حال بررسی":
-                                                      "پاسخ داده شده"),
+                                                      "پاسخ داده شده",textAlign: TextAlign.center,),
                                                     )),
 
                                                   ],

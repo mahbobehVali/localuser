@@ -91,6 +91,20 @@ class Constants {
 
   ];
 
+  List<dynamic> rowSupport = [
+    {
+      "title":"پشتیبانی  دستگاه",
+      "icon":Icon(Icons.contact_support_outlined)
+
+    },
+    {
+      "title": "درخواست به مدیر",
+      "icon":Icon(Icons.contact_support_outlined)
+    },
+
+
+  ];
+
   List<String> waterVolume = [
     "حجم کل آب مصرف شده",
     "مجموع ساعات کارکرد پمپ ها",
@@ -124,6 +138,14 @@ class Constants {
     AlertTypeEntity("جدید", 0),
     AlertTypeEntity("در انتظار بررسی", 1),
     AlertTypeEntity("پاسخ داده شده", 2),
+
+  ];
+
+  List<AlertTypeEntity> supportStatus = [
+    AlertTypeEntity("جدید", 0),
+    AlertTypeEntity("در حال بررسی", 1),
+    AlertTypeEntity("پاسخ داده شده", 2),
+    AlertTypeEntity("بسته شده", 3),
 
   ];
 

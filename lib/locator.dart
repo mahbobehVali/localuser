@@ -14,6 +14,12 @@ import 'package:mahaliii/features/report_feature/data/repository/report_reposito
 import 'package:mahaliii/features/report_feature/domain/repository/report_repository.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/area_usecase.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/repository/status_summary_repository.dart';
+import 'package:mahaliii/features/support_feature/data/datasource/remote/support_api_provider.dart';
+import 'package:mahaliii/features/support_feature/data/datasource/remote/support_api_provider.dart';
+import 'package:mahaliii/features/support_feature/data/repository/support_repositoryimpl.dart';
+import 'package:mahaliii/features/support_feature/domain/repository/support_repository.dart';
+import 'package:mahaliii/features/support_feature/domain/usecase/support_usecase.dart';
+import 'package:mahaliii/features/support_feature/domain/usecase/support_usecase.dart';
 import 'package:mahaliii/features/well_feature/data/datasource/remote/wells_api_provider.dart';
 import 'package:mahaliii/features/well_feature/domain/repository/wells_repository.dart';
 import 'package:mahaliii/features/well_feature/domain/usecase/get_program_usecase.dart';
@@ -41,6 +47,8 @@ import 'features/status_summary_feature/data/repository/status_summary_repositor
 import 'features/status_summary_feature/domain/usecase/last_activity_usecase.dart';
 import 'features/status_summary_feature/domain/usecase/report_flowmeter_usecase.dart';
 import 'features/status_summary_feature/domain/usecase/wells_list_usecase.dart';
+import 'features/support_feature/domain/usecase/send_support_usecase.dart';
+import 'features/support_feature/domain/usecase/support_answers_usecase.dart';
 import 'features/well_feature/data/repository/wells_repositoryimpl.dart';
 import 'features/well_feature/domain/usecase/alert_count_usecase.dart';
 import 'features/well_feature/domain/usecase/flow_meter_usecase.dart';
@@ -123,5 +131,12 @@ Future<void> setup() async {
   locator.registerFactory<SendSmsUseCase>(() =>SendSmsUseCase(locator()));
   locator.registerFactory<ChangePasswordUseCase>(() =>ChangePasswordUseCase(locator()));
   locator.registerFactory<ChangeAlertUseCase>(() =>ChangeAlertUseCase(locator()));
+
+
+  locator.registerFactory<SupportApiProvider>(() =>SupportApiProvider(dio));
+  locator.registerFactory<SupportRepository>(() =>SupportRepositoryImpl(supportApiProvider: locator()));
+  locator.registerFactory<SupportUseCase>(() =>SupportUseCase(locator()));
+  locator.registerFactory<SupportAnswersUseCase>(() =>SupportAnswersUseCase(locator()));
+  locator.registerFactory<SendSupportUseCase>(() =>SendSupportUseCase(locator()));
 
 }

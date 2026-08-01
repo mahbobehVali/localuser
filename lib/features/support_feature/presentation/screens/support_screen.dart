@@ -1,0 +1,286 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/common/params/flowmeter_params.dart';
+import 'package:mahaliii/config/color_palette.dart';
+import 'package:mahaliii/config/texts_style.dart';
+import 'package:mahaliii/features/support_feature/domain/entity/support_data_entity.dart';
+import 'package:mahaliii/features/support_feature/domain/usecase/send_support_usecase.dart';
+import 'package:mahaliii/features/support_feature/domain/usecase/support_answers_usecase.dart';
+import 'package:mahaliii/features/support_feature/domain/usecase/support_usecase.dart';
+import 'package:mahaliii/features/support_feature/presentation/bloc/support_bloc.dart';
+import 'package:mahaliii/features/support_feature/presentation/bloc/support_status.dart';
+import 'package:mahaliii/features/support_feature/presentation/screens/support_answer_screen.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
+import '../../../../common/utils/constants.dart';
+import '../../../../common/widgets/pagination_widget.dart';
+import '../../../../common/widgets/show_dialogs.dart';
+import '../../../../locator.dart';
+import '../../../alert_feature/domain/entity/alert_type_entity.dart';
+
+class SupportScreen extends StatelessWidget {
+  const SupportScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: BlocProvider(
+        create: (context) {
+          SupportBloc supportBloc = SupportBloc(
+            locator<SupportUseCase>(),
+            locator<SupportAnswersUseCase>(),
+            locator<SendSupportUseCase>(),
+          );
+          supportBloc.add(GetSupportMessage(FlowMeterParams(page: 1)));
+          return supportBloc;
+        },
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("پشتیبانی", style: TextStyleP.f16Medium),
+                SizedBox(height: 16.h),
+                const Text("ثبت درخواست جدید"),
+                SizedBox(height: 24.h),
+                Row(
+                  children: List.generate(
+                    2,
+                        (index) {
+                      return Expanded(
+                        child: Builder(
+                          builder: (context) {
+                            return GestureDetector(
+                              onTap: () {
+                                ShowDialogs().sendRequestToSupport(context, BlocProvider.of<SupportBloc>(context),
+                                    AlertTypeEntity(Constants().rowSupport[index]["title"], 1));
+
+                              },
+                              child: Container(
+                                height: 70.h,
+                                margin: const EdgeInsets.all(8.0),
+                                // padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: ColorPalette.white,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Constants().rowSupport[index]["icon"],
+                                    Text(Constants().rowSupport[index]["title"]),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    width: double.infinity,
+                    color: ColorPalette.white,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("پیام‌های ارسال شده در پشتیبانی", style: TextStyleP.f12Regular),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: BlocBuilder<SupportBloc, SupportState>(
+                            // buildWhen: (previous, current) =>
+                            // current.selectedAlertType!=previous.selectedAlertType,
+
+                            builder: (context, state) {
+
+                              return Container(
+
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(color: Colors.grey)),
+                                width: MediaQuery.sizeOf(context).width/2,
+                                alignment: Alignment.center,
+                                child:
+                                DropdownButton<AlertTypeEntity>(
+                                    underline: const SizedBox(),
+                                    isExpanded: true,
+                                    padding: EdgeInsets.only(right: 15.w),
+                                    value: state.supportStatusList[state.selectedSupportStatus!],
+                                    items: state.supportStatusList
+                                        .map((alertType) =>
+                                        DropdownMenuItem<AlertTypeEntity>(
+                                          value: alertType,
+                                          child: Text(alertType.name),
+                                        ))
+                                        .toList(),
+                                    onChanged: (value) {
+                                      BlocProvider.of<SupportBloc>(context)
+                                          .add(OneSupportStatusClicked(value!));
+                                    }),
+                              );
+                            },
+                          ),
+                        ),
+
+                        SizedBox(height: 10.h),
+                        Container(
+                          decoration: Constants().whiteFiveRadiusDecoration,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                BlocBuilder<SupportBloc, SupportState>(
+                                  buildWhen: (previous, current) => current.supportStatus != previous.supportStatus,
+                                  builder: (context, state) {
+                                    if (state.supportStatus is SupportSuccess) {
+                                      SupportSuccess supportSuccess = state.supportStatus as SupportSuccess;
+
+                                      return Column(
+                                        children: [
+                                          SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: SizedBox(
+                                              width: 500,
+                                              child: ListView.builder(
+                                                physics: const NeverScrollableScrollPhysics(),
+                                                shrinkWrap: true,
+                                                padding: EdgeInsets.zero,
+                                                itemCount: supportSuccess.supportEntity.data!.length + 1,
+                                                itemBuilder: (context, index) {
+                                                  List<SupportDataEntity> data = [];
+                                                  if (index > 0) data = supportSuccess.supportEntity.data!;
+
+                                                  return index == 0
+                                                      ? Container(
+                                                    padding: const EdgeInsets.all(12),
+                                                    decoration: Constants().boxDecoration,
+                                                    child: const Row(
+                                                      children: [
+                                                        Expanded(flex: 4, child: Text("نوع پشتیبانی")),
+                                                        Expanded(flex: 4, child: Text("موضوع")),
+                                                        Expanded(flex: 2, child: Text("تاریخ")),
+                                                        Expanded(flex: 3, child: Text("ساعت")),
+                                                        Expanded(flex: 4, child: Text("وضعیت")),
+                                                      ],
+                                                    ),
+                                                  )
+                                                      : GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                                        return SupportAnswerScreen(supportDataEntity: data[index-1],);
+                                                      },));
+
+                                                    },
+                                                        child: Container(
+                                                          padding: const EdgeInsets.all(12),
+                                                          decoration: const BoxDecoration(
+                                                        border: Border(bottom: BorderSide(color: Color(0xffD7D7D7))),
+                                                        ),
+                                                        child: Row(
+                                                        children: [
+                                                          Expanded(
+                                                            flex: 4,
+                                                            child: Text(data[index - 1].part == 1 ? "درخواست به مدیر" : "پشتیبانی دستگاه"),
+                                                          ),
+                                                          Expanded(flex: 4, child: Text(data[index - 1].subject.toString().toPersianDigit() ?? "")),
+                                                          Expanded(flex: 2, child: Text(data[index - 1].clock?.toPersianDigit() ?? "")),
+                                                          Expanded(flex: 3, child: Text(data[index - 1].date?.toPersianDigit() ?? "")),
+                                                          Expanded(
+                                                            flex: 4,
+                                                            child: Container(
+                                                              padding: const EdgeInsets.all(5),
+                                                              decoration: BoxDecoration(
+                                                                color: data[index - 1].status == 0
+                                                                    ? ColorPalette.lightBlue
+                                                                    : data[index - 1].status == 1
+                                                                    ? Colors.yellow
+                                                                    : ColorPalette.lightGreen,
+                                                                borderRadius: BorderRadius.circular(5),
+                                                              ),
+                                                              child: Text(
+                                                                data[index - 1].status == 0
+                                                                    ? "جدید"
+                                                                    : data[index - 1].status == 1
+                                                                    ? "در حال بررسی"
+                                                                    : "پاسخ داده شده",
+                                                                textAlign: TextAlign.center,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                                                                            ),
+                                                                                                          ),
+                                                      );
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          PaginationWidget(
+                                            selected: state.selectedSupportPage ,
+                                            lastPage: supportSuccess.supportEntity.meta!.lastPage!,
+                                            onPageChanged: (newPage) {
+                                              BlocProvider.of<SupportBloc>(context).add(
+                                                GetSupportMessage(
+                                                   FlowMeterParams(
+                                                    page: newPage,
+                                                     status: 1
+
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          )
+
+                                        ],
+                                      );
+                                    } else if (state.supportStatus is SupportLoading) {
+                                      return const Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.all(20.0),
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      );
+                                    } else if (state.supportStatus is SupportEmpty) {
+                                      return const SizedBox(
+                                        height: 150,
+                                        child: Center(child: Text("پیامی وجود ندارد")),
+                                      );
+                                    } else if (state.supportStatus is SupportError) {
+                                      SupportError alertError = state.supportStatus as SupportError;
+                                      return Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(20.0),
+                                          child: Text(alertError.error),
+                                        ),
+                                      );
+                                    } else {
+                                      return const SizedBox.shrink();
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

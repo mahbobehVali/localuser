@@ -51,7 +51,6 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("buildddddd");
 
     if (info.isEmpty) {
       return const Scaffold(
@@ -64,7 +63,6 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
 
         body: BlocProvider<StatusSummaryBloc>(
           create: (context) {
-            print("createtttttt");
             StatusSummaryBloc statusSummaryBloc= StatusSummaryBloc(
               locator<WellsListUseCase>(),
               locator<LastActivityUseCase>(),

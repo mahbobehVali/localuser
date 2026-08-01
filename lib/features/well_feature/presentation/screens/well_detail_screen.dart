@@ -214,8 +214,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                   BlocBuilder<WellDetailBloc, WellDetailState>(
                     builder: (context, state) {
                       return SegmentedButton(
-                        showSelectedIcon: false,
-                          selectedIcon: SizedBox(),
 
 
                           onSelectionChanged: (Set<int> newSelected) {
@@ -226,7 +224,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                             ButtonSegment(value: 0,label: Text("وضعیت کلی")),
                             ButtonSegment(value: 1,label: Text("کنترل چاه")),
 
-                          ], selected:{state.selectedWellTab??0});
+                          ], selected:{state.selectedWellTab});
                     },
                   ),
                   SizedBox(height: 26),
@@ -266,7 +264,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         current.selectedChartTab!=previous.selectedChartTab,
                                         builder: (context, state) {
                                           return SegmentedButton(
-                                            selectedIcon: SizedBox(),
 
                                               onSelectionChanged: (Set<int> newSelected) {
                                                 BlocProvider.of<WellDetailBloc>(context).add(

@@ -8,6 +8,8 @@ import 'package:mahaliii/common/params/change_password_params.dart';
 import 'package:mahaliii/common/params/create_time_params.dart';
 import 'package:mahaliii/common/widgets/global_snackbar.dart';
 import 'package:mahaliii/common/widgets/refuse_button.dart';
+import 'package:mahaliii/common/widgets/show_snack_bar.dart';
+import 'package:mahaliii/common/widgets/sign_up_image.dart';
 import 'package:mahaliii/common/widgets/time_picker_field.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/config/texts_style.dart';
@@ -18,6 +20,8 @@ import 'package:mahaliii/features/panel_feature/presentation/bloc/account_bloc.d
 import 'package:mahaliii/features/panel_feature/presentation/bloc/change_password_status.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/entity/wells_data_entity.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/entity/wells_entity.dart';
+import 'package:mahaliii/features/support_feature/presentation/bloc/send_support_status.dart';
+import 'package:mahaliii/features/support_feature/presentation/bloc/support_bloc.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/create_time_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/delete_time_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
@@ -28,9 +32,13 @@ import '../../features/alert_feature/presentation/bloc/alert_bloc.dart';
 import '../../features/panel_feature/presentation/cubit/logout_cubit.dart';
 import '../../features/well_feature/domain/entity/program_day_entity.dart';
 import '../../features/well_feature/presentation/bloc/well_detail_bloc/on_off_status.dart';
+import '../params/send_new_request_to_support_params.dart';
+import '../utils/constant_texts.dart';
 import '../utils/constants.dart';
+import 'bottom_sheets.dart';
 import 'clock_box.dart';
 import 'global_elevated_button.dart';
+import 'image_converter.dart';
 
 class ShowDialogs {
   int timeToMinutes(String timeStr) {
@@ -80,7 +88,7 @@ class ShowDialogs {
 
     return false; //  هیچ تداخلی وجود ندارد و جاده صاف است!
   }
-  
+
   Future<void> changePasswordShowDialog({
     required BuildContext context,
     required AccountBloc panelBloc,
@@ -605,7 +613,7 @@ class ShowDialogs {
                         );
                   },
                 ),
-                        
+
                       ],
                     ),
                   ),
@@ -1082,6 +1090,211 @@ class ShowDialogs {
                 ],
               ),
             ),
+          ),
+        );
+      },
+    );
+  }
+
+
+  Future<void> sendRequestToSupport(BuildContext sendContext,
+      SupportBloc supportBloc, AlertTypeEntity alertTypeEntity) {
+    TextEditingController subjectController = TextEditingController();
+    TextEditingController descriptionController = TextEditingController();
+
+    return showDialog(
+      barrierDismissible: false,
+      context: sendContext,
+      builder: (context) {
+        final newSupportKey = GlobalKey<FormState>();
+
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+
+          body: SingleChildScrollView(
+            child: BlocProvider.value(
+                value: supportBloc,
+                child: Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: AlertDialog(
+                    backgroundColor: Colors.white,
+                    content: SizedBox(
+                      height: 500.h,
+                      width: 550.w,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("درخواست جدید به پشتیبانی"),
+                          SizedBox(
+                            height: 25,
+                          ),
+                          Form(
+                              key: newSupportKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("دپارتمان مربوطه"),
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  Container(
+                                    height: 35.h,
+                                    width: 140.w,
+                                    padding: EdgeInsets.all(7),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey,
+                                        ),
+                                        borderRadius: BorderRadius.circular(5)),
+                                    child: Center(child: Text(alertTypeEntity.name)),
+                                  ),
+                                  SizedBox(
+                                    height: 10.h,
+                                  ),
+                                  Text("عنوان پشتیبانی"),
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  TextFormField(
+
+                                    textAlignVertical: TextAlignVertical.center,
+                                    style: TextStyle(decoration: TextDecoration.none
+                                    ),
+
+
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      // contentPadding: EdgeInsetsGeometry.symmetric(vertical: 0),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(15),
+
+                                      ),
+                                    ),
+
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return "عنوان الزامی است";
+                                      }
+                                      return null;
+                                    },
+                                    controller: subjectController,
+                                  ),
+
+                                  SizedBox(
+                                    height: 15.h,
+                                  ),
+                                  Text("شرح موضوع"),
+                                  SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  TextFormField(
+
+                                    maxLines: 2,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                      return  "شرح موضوع الزامی است";
+                                      }
+                                      return null;
+                                    },
+                                    controller: descriptionController,
+                                  ),
+                                ],
+                              )),
+                          SizedBox(
+                            height: 15.h,
+                          ),
+                          Text("پیوست فایل"),
+                          SizedBox(
+                            height: 5.h,
+                          ),
+                          BlocBuilder<SupportBloc, SupportState>(
+                            buildWhen: (previous, current) =>
+                            previous.supportFile != current.supportFile,
+                            builder: (context, state) {
+                              return SelectImageWidget(
+                                width: 70.w,
+                                height: 70.h,
+                                image: state.supportFile,
+                                onTap: () {
+                                  BottomSheets().imageSupport(context, supportBloc);
+
+                                },);
+                            },
+                          ),
+                          BlocBuilder<SupportBloc, SupportState>(builder: (context, state) {
+                            return Visibility(visible: state.overImage,child: Text("حجم فایل بیشتر از یک مگابایت نباشد.",style: TextStyle(color: Colors.red),));
+                          },),
+                          SizedBox(
+                            height: 25.h,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RefuseButton(
+                                width: 100.w,
+                              ),
+                              SizedBox(
+                                width: 10.w,
+                              ),
+                              BlocConsumer<SupportBloc, SupportState>(
+
+                                listenWhen: (previous, current) =>
+                                current.sendSupportStatus != previous.sendSupportStatus,
+                                listener: (context, state) {
+                                  if (state.sendSupportStatus is SendSupportSuccess) {
+                                    ShowSnacksBars.snack(sendContext, ConstantTexts.beRegisteredRequest,color: Colors.green,duration: 2);
+                                    Navigator.of(context).pop();
+
+                                  }
+                                  if (state.sendSupportStatus is SendSupportError) {
+                                    SendSupportError sendRequestError =
+                                    state.sendSupportStatus
+                                    as SendSupportError;
+                                    ShowSnacksBars.snack(sendContext, sendRequestError.error,duration: 2);
+
+                                    Navigator.of(context).pop();
+
+                                  }
+                                },
+                                builder: (context, state) {
+                                  return GlobalElevatedButton(
+                                    width: 100.w,
+                                    onTap:state.overImage==true?null: () async {
+                                      if (newSupportKey.currentState!.validate()) {
+
+                                        dynamic file =
+                                        await ImageConverter.getMultiPart(
+                                            state.supportFile,
+                                            state.supportFile.split("/").last);
+                                        supportBloc.add(
+                                            SendNewSupportClicked(
+                                                SendNewSupportParams(
+                                                    part:1,
+                                                    // state.selectedDepartment,
+                                                    subject:
+                                                    subjectController.text,
+                                                    status: 0,
+                                                    description:
+                                                    descriptionController.text,
+                                                    payVast: file)));
+                                      }
+                                    },
+                                    widget: state.sendSupportStatus is SendSupportLoading?
+                                    CircularProgressIndicator(): Text(
+                                      "ارسال",
+                                      style:  TextStyle(color: Colors.white,fontSize: 18),
+                                    ),
+                                    backColor: ColorPalette.darkBlue
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )),
           ),
         );
       },
