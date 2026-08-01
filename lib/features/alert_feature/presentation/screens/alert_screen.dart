@@ -99,7 +99,7 @@ class AlertScreen extends StatelessWidget {
                                           width: 500,
 
                                           child: ListView.builder(
-                                            physics: NeverScrollableScrollPhysics(),
+                                            // physics: NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             padding: EdgeInsets.zero, // این خط فاصله اضافه را حذف می‌کند
 

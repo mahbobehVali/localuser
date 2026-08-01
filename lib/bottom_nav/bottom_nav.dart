@@ -48,7 +48,7 @@ class BottomNavWidget extends StatelessWidget {
           ]),
           child: BottomAppBar(
             padding: EdgeInsets.only(right: 10.w),
-            height: 75.h,
+            height: 44.h,
             color: Colors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

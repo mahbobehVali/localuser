@@ -14,7 +14,7 @@ class AlertApiProvider {
       var response = await dio.get(
         "alert/list",
         queryParameters: {
-          "limit":5,
+          "limit":10,
           "page":alertFilterParams.page,
           if (alertFilterParams.type != null) "type": alertFilterParams.type,
           if (alertFilterParams.status != null) "status": alertFilterParams.status,
