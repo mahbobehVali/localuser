@@ -5,6 +5,7 @@ import 'package:mahaliii/common/params/alert_filter_params.dart';
 import 'package:mahaliii/common/utils/constants.dart';
 import 'package:mahaliii/features/alert_feature/domain/entity/alert_type_entity.dart';
 import 'package:mahaliii/features/alert_feature/domain/entity/alert_filter_model.dart';
+import 'package:mahaliii/features/alert_feature/domain/usecase/alert_detail_usecase.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/area_usecase.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/region_usecase.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/usecase/wells_list_usecase.dart';
@@ -13,6 +14,7 @@ import '../../../../common/utils/data_state.dart';
 import '../../../../common/utils/use_case.dart';
 import '../../../status_summary_feature/domain/entity/wells_entity.dart';
 import '../../domain/usecase/alert_usecase.dart';
+import 'alert_detail_status.dart';
 import 'alert_status.dart';
 import 'alert_well_list_status.dart';
 
@@ -24,7 +26,9 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
   RegionUseCase regionUseCase;
   AreaUseCase areaUseCase;
   WellsListUseCase wellsListUseCase;
-  AlertBloc(this.alertUseCase,this.regionUseCase,this.areaUseCase,this.wellsListUseCase) : super(AlertState(
+  AlertDetailUseCase alertDetailUseCase;
+  AlertBloc(this.alertUseCase,this.regionUseCase,this.areaUseCase,this.wellsListUseCase,
+      this.alertDetailUseCase) : super(AlertState(
       alertStatus: AlertLoading(),selectedAlertPage: 1,
     wellName: "",
     date: "",
@@ -36,9 +40,8 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
     selectedAlertStatus: 0,
     alertStartDate: "",
     alertEndDate: "",
-    alertFilterModel: AlertFilterModel()
-
-
+    alertFilterModel: AlertFilterModel(),
+    alertDetailStatus: AlertDetailInitial()
 
   )) {
     on<AlertStart>((event, emit) async {
@@ -108,6 +111,22 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
       emit(state.copyWith(newAlertStartDate: event.startDate,newAlertEndDate: event.endDate,
           newAlertFilterModel: event.alertFilterModel));
 
+    });
+
+    on<AlertDetailEvent>((event, emit) async {
+
+      emit(state.copyWith(newAlertDetailStatus: AlertDetailLoading()));
+      DataState dataState = await alertDetailUseCase(event.id);
+      if (dataState is DataSuccess) {
+        if(dataState.data.isEmpty){
+          emit(state.copyWith(newAlertDetailStatus: AlertDetailEmpty()));
+        }else{
+          emit(state.copyWith(newAlertDetailStatus: AlertDetailSuccess(dataState.data)));
+        }
+      }
+      if (dataState is DataFailed) {
+        emit(state.copyWith(newAlertDetailStatus: AlertDetailError(dataState.error!)));
+      }
     });
   }
 }

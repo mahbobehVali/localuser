@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:mahaliii/features/alert_feature/data/model/alert_detail_model.dart';
 import 'package:mahaliii/features/alert_feature/data/model/alerts_model.dart';
+import 'package:mahaliii/features/alert_feature/domain/entity/alert_detail_entity.dart';
 import 'package:mahaliii/features/alert_feature/domain/entity/alerts_entity.dart';
 
 import '../../../../../../common/error_handling/check_exceptions.dart';
@@ -37,15 +39,11 @@ class AlertRepositoryImpl extends AlertRepository {
     try {
 
       Response response = await alertApiProvider.detailAlert(id);
-      if(response.data.empty){
-        print("empty");
-        return DataSuccess([]);
 
-      }else{
-        AlertsEntity alertEntity=AlertsModel.fromJson(response.data);
+        List<AlertDetailEntity> alertEntity=AlertDetailModel.parseList(response.data);
 
         return DataSuccess(alertEntity);
-      }
+
 
     } on AppException catch (e) {
       return CheckExceptions.getError(e);

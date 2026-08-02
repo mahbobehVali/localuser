@@ -28,6 +28,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'common/socket_repository.dart';
 import 'common/utils/constants.dart';
 import 'common/utils/sharedpreference.dart';
+import 'features/alert_feature/domain/usecase/alert_detail_usecase.dart';
 import 'features/auth_feature/data/datasource/remote/auth_api_provider.dart';
 import 'features/auth_feature/data/repository/auth_repositoryimpl.dart';
 import 'features/auth_feature/domain/repository/auth_repository.dart';
@@ -131,6 +132,7 @@ Future<void> setup() async {
   locator.registerFactory<SendSmsUseCase>(() =>SendSmsUseCase(locator()));
   locator.registerFactory<ChangePasswordUseCase>(() =>ChangePasswordUseCase(locator()));
   locator.registerFactory<ChangeAlertUseCase>(() =>ChangeAlertUseCase(locator()));
+  locator.registerFactory<AlertDetailUseCase>(() =>AlertDetailUseCase(locator()));
 
 
   locator.registerFactory<SupportApiProvider>(() =>SupportApiProvider(dio));

@@ -121,7 +121,8 @@ class SupportAnswerScreen extends StatelessWidget {
                                );
 
                              },),
-                         if(supportAnswersSuccess.supportAnswerEntity.list!=null)  ListView.builder(
+                         if(supportAnswersSuccess.supportAnswerEntity.list!=null)
+                           ListView.builder(
                            physics: NeverScrollableScrollPhysics(),
                              shrinkWrap: true,
                              itemCount: supportAnswersSuccess.supportAnswerEntity.list?.length,
@@ -159,17 +160,52 @@ class SupportAnswerScreen extends StatelessWidget {
                                );
 
                              },),
-
+                           SizedBox(height: 20.h),
                            Row(
+                             mainAxisAlignment: MainAxisAlignment.end,
                              children: [
-                               GlobalElevatedButton(widget: Text("بستن"),onTap: () {
+                               GlobalElevatedButton(backColor: Colors.transparent,
+                                 borderColor: ColorPalette.inverseGrey,
+                                 widget: Row(
+                                   children: [
+                                     Text("بستن",style: TextStyle(color: ColorPalette.black),),
+                                     SizedBox(width: 3.w,),
+                                     Icon(Icons.cancel_outlined,color: ColorPalette.black),
 
-                               },),
-                               GlobalElevatedButton(widget: Text("پاسخ"),onTap: () {
+                                   ],
+                                 ),onTap: () {
 
-                               },),
+                                 },),
+                               SizedBox(
+                                 width: 10.w,
+                               ),
+                               BlocBuilder<SupportBloc, SupportState>(
+                                 builder: (context, state) {
+                                   return GlobalElevatedButton(backColor: Colors.transparent,
+                                     borderColor: ColorPalette.inverseGrey,
+                                     widget: Row(
+                                       children: [
+                                         Text("پاسخ",style: TextStyle(color: ColorPalette.black),),
+                                         SizedBox(width: 3.w,),
+                                         Icon(Icons.arrow_circle_left_outlined,color: ColorPalette.black),
+
+                                       ],
+                                     ),onTap: () {
+                                       BlocProvider.of<SupportBloc>(context).add(ChangeAnswer(!state.answer));
+
+                                     },);
+                                 },
+                               ),
+                               // if(state.answer) Container(
+                               //   decoration: BoxDecoration(
+                               //       border: BoxBorder.all()
+                               //   ),
+                               //   child: Text("data"),
+                               // )
                              ],
                            )
+
+
                          ],
                        ),
                      ),
@@ -179,7 +215,7 @@ class SupportAnswerScreen extends StatelessWidget {
                  }
                },),
              ),
-              SizedBox(height: 20.h),
+
             ],
           ),
         ),

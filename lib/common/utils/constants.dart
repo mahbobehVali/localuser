@@ -94,12 +94,15 @@ class Constants {
   List<dynamic> rowSupport = [
     {
       "title":"پشتیبانی  دستگاه",
-      "icon":Icon(Icons.contact_support_outlined)
+      "icon":Icon(Icons.contact_support_outlined),
+      "part":5
 
     },
     {
       "title": "درخواست به مدیر",
-      "icon":Icon(Icons.contact_support_outlined)
+      "icon":Icon(Icons.contact_support_outlined),
+      "part":1
+
     },
 
 

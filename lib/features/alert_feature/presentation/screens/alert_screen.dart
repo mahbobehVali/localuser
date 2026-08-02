@@ -5,6 +5,7 @@ import 'package:mahaliii/common/params/alert_filter_params.dart';
 import 'package:mahaliii/common/utils/constants.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/config/texts_style.dart';
+import 'package:mahaliii/features/alert_feature/domain/usecase/alert_detail_usecase.dart';
 import 'package:mahaliii/features/alert_feature/domain/usecase/alert_usecase.dart';
 import 'package:mahaliii/features/alert_feature/presentation/bloc/alert_status.dart';
 import 'package:mahaliii/features/alert_feature/presentation/screens/alert_detail_screen.dart';
@@ -35,6 +36,7 @@ class AlertScreen extends StatelessWidget {
       locator<RegionUseCase>(),
       locator<AreaUseCase>(),
       locator<WellsListUseCase>(),
+      locator<AlertDetailUseCase>(),
     );
     alertBloc.add(AlertStart(alertFilterParams: AlertFilterParams(
        page: 1

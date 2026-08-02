@@ -59,9 +59,9 @@ class SupportRepositoryImpl extends SupportRepository {
     try {
 
       Response response = await supportApiProvider.sendSupport(sendNewSupportParams);
-      SupportAnswerEntity supportEntity=SupportAnswerModel.fromJson(response.data);
+      // SupportAnswerEntity supportEntity=SupportAnswerModel.fromJson(response.data);
 
-      return DataSuccess(supportEntity);
+      return DataSuccess(response.data);
     } on AppException catch (e) {
       return CheckExceptions.getError(e);
     }

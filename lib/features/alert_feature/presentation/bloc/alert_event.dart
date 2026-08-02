@@ -97,3 +97,12 @@ class RemoveSingleFilterEvent extends AlertEvent {
   // TODO: implement props
   List<Object?> get props => [];
 }
+
+class AlertDetailEvent extends AlertEvent {
+  final int id;
+  const AlertDetailEvent(this.id);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [id];
+}

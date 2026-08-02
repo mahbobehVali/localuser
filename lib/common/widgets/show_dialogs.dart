@@ -1269,7 +1269,7 @@ class ShowDialogs {
                                         supportBloc.add(
                                             SendNewSupportClicked(
                                                 SendNewSupportParams(
-                                                    part:1,
+                                                    part:alertTypeEntity.id,
                                                     // state.selectedDepartment,
                                                     subject:
                                                     subjectController.text,

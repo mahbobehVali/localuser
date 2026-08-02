@@ -34,10 +34,12 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
     supportAnswersStatus: SupportAnswersInitial(),
     sendSupportStatus: SendSupportInitial(),
       supportFile:"",
-      overImage: false
+      overImage: false,
+    answer: false
   )) {
     on<GetSupportMessage>((event, emit) async {
-      emit(state.copyWith(newSupportStatus: SupportLoading(),newSelectedSupportPage: event.flowMeterParams.page));
+      emit(state.copyWith(newSupportStatus: state.supportStatus is SupportSuccess?
+          SupportAgainLoading():SupportLoading(),newSelectedSupportPage: event.flowMeterParams.page));
 
       DataState dataState = await supportUseCase(event.flowMeterParams);
 
@@ -141,6 +143,11 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
         emit(state.copyWith(
             newSendSupportStatus: SendSupportError(dataState.error!)));
       }
+    });
+
+    on<ChangeAnswer>((event, emit) async {
+      emit(state.copyWith(newAnswer: event.answer));
+
     });
 
   }

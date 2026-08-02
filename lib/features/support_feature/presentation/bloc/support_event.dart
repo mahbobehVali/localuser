@@ -66,3 +66,15 @@ class AddSupportImageClicked extends SupportEvent {
   // TODO: implement props
   List<Object?> get props => [];
 }
+
+class ChangeAnswer extends SupportEvent {
+   bool answer;
+
+
+   ChangeAnswer(this.answer);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [answer];
+}
+

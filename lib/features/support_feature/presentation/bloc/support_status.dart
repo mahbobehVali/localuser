@@ -16,6 +16,11 @@ class SupportLoading extends SupportStatus {
   List<Object> get props => [];
 }
 
+class SupportAgainLoading extends SupportStatus {
+  @override
+  List<Object> get props => [];
+}
+
 class SupportEmpty extends SupportStatus {
   @override
   List<Object> get props => [];
