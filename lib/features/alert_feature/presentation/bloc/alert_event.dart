@@ -106,3 +106,22 @@ class AlertDetailEvent extends AlertEvent {
   // TODO: implement props
   List<Object?> get props => [id];
 }
+
+class AlertCreateEvent extends AlertEvent {
+  final SendNewSupportParams sendNewSupportParams;
+  const AlertCreateEvent(this.sendNewSupportParams);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [sendNewSupportParams];
+}
+
+
+class ChangeAlert extends AlertEvent {
+  final int status;
+  const ChangeAlert(this.status);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [status];
+}

@@ -1,6 +1,5 @@
 library;
 
-import '../../domain/entity/alert_data_entity.dart';
 import '../../domain/entity/alert_detail_entity.dart';
 
 class AlertDetailModel extends AlertDetailEntity {

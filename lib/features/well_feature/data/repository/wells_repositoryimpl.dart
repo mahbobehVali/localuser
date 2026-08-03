@@ -7,7 +7,6 @@ import 'package:mahaliii/features/well_feature/data/model/well_work_model.dart';
 import 'package:mahaliii/features/well_feature/domain/entity/alert_count_entity.dart';
 import 'package:mahaliii/features/well_feature/domain/entity/well_flowmeter_entity.dart';
 import 'package:mahaliii/features/well_feature/domain/entity/well_work_entity.dart';
-import 'package:socket_io_client/socket_io_client.dart' as i_o;
 
 import '../../../../common/error_handling/check_exceptions.dart';
 import '../../../../common/error_handling/exceptions.dart';

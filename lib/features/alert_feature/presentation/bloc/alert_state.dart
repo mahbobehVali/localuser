@@ -17,6 +17,8 @@ class AlertState {
   final String? alertEndDate;
   final AlertFilterModel? alertFilterModel;
   final AlertDetailStatus? alertDetailStatus;
+  final AlertCreateStatus? alertCreateStatus;
+  final int? alert;
 
 
 
@@ -35,6 +37,8 @@ class AlertState {
     required this.alertEndDate,
     required this.alertFilterModel,
     required this.alertDetailStatus,
+    required this.alertCreateStatus,
+    required this.alert,
   });
 
   AlertState copyWith(
@@ -52,7 +56,9 @@ class AlertState {
         String? newAlertStartDate,
         String? newAlertEndDate,
         AlertFilterModel? newAlertFilterModel,
-        AlertDetailStatus? newAlertDetailStatus
+        AlertDetailStatus? newAlertDetailStatus,
+        AlertCreateStatus? newAlertCreateStatus,
+        int? newAlert
 
       }) {
     return AlertState(
@@ -71,7 +77,9 @@ class AlertState {
       alertStartDate: newAlertStartDate??alertStartDate,
       alertEndDate: newAlertEndDate??alertEndDate,
       alertFilterModel: newAlertFilterModel??alertFilterModel,
-      alertDetailStatus: newAlertDetailStatus?? alertDetailStatus
+      alertDetailStatus: newAlertDetailStatus?? alertDetailStatus,
+      alertCreateStatus: newAlertCreateStatus??alertCreateStatus,
+      alert: newAlert??alert
 
     );
   }

@@ -1,7 +1,4 @@
-import 'package:collection/collection.dart'; // 1. این پکیج را ایمپورت کنید
 import 'package:equatable/equatable.dart';
-import 'package:mahaliii/features/status_summary_feature/domain/entity/wells_entity.dart';
-import 'package:mahaliii/features/support_feature/domain/entity/support_entity.dart';
 
 import '../../domain/entity/support_answer_entity.dart';
 abstract class SupportAnswersStatus extends Equatable {

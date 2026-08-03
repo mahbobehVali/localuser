@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mahaliii/common/utils/use_case.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/repository/status_summary_repository.dart';
@@ -14,7 +15,6 @@ import '../../../domain/usecase/report_flowmeter_usecase.dart';
 import '../../../domain/usecase/wells_list_usecase.dart';
 import 'last_activity_status.dart';
 import 'status_summary_status.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
 
 part 'status_summary_event.dart';
 part 'status_summary_state.dart';

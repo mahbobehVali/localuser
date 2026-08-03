@@ -47,8 +47,8 @@ class BottomNavWidget extends StatelessWidget {
             BoxShadow(offset: Offset(0, 1),blurRadius: 5,color: Color(0xffDDDDDD))
           ]),
           child: BottomAppBar(
-            padding: EdgeInsets.only(right: 10.w),
-            height: 44.h,
+            padding: EdgeInsets.only(right: 10.w,bottom: 4.h,top: 4.h),
+            // height: 44.h,
             color: Colors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -60,12 +60,13 @@ class BottomNavWidget extends StatelessWidget {
 
                       children: [
                         SizedBox(
-                            child: Image.asset(bottomNavItems[index]["icon"],color: state==index?ColorPalette.darkBlue:Colors.black)),
+                            child: Image.asset(bottomNavItems[index]["icon"],
+                                color: state==index?ColorPalette.darkBlue:Colors.black)),
                         SizedBox(height: 6.h,),
                         Text(bottomNavItems[index]["title"],
-                          textAlign: TextAlign.center,style: TextStyle(
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
                           color: state==index?ColorPalette.darkBlue:Colors.black,
-                          fontFamily:"IRANYekan",
                           fontWeight: FontWeight.w500
 
                         ),)

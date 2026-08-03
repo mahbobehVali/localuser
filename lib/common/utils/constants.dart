@@ -91,9 +91,23 @@ class Constants {
 
   ];
 
+
+  List<dynamic> alertCrete = [
+    {
+      "title":"در حال بررسی",
+      "status":1
+
+    },
+    {
+      "title": "رفع شده",
+      "status": 2
+    }
+
+  ];
+
   List<dynamic> rowSupport = [
     {
-      "title":"پشتیبانی  دستگاه",
+      "title":"پشتیبانی دستگاه",
       "icon":Icon(Icons.contact_support_outlined),
       "part":5
 

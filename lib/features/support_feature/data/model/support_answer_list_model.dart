@@ -1,8 +1,6 @@
 
 import 'package:mahaliii/features/support_feature/domain/entity/support_answer_list_entity.dart';
 
-import '../../domain/entity/support_data_entity.dart';
-
 class SupportAnswerListModel extends SupportAnswerListEntity {
   SupportAnswerListModel({
 

@@ -7,16 +7,19 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mahaliii/common/params/flowmeter_params.dart';
 import 'package:mahaliii/common/utils/constants.dart';
+import 'package:mahaliii/features/support_feature/domain/usecase/send_answer_usecase.dart';
 import 'package:mahaliii/features/support_feature/domain/usecase/send_support_usecase.dart';
 import 'package:mahaliii/features/support_feature/domain/usecase/support_answers_usecase.dart';
+import 'package:mahaliii/features/support_feature/domain/usecase/support_close_usecase.dart';
 import 'package:mahaliii/features/support_feature/domain/usecase/support_usecase.dart';
+import 'package:mahaliii/features/support_feature/presentation/bloc/send_answer_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/send_support_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_answers_status.dart';
+import 'package:mahaliii/features/support_feature/presentation/bloc/support_close_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_status.dart';
 
 import '../../../../common/params/send_new_request_to_support_params.dart';
 import '../../../../common/utils/data_state.dart';
-import '../../../../common/utils/use_case.dart';
 import '../../../alert_feature/domain/entity/alert_type_entity.dart';
 
 part 'support_event.dart';
@@ -26,7 +29,9 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
   SupportUseCase supportUseCase;
   SupportAnswersUseCase supportAnswersUseCase;
   SendSupportUseCase sendSupportUseCase;
-  SupportBloc(this.supportUseCase,this.supportAnswersUseCase,this.sendSupportUseCase) : super(SupportState(
+  SendAnswerUseCase sendAnswer;
+  SupportCloseUseCase supportCloseUseCase;
+  SupportBloc(this.supportUseCase,this.supportAnswersUseCase,this.sendSupportUseCase,this.sendAnswer,this.supportCloseUseCase) : super(SupportState(
     supportStatus: SupportInitial(),
     selectedSupportPage: 1,
     selectedSupportStatus: 0,
@@ -35,7 +40,9 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
     sendSupportStatus: SendSupportInitial(),
       supportFile:"",
       overImage: false,
-    answer: false
+    answer: false,
+    sendAnswerStatus: SendAnswerInitial(),
+    supportCloseStatus: SupportCloseInitial()
   )) {
     on<GetSupportMessage>((event, emit) async {
       emit(state.copyWith(newSupportStatus: state.supportStatus is SupportSuccess?
@@ -145,9 +152,39 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
       }
     });
 
+    on<SendAnswer>((event, emit) async {
+      emit(state.copyWith(newSendAnswerStatus: SendAnswerLoading()));
+      DataState dataState =
+      await sendAnswer(event.sendNewRequestToSupportParams);
+      if (dataState is DataSuccess) {
+        emit(state.copyWith(newSendAnswerStatus: const SendAnswerSuccess()));
+        add(GetSupportAnswers(event.sendNewRequestToSupportParams.id!));
+
+      }
+      if (dataState is DataFailed) {
+        emit(state.copyWith(
+            newSendAnswerStatus: SendAnswerError(dataState.error!)));
+      }
+    });
+
+
     on<ChangeAnswer>((event, emit) async {
       emit(state.copyWith(newAnswer: event.answer));
 
+    });
+
+    on<SupportClose>((event, emit) async {
+      emit(state.copyWith(newSupportCloseStatus: SupportCloseLoading()));
+      DataState dataState =
+      await supportCloseUseCase(event.id);
+      if (dataState is DataSuccess) {
+        emit(state.copyWith(newSupportCloseStatus: const SupportCloseSuccess()));
+
+      }
+      if (dataState is DataFailed) {
+        emit(state.copyWith(
+            newSupportCloseStatus: SupportCloseError(dataState.error!)));
+      }
     });
 
   }

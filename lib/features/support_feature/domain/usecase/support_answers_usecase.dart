@@ -1,6 +1,4 @@
 
-import 'package:mahaliii/common/params/flowmeter_params.dart';
-
 import '../../../../common/utils/data_state.dart';
 import '../../../../common/utils/use_case.dart';
 import '../repository/support_repository.dart';

@@ -1,13 +1,10 @@
 
-import 'package:mahaliii/features/alert_feature/data/model/alert_meta_model.dart';
 import 'package:mahaliii/features/support_feature/data/model/support_answer_list_model.dart';
 import 'package:mahaliii/features/support_feature/data/model/support_data_model.dart';
 
-import '../../../alert_feature/domain/entity/alert_meta_entity.dart';
 import '../../domain/entity/support_answer_entity.dart';
 import '../../domain/entity/support_answer_list_entity.dart';
 import '../../domain/entity/support_data_entity.dart';
-import '../../domain/entity/support_entity.dart';
 
 class SupportAnswerModel extends SupportAnswerEntity {
   SupportAnswerModel({

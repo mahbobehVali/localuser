@@ -1,5 +1,5 @@
 
-import 'package:mahaliii/features/report_feature/domain/entity/capacity_list_entity.dart';
+
 
 class SupportDataEntity {
   // "payvast": "file-1785158272521-623217533.jpg",

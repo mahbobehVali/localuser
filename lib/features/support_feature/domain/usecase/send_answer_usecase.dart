@@ -5,15 +5,15 @@ import '../../../../common/utils/data_state.dart';
 import '../../../../common/utils/use_case.dart';
 import '../repository/support_repository.dart';
 
-class SendSupportUseCase extends UseCase<DataState<dynamic>, SendNewSupportParams> {
+class SendAnswerUseCase extends UseCase<DataState<dynamic>, SendNewSupportParams> {
   SupportRepository supportRepository;
 
-  SendSupportUseCase(this.supportRepository);
+  SendAnswerUseCase(this.supportRepository);
 
   // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
 
   @override
   Future<DataState> call(sendNewSupportParams) {
-    return supportRepository.sendSupport(sendNewSupportParams);
+    return supportRepository.sendAnswer(sendNewSupportParams);
   }
 }

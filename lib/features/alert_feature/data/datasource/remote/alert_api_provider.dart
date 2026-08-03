@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:mahaliii/common/params/send_new_request_to_support_params.dart';
 
 import '../../../../../common/error_handling/check_exceptions.dart';
 import '../../../../../common/params/alert_filter_params.dart';
@@ -42,6 +43,30 @@ class AlertApiProvider {
 
       return response;
     } on DioException catch (e) {
+
+      if (e.type == DioExceptionType.connectionError) {
+        print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");
+      }
+
+      return CheckExceptions.response(e.response);
+    }
+  }
+
+  Future<dynamic> alertCreate(SendNewSupportParams sendNewSupportParams) async {
+    try {
+      var response = await dio.post(
+        "alert/create",
+        data: {
+          "status":sendNewSupportParams.status,
+          "message":sendNewSupportParams.description,
+          "id":sendNewSupportParams.id,
+        }
+      );
+
+      return response;
+    } on DioException catch (e) {
+      print(e.response);
+      print(e.response?.statusCode);
 
       if (e.type == DioExceptionType.connectionError) {
         print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");

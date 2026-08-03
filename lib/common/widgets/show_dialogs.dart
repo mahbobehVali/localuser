@@ -710,7 +710,6 @@ class ShowDialogs {
                     // پاک کردن اسنک‌بارهای قبلی
                     ScaffoldMessenger.of(context).clearSnackBars();
 
-                    // نمایش اسنک‌بار سبز موفقیت
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("دستور با موفقیت به پمپ ارسال شد"),
@@ -723,14 +722,12 @@ class ShowDialogs {
                     Navigator.of(dialogContext).pop();
                   }
 
-                  // 💡 ۲. در صورت خطا یا تایم‌اوت
                   if (state.onOffStatus is OnOffError) {
                     final errorState = state.onOffStatus as OnOffError;
 
                     // پاک کردن اسنک‌بارهای قبلی
                     ScaffoldMessenger.of(context).clearSnackBars();
 
-                    // نمایش اسنک‌بار قرمز خطا
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(errorState.error),
@@ -748,16 +745,8 @@ class ShowDialogs {
 
                   return AlertDialog(
                     content: SizedBox(
-                      height: 120.h,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text("آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟"),
-
-
-                        ],
-                      ),
+                      height: 100.h,
+                      child: Text("آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟"),
                     ),
                     actions: [
                       // اگر در حال دریافت پاسخ هستیم، تایمر ۶۰ ثانیه‌ای را نشان بده

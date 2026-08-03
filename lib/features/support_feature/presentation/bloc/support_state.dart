@@ -12,6 +12,8 @@ class SupportState {
   final String supportFile;
   final bool overImage;
    bool answer;
+  final SendAnswerStatus sendAnswerStatus;
+  final SupportCloseStatus supportCloseStatus;
 
   SupportState({
 
@@ -24,6 +26,8 @@ class SupportState {
     required this.supportFile,
     required this.overImage,
     required this.answer,
+    required this.sendAnswerStatus,
+    required this.supportCloseStatus,
   });
 
   SupportState copyWith(
@@ -36,7 +40,9 @@ class SupportState {
         SendSupportStatus? newSendSupportStatus,
         String? newSupportFile,
         bool? newOverImage,
-        bool? newAnswer
+        bool? newAnswer,
+        SendAnswerStatus? newSendAnswerStatus,
+        SupportCloseStatus? newSupportCloseStatus
 
       }) {
     return SupportState(
@@ -48,7 +54,9 @@ class SupportState {
       sendSupportStatus: newSendSupportStatus??sendSupportStatus,
       supportFile: newSupportFile??supportFile,
       overImage: newOverImage??overImage,
-      answer: newAnswer??answer
+      answer: newAnswer??answer,
+      sendAnswerStatus: newSendAnswerStatus??sendAnswerStatus,
+      supportCloseStatus: newSupportCloseStatus??supportCloseStatus
 
 
     );

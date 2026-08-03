@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:mahaliii/common/params/send_new_request_to_support_params.dart';
 import 'package:mahaliii/features/alert_feature/data/model/alert_detail_model.dart';
 import 'package:mahaliii/features/alert_feature/data/model/alerts_model.dart';
 import 'package:mahaliii/features/alert_feature/domain/entity/alert_detail_entity.dart';
@@ -44,6 +45,19 @@ class AlertRepositoryImpl extends AlertRepository {
 
         return DataSuccess(alertEntity);
 
+
+    } on AppException catch (e) {
+      return CheckExceptions.getError(e);
+    }
+  }
+
+  @override
+  Future<DataState<dynamic>> alertCreate(SendNewSupportParams sendNewSupportParams) async {
+    try {
+print("api");
+      Response response = await alertApiProvider.alertCreate(sendNewSupportParams);
+
+      return DataSuccess(response.data);
 
     } on AppException catch (e) {
       return CheckExceptions.getError(e);

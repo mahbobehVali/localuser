@@ -15,6 +15,7 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/widgets/program_widget.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
+
 import '../../../../common/utils/constants.dart';
 import '../../../../common/widgets/global_snackbar.dart';
 import '../../../../common/widgets/icon_container.dart';
@@ -661,8 +662,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                 print("fingerStatus$fingerStatus");
 
                                 // بررسی اینکه آیا فرآیند در حال اجراست یا خیر
-                                final bool isLoading = fingerStatus is FingerLoading ||
-                                    fingerStatus is FingerRequestAccepted;
+                                // final bool isLoading = fingerStatus is FingerLoading ||
+                                //     fingerStatus is FingerRequestAccepted;
 
                                 // ۱. حالت موفقیت‌آمیز
                                 if (fingerStatus is FingerSuccess) {
@@ -781,6 +782,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                   },
 
                                   child: CupertinoSwitch(
+
                                     value: state.isSwitched!,
                                     onChanged: (value) {
 

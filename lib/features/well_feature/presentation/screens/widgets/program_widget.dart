@@ -49,33 +49,31 @@ class Program extends StatelessWidget {
                         width: 24,
                         height: 24,
                       ),
-                      SizedBox(width: 8),
+                      SizedBox(width: 6.w),
 
                       Text("برنامه‌ریزی هفتگی پمپ"),
                     ],
                   ),
                   SizedBox(width: 8),
-                  Expanded(
-                    child: Builder(
-                      builder: (context) {
-                        return GlobalElevatedButton(
-                          widget: Text(
-                            "ایجاد زمانبندی جدید",
-                            style: TextStyle(color: Colors.black),
-                          ),
-                          backColor: ColorPalette.darkBlue,
-                          onTap: () {
-                            ShowDialogs().newTimeCreate(
-                              context: context,
-                              wellDetailBloc: BlocProvider.of<WellDetailBloc>(context,),
-                              wellsDataEntity: wellsDataEntity,
-                              programDayEntity: getProgramSuccess.programDayEntity
+                  Builder(
+                    builder: (context) {
+                      return GlobalElevatedButton(
+                        widget: Text(
+                          "ثبت زمان جدید",
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        backColor: ColorPalette.darkBlue,
+                        onTap: () {
+                          ShowDialogs().newTimeCreate(
+                            context: context,
+                            wellDetailBloc: BlocProvider.of<WellDetailBloc>(context,),
+                            wellsDataEntity: wellsDataEntity,
+                            programDayEntity: getProgramSuccess.programDayEntity
 
-                            );
-                          },
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               ),

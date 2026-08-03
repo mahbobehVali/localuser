@@ -52,4 +52,33 @@ class SupportApiProvider {
     }
   }
 
+  Future<dynamic> sendAnswer(SendNewSupportParams sendNewSupportParams) async {
+
+    try {
+      final response = await dio.post("support/answer",
+      data: {
+        "support_id":sendNewSupportParams.id,
+        "description":sendNewSupportParams.description,
+         if(sendNewSupportParams.payVast!=null) "file":sendNewSupportParams.payVast,
+        "status":2
+      });
+      return response;
+    } on DioException catch (e) {
+      return CheckExceptions.response(e.response);
+    }
+  }
+
+  Future<dynamic> supportClose(int id) async {
+
+    try {
+      final response = await dio.post("support/close",
+      data: {
+        "support_id":id,
+      });
+      return response;
+    } on DioException catch (e) {
+      return CheckExceptions.response(e.response);
+    }
+  }
+
 }

@@ -84,7 +84,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
             return statusSummaryBloc;
           },
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

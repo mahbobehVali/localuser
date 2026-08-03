@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mahaliii/common/params/create_time_params.dart';
 import 'package:mahaliii/common/params/flowmeter_params.dart';
@@ -12,6 +13,7 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/week_well_work_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_screen_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_status.dart';
+
 import '../../../../../common/utils/data_state.dart';
 import '../../../../../common/utils/use_case.dart';
 import '../../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
@@ -22,8 +24,6 @@ import 'create_time_status.dart';
 import 'finger_status.dart';
 import 'get_program_status.dart';
 import 'on_off_status.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
-
 
 part 'well_detail_event.dart';
 part 'well_detail_state.dart';

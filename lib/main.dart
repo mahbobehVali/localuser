@@ -105,7 +105,7 @@ class _MyAppState extends State<MyApp> {
 
                 ),
               )),
-              themeMode: ThemeMode.system, // هماهنگی خودکار با سیستم‌عامل کاربر
+                themeMode: ThemeMode.system, // هماهنگی خودکار با سیستم‌عامل کاربر
 
                 localizationsDelegates: const [
                 // Add Localization

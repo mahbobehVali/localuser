@@ -2,8 +2,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:mahaliii/features/alert_feature/domain/entity/alert_detail_entity.dart';
 
-import '../../domain/entity/alerts_entity.dart';
-
 sealed class AlertDetailStatus extends Equatable {
   const AlertDetailStatus();
 }

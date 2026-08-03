@@ -3,17 +3,20 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mahaliii/common/params/alert_filter_params.dart';
 import 'package:mahaliii/common/utils/constants.dart';
-import 'package:mahaliii/features/alert_feature/domain/entity/alert_type_entity.dart';
 import 'package:mahaliii/features/alert_feature/domain/entity/alert_filter_model.dart';
+import 'package:mahaliii/features/alert_feature/domain/entity/alert_type_entity.dart';
+import 'package:mahaliii/features/alert_feature/domain/usecase/alert_create_usecase.dart';
 import 'package:mahaliii/features/alert_feature/domain/usecase/alert_detail_usecase.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/area_usecase.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/region_usecase.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/usecase/wells_list_usecase.dart';
 
+import '../../../../common/params/send_new_request_to_support_params.dart';
 import '../../../../common/utils/data_state.dart';
 import '../../../../common/utils/use_case.dart';
 import '../../../status_summary_feature/domain/entity/wells_entity.dart';
 import '../../domain/usecase/alert_usecase.dart';
+import 'alert_create_status.dart';
 import 'alert_detail_status.dart';
 import 'alert_status.dart';
 import 'alert_well_list_status.dart';
@@ -27,8 +30,9 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
   AreaUseCase areaUseCase;
   WellsListUseCase wellsListUseCase;
   AlertDetailUseCase alertDetailUseCase;
+  AlertCreateUseCase alertCreateUseCase;
   AlertBloc(this.alertUseCase,this.regionUseCase,this.areaUseCase,this.wellsListUseCase,
-      this.alertDetailUseCase) : super(AlertState(
+      this.alertDetailUseCase,this.alertCreateUseCase) : super(AlertState(
       alertStatus: AlertLoading(),selectedAlertPage: 1,
     wellName: "",
     date: "",
@@ -41,7 +45,9 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
     alertStartDate: "",
     alertEndDate: "",
     alertFilterModel: AlertFilterModel(),
-    alertDetailStatus: AlertDetailInitial()
+    alertDetailStatus: AlertDetailInitial(),
+    alertCreateStatus: AlertCreateInitial(),
+    alert: null
 
   )) {
     on<AlertStart>((event, emit) async {
@@ -114,6 +120,7 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
     });
 
     on<AlertDetailEvent>((event, emit) async {
+      print("ffff");
 
       emit(state.copyWith(newAlertDetailStatus: AlertDetailLoading()));
       DataState dataState = await alertDetailUseCase(event.id);
@@ -127,6 +134,49 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
       if (dataState is DataFailed) {
         emit(state.copyWith(newAlertDetailStatus: AlertDetailError(dataState.error!)));
       }
+    });
+
+    on<AlertCreateEvent>((event, emit) async {
+      print("bloc");
+
+      emit(state.copyWith(newAlertCreateStatus: AlertCreateLoading()));
+
+      DataState dataState = await alertCreateUseCase(event.sendNewSupportParams);
+
+      if (dataState is DataSuccess) {
+        // چک کردن نال نبودن برای جلوگیری از کرش
+        final detailId = event.sendNewSupportParams.id;
+
+        if (detailId != null) {
+          // مستقیم UseCase دوم را اجرا می‌کنیم
+          DataState detailDataState = await alertDetailUseCase(detailId);
+
+          if (detailDataState is DataSuccess) {
+            emit(state.copyWith(
+              newAlertCreateStatus: AlertCreateSuccess(),
+              newAlertDetailStatus: AlertDetailSuccess(detailDataState.data),
+            ));
+          } else {
+            // مدیریت خطای جزئیات
+            emit(state.copyWith(
+              newAlertCreateStatus: AlertCreateSuccess(),
+              newAlertDetailStatus: AlertDetailError(detailDataState.error!),
+            ));
+          }
+        } else {
+          emit(state.copyWith(newAlertCreateStatus: AlertCreateSuccess()));
+        }
+      }
+
+      if (dataState is DataFailed) {
+        emit(state.copyWith(newAlertCreateStatus: AlertCreateError(dataState.error!)));
+      }
+    });
+
+    on<ChangeAlert>((event, emit) async {
+
+      emit(state.copyWith(newAlert: event.status));
+
     });
   }
 }

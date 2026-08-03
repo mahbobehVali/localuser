@@ -48,6 +48,16 @@ class SendNewSupportClicked extends SupportEvent {
   List<Object?> get props => [];
 }
 
+class SendAnswer extends SupportEvent {
+  SendNewSupportParams sendNewRequestToSupportParams;
+
+  SendAnswer(this.sendNewRequestToSupportParams);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
 class AddSupportFileClicked extends SupportEvent {
 
 
@@ -76,5 +86,15 @@ class ChangeAnswer extends SupportEvent {
   @override
   // TODO: implement props
   List<Object?> get props => [answer];
+}
+
+class SupportClose extends SupportEvent {
+  int id;
+
+  SupportClose(this.id);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [id];
 }
 

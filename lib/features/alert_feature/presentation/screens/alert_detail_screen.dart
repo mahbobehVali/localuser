@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/common/widgets/global_snackbar.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
+
+import 'package:mahaliii/common/params/send_new_request_to_support_params.dart';
+import 'package:mahaliii/common/utils/constants.dart';
 import 'package:mahaliii/common/widgets/global_elevated_button.dart';
 import 'package:mahaliii/common/widgets/icon_container.dart';
-import 'package:mahaliii/features/alert_feature/presentation/bloc/alert_detail_status.dart';
-import 'package:persian_number_utility/persian_number_utility.dart';
-import 'package:persian_number_utility/persian_number_utility.dart';
+import 'package:mahaliii/config/color_palette.dart';
+import 'package:mahaliii/config/texts_style.dart';
+import 'package:mahaliii/locator.dart';
 
-import '../../../../config/color_palette.dart';
-import '../../../../config/texts_style.dart';
-import '../../../../locator.dart';
-import '../../../sign_up_feature/domain/usecase/area_usecase.dart';
-import '../../../sign_up_feature/domain/usecase/region_usecase.dart';
-import '../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
-import '../../domain/entity/alert_data_entity.dart';
-import '../../domain/usecase/alert_detail_usecase.dart';
-import '../../domain/usecase/alert_usecase.dart';
-import '../bloc/alert_bloc.dart';
+import 'package:mahaliii/features/alert_feature/domain/entity/alert_data_entity.dart';
+import 'package:mahaliii/features/alert_feature/domain/usecase/alert_create_usecase.dart';
+import 'package:mahaliii/features/alert_feature/domain/usecase/alert_detail_usecase.dart';
+import 'package:mahaliii/features/alert_feature/domain/usecase/alert_usecase.dart';
+import 'package:mahaliii/features/alert_feature/presentation/bloc/alert_bloc.dart';
+import 'package:mahaliii/features/alert_feature/presentation/bloc/alert_create_status.dart';
+import 'package:mahaliii/features/alert_feature/presentation/bloc/alert_detail_status.dart';
+import 'package:mahaliii/features/sign_up_feature/domain/usecase/area_usecase.dart';
+import 'package:mahaliii/features/sign_up_feature/domain/usecase/region_usecase.dart';
+import 'package:mahaliii/features/status_summary_feature/domain/usecase/wells_list_usecase.dart';
 
 class AlertDetailScreen extends StatelessWidget {
-  const AlertDetailScreen({super.key,required this.alertDataEntity});
+   AlertDetailScreen({super.key,required this.alertDataEntity});
   final AlertDataEntity alertDataEntity;
+  final TextEditingController createController= TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +38,7 @@ class AlertDetailScreen extends StatelessWidget {
           locator<AreaUseCase>(),
           locator<WellsListUseCase>(),
           locator<AlertDetailUseCase>(),
+          locator<AlertCreateUseCase>(),
         );
         alertBloc.add(AlertDetailEvent(alertDataEntity.id!));
         return alertBloc;
@@ -167,30 +174,39 @@ class AlertDetailScreen extends StatelessWidget {
                                         "لطفا وضعیت هشدار را در هر مرحله کار مشخص کنید و همراه آن توضیحی ارسال فرمایید.",
                                       ),
                                       SizedBox(height: 8.h),
-                                      Row(
-                                        children: List.generate(2, (index) {
-                                          Color color=index==0? ColorPalette.orange:ColorPalette.darkGreen;
-                                          return Expanded(
-                                            child: Container(
-                                              padding: EdgeInsets.all(8),
-                                              margin: EdgeInsets.all(8),
-                                              decoration: BoxDecoration(
-                                                  // color: ColorPalette.darkBlue,
-                                                  borderRadius: BorderRadius.circular(5),
-                                                  border: BoxBorder.all(color:color)
-                                              ),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                children: [
-                                                  Icon(Icons.circle_outlined,color: color,size: 14.sp),
-                                                  Text(index==0?"در حال بررسی":"رفع هشدار",
-                                                  style: TextStyle(color: color),)
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },)
-                                      ),
+                                      BlocBuilder<AlertBloc,AlertState>(builder: (context, state) {
+                                        return Row(
+                                            children: List.generate(2, (index) {
+                                              Color color=index==0? ColorPalette.orange:ColorPalette.darkGreen;
+                                              return Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    BlocProvider.of<AlertBloc>(context).add(ChangeAlert(Constants().alertCrete[index]["status"]));
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(8),
+                                                    margin: EdgeInsets.all(8),
+                                                    decoration: BoxDecoration(
+                                                      // color: ColorPalette.darkBlue,
+                                                        borderRadius: BorderRadius.circular(5),
+                                                        border: BoxBorder.all(color:color)
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                      children: [
+                                                        Icon(Constants().alertCrete[index]["status"]==state.alert?
+                                                        Icons.circle:
+                                                        Icons.circle_outlined,color: color,size: 14.sp),
+                                                        Text(Constants().alertCrete[index]["title"],
+                                                          style: TextStyle(color: color),)
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },)
+                                        );
+                                      },),
                                     ],
                                   ),
                                 ),
@@ -225,8 +241,7 @@ class AlertDetailScreen extends StatelessWidget {
                           return IntrinsicHeight( // ۱. این ویجت باعث هم‌ارتفاع شدن ستون‌های چپ و راست می‌شود
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
-                              // crossAxisAlignment: CrossAxisAlignment.end,
-                              // crossAxisAlignment: CrossAxisAlignment.stretch, // ۲. کشیده شدن عمودی
+
                               children: [
                                 Row(
                                   children: [
@@ -303,7 +318,68 @@ class AlertDetailScreen extends StatelessWidget {
 
                   }
 
-                ))
+                )),
+              BlocConsumer<AlertBloc, AlertState>(
+
+                 listener: (context, state) {
+                   if(state.alertCreateStatus is AlertCreateSuccess){
+                     GlobalSnackBar.show(context, message: "ارسال شد");
+                   }
+                   if(state.alertCreateStatus is AlertCreateError){
+                     GlobalSnackBar.show(context, message: "خطایی رخ داده");
+                   }
+
+                 },
+                  builder: (context, state) {
+                    return Row(
+                children: [
+                  Expanded(child: SizedBox(
+                    height: 40.h,
+                    child: TextFormField(
+                      controller:createController ,
+                      maxLines: 2,
+                      decoration: InputDecoration(
+                        suffixIcon: SizedBox(
+                          width: 90.w,
+                          height: double.infinity,
+                          child: ValueListenableBuilder<TextEditingValue>(
+                            valueListenable: createController,
+                            builder: (context, value, child) {
+                              return GlobalElevatedButton(widget:
+                              state.alertCreateStatus is AlertCreateLoading
+                                  ?
+                              Center(child: CircularProgressIndicator(),)
+                                  : Text(
+                                "ارسال",
+                                style: TextStyle(color: ColorPalette.white),),
+                                backColor: ColorPalette.darkBlue,
+                                onTap:
+                                createController.text.isEmpty ||
+                                    state.alert == null ? null :
+                                    () {
+                                      print("sffdf");
+                                      BlocProvider.of<AlertBloc>(context).add(
+                                          AlertCreateEvent(SendNewSupportParams(
+                                              status: state.alert,
+                                              description: createController.text,
+                                            id: alertDataEntity.id
+                                          )));
+                                    }
+
+                              );
+
+                            }
+                          ),
+                        )
+                      ),
+
+                    ),
+                  )),
+
+                ],
+              );
+            },
+          )
 
             ],
           ),
