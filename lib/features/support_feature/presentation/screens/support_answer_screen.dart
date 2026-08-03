@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/common/utils/constants.dart';
+import 'package:mahaliii/common/widgets/download_image.dart';
 import 'package:mahaliii/common/widgets/global_elevated_button.dart';
+import 'package:mahaliii/common/widgets/icon_container.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/support_feature/domain/entity/support_answer_list_entity.dart';
@@ -9,12 +14,16 @@ import 'package:mahaliii/features/support_feature/domain/entity/support_data_ent
 import 'package:mahaliii/features/support_feature/domain/usecase/send_support_usecase.dart';
 import 'package:mahaliii/features/support_feature/domain/usecase/support_answers_usecase.dart';
 import 'package:mahaliii/features/support_feature/domain/usecase/support_usecase.dart';
+import 'package:mahaliii/features/support_feature/presentation/bloc/send_answer_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_answers_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_bloc.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_close_status.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/params/send_new_request_to_support_params.dart';
+import '../../../../common/widgets/bottom_sheets.dart';
+import '../../../../common/widgets/global_snackbar.dart';
+import '../../../../common/widgets/image_converter.dart';
 import '../../../../locator.dart';
 import '../../domain/usecase/send_answer_usecase.dart';
 import '../../domain/usecase/support_close_usecase.dart';
@@ -82,7 +91,13 @@ class SupportAnswerScreen extends StatelessWidget {
                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                                            children: [
-                                             Text(supportAnswersSuccess.supportAnswerEntity.user!),
+                                             Row(
+                                               children: [
+                                                 IconContainer(icon: Icon(Icons.person_2_outlined), color: ColorPalette.lightBlue,),
+                                                 SizedBox(width: 5.w,),
+                                                 Text(supportAnswersSuccess.supportAnswerEntity.user!),
+                                               ],
+                                             ),
                                              Text("${supportDataEntity.clock!.toString().toPersianDigit()}     ${supportDataEntity.date!.toString().toPersianDigit()}"),
                                              // Expanded(child: Text(supportDataEntity.date!)),
                                            ],
@@ -116,18 +131,8 @@ class SupportAnswerScreen extends StatelessWidget {
                                          ),
                                          SizedBox(height: 8,),
 
-                                         Container(
-                                           width: double.infinity,
-                                           padding: EdgeInsets.all(8),
-                                           decoration: BoxDecoration(
-                                               borderRadius: BorderRadius.circular(4),
-
-                                               border: BoxBorder.all(color: ColorPalette.inverseGrey)
-                                           ),
-                                           //https://abyarinovin.ir/uploads/support/file-1785157876168-204219303.jpg
-                                           child: Center(child: Text("فایل پیوست شده")),
-
-                                         )
+                                        supportDataEntity.payvast==null?SizedBox():
+                                        PayvastSupportFile(url: "${Constants.baseUrl}uploads/support/${supportDataEntity.payvast}")
                                        ],
                                      );
 
@@ -147,24 +152,26 @@ class SupportAnswerScreen extends StatelessWidget {
                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                                                children: [
-                                                 Text(supportAnswerListEntity.name??"نامشخص"),
+                                                 Row(
+                                                   children: [
+                                                     IconContainer(icon: Icon(Icons.contact_support_outlined), color: ColorPalette.lightBlue,),
+                                                     SizedBox(width: 5.w,),
+                                                     Text(supportAnswerListEntity.name??"نامشخص"),
+                                                   ],
+                                                 ),
                                                  Text("${supportAnswerListEntity.clock!.toString().toPersianDigit()}     ${supportAnswerListEntity.date!.toString().toPersianDigit()}"),
                                                  // Expanded(child: Text(supportDataEntity.date!)),
                                                ],
                                              ),
                                              SizedBox(height: 8,),
-                                             Container(
-                                               width: double.infinity,
-
-                                               padding: EdgeInsets.all(8),
-                                               decoration: BoxDecoration(
-                                                   borderRadius: BorderRadius.circular(4),
-
-                                                   border: BoxBorder.all(color: ColorPalette.inverseGrey)
-                                               ),
-                                               child: Text(supportAnswerListEntity.description!),
-
+                                             ExpandableText(
+                                               text: supportDataEntity.description??"",
+                                               maxChars: 200,
                                              ),
+                                             SizedBox(height: 8,),
+
+                                             supportAnswerListEntity.payvast==null?SizedBox():
+                                             PayvastSupportFile(url: "${Constants.baseUrl}uploads/support/${supportDataEntity.payvast}")
 
                                            ],
                                          ),
@@ -183,86 +190,137 @@ class SupportAnswerScreen extends StatelessWidget {
                      ),
                      SizedBox(height: 20.h),
                      BlocBuilder<SupportBloc, SupportState>(builder: (context, state) {
-                       print("ff");
                        return state.answer
-                           ? Container(
-                         width: double.infinity,
-                         decoration: BoxDecoration(
-                           border: Border.all(), // اصلاح کوچک: Border.all بجای BoxBorder.all
-                         ),
-                         child: Padding(
-                           padding: const EdgeInsets.all(8.0),
-                           child: Row(
-                             children: [
-                               Expanded(
-                                 child: TextFormField(
-                                   controller: answerController,
-                                   decoration: const InputDecoration(
-                                     hintText: "پیام خود را بنویسید",
-                                     border: InputBorder.none,
-                                     focusedBorder: InputBorder.none,
-                                     enabledBorder: InputBorder.none,
-                                     errorBorder: InputBorder.none,
-                                     disabledBorder: InputBorder.none,
+                           ? BlocConsumer<SupportBloc, SupportState>(builder: (context, state) {
+                             return Row(
+                               children: [
+                                 Expanded(
+                                   child: SizedBox(
+                                     height: 40.h,
+
+                                     child: TextFormField(
+                                       maxLines: 2,
+                                       controller: answerController,
+                                       decoration: InputDecoration(
+                                         prefixIcon:  BlocConsumer<SupportBloc, SupportState>(
+                                           listener: (context, state) {
+                                             if(state.overImage==true) {
+                                               GlobalSnackBar.show(context, message: "حجم فایل بیشتر از یک مگابایت نباشد.");
+                                             }
+                                           },
+                                           listenWhen: (previous, current) => state.overImage==true,
+                                           buildWhen: (previous, current) =>
+                                           previous.supportFile != current.supportFile ||
+                                           previous.overImage != current.overImage,
+                                           builder: (context, state) {
+                                             // print("file${state.supportFile}");
+                                             // print("state.overImage${state.overImage}");
+                                             return GestureDetector(onTap: () {
+                                               BottomSheets().imageSupport(context, BlocProvider.of<SupportBloc>(context));
+                                             }, child: _buildImageContent(state.supportFile,state.overImage));
+                                           },
+                                         ),
+
+
+                                         suffixIcon: SizedBox(
+                                           width: 90.w,
+                                           height: double.infinity,
+                                           child: ValueListenableBuilder<TextEditingValue>(
+                                             valueListenable: answerController,
+                                             builder: (context, value, child) {
+                                               final isTextEmpty = value.text.trim().isEmpty;
+
+
+                                               return  GlobalElevatedButton(
+                                                 widget:state.sendAnswerStatus is SendAnswerLoading?
+                                                 Center(child: CircularProgressIndicator(),): Text(
+                                                   "ارسال",
+                                                   style: TextStyle(color: ColorPalette.white),
+                                                 ),
+                                                 backColor: ColorPalette.darkBlue,
+                                                 onTap: isTextEmpty
+                                                     ? null
+                                                     : () async {
+                                                   dynamic file = await ImageConverter.getMultiPart(
+                                                       state.supportFile,
+                                                       state.supportFile.split("/").last);
+
+
+                                                   BlocProvider.of<SupportBloc>(context).add(
+                                                     SendAnswer(
+                                                         SendNewSupportParams(
+                                                             description: answerController.text,
+                                                             id: supportDataEntity.id,
+                                                             payVast:file
+                                                         )
+                                                     ),
+                                                   );
+                                                 },
+                                               );
+                                             },
+                                           ),
+                                         ),
+                                         hintText: "پیام خود را بنویسید",
+
+                                         errorBorder: InputBorder.none,
+                                         disabledBorder: InputBorder.none,
+                                       ),
+                                     ),
                                    ),
                                  ),
-                               ),
-                               // گوش دادن به تغییرات کنترلر فقط برای دکمه ارسال
-                               // گوش دادن به تغییرات کنترلر فقط برای دکمه ارسال
-                               ValueListenableBuilder<TextEditingValue>(
-                                 valueListenable: answerController,
-                                 builder: (context, value, child) {
-                                   final isTextEmpty = value.text.trim().isEmpty;
+                               ],
+                             );
+                           },
+                           listenWhen: (previous, current) => previous.sendAnswerStatus!=current.sendAnswerStatus,
 
-                                   return GlobalElevatedButton(
-                                     widget: Text(
-                                       "ارسال",
-                                       style: TextStyle(color: ColorPalette.white),
-                                     ),
-                                     backColor: ColorPalette.darkBlue,
-                                     onTap: isTextEmpty
-                                         ? null
-                                         : () {
-                                       print("supportDataEntity.id ${supportDataEntity.id}");
-                                       BlocProvider.of<SupportBloc>(context).add(
-                                         SendAnswer(
-                                             SendNewSupportParams(
-                                                 description: answerController.text,
-                                                 id: supportDataEntity.id,
-                                                 payVast:null
-                                             )
-                                         ),
-                                       );
-                                     },
-                                   );
-                                 },
-                               ),
-                             ],
-                           ),
-                         ),
+                       listener: (context, state) {
+                       if(state.sendAnswerStatus is SendAnswerSuccess){
+                       GlobalSnackBar.show(context, message: "ارسال شد");
+                       }
+                       if(state.sendAnswerStatus is SendAnswerError){
+                       GlobalSnackBar.show(context, message: "خطایی رخ داده");
+                       }
+
+                       },
                        )
                            : Row(
                          mainAxisAlignment: MainAxisAlignment.end,
                          children: [
-                           GlobalElevatedButton(backColor: Colors.transparent,
-                             borderColor: ColorPalette.inverseGrey,
-                             widget: Row(
-                               children: [
-                                 state.supportCloseStatus is SupportCloseLoading?
-                                 Center(child: CircularProgressIndicator(),):
-                                 Text("بستن",style: TextStyle(color: ColorPalette.black),),
-                                 SizedBox(width: 3.w,),
-                                 Icon(Icons.cancel_outlined,color: ColorPalette.black),
+                           BlocConsumer<SupportBloc, SupportState>(
+                             listenWhen: (previous, current) => previous.supportCloseStatus!=current.supportCloseStatus,
 
-                               ],
-                             ),onTap: () {
-                             BlocProvider.of<SupportBloc>(context).add(SupportClose(supportDataEntity.id!));
+                             listener: (context, state) {
+                               if(state.supportCloseStatus is SupportCloseSuccess){
+                                 GlobalSnackBar.show(context, message: "بسته شد");
+                               }
+                               if(state.supportCloseStatus is SupportCloseError){
+                                 GlobalSnackBar.show(context, message: "خطایی رخ داده");
+                               }
+                             },
+                             buildWhen: (previous, current) => previous.supportCloseStatus!=current.supportCloseStatus,
+                             builder: (context, state) {
+                               return GlobalElevatedButton(backColor: Colors.transparent,
+                                 borderColor: ColorPalette.inverseGrey,
+                                 widget: Row(
+                                   children: [
+                                     state.supportCloseStatus is SupportCloseLoading?
+                                     Center(child: CircularProgressIndicator(),):
+                                     Text("بستن",style: TextStyle(color: ColorPalette.black),),
+                                     SizedBox(width: 3.w,),
+                                     Icon(Icons.cancel_outlined,color: ColorPalette.black),
 
-                             },),
+                                   ],
+                                 ),onTap: () {
+                                   BlocProvider.of<SupportBloc>(context).add(SupportClose(supportDataEntity.id!));
+
+                                 },);
+                             },
+                           ),
                            SizedBox(
                              width: 10.w,
                            ),
                            BlocBuilder<SupportBloc, SupportState>(
+                             buildWhen: (previous, current) => previous.answer!=current.answer,
                              builder: (context, state) {
                                return GlobalElevatedButton(backColor: Colors.transparent,
                                  borderColor: ColorPalette.inverseGrey,
@@ -274,7 +332,6 @@ class SupportAnswerScreen extends StatelessWidget {
 
                                    ],
                                  ),onTap: () {
-                                   print("state.answer${state.answer}");
                                    BlocProvider.of<SupportBloc>(context).add(ChangeAnswer(!state.answer));
 
                                  },);
@@ -290,14 +347,40 @@ class SupportAnswerScreen extends StatelessWidget {
                ),
              ),
 
-
-
             ],
           ),
         ),
       ),
     );
   }
+
+   Widget _buildImageContent(dynamic image,bool over) {
+     if (image.isEmpty || over) {
+       return const Icon(
+         Icons.attach_file,
+         size: 30,
+         color: Colors.grey,
+       );
+     }
+     // else if (image.startsWith("http")) {
+     //   return Image.network(
+     //     image,
+     //     fit: BoxFit.cover,
+     //     errorBuilder: (context, error, stackTrace) =>
+     //     const Icon(Icons.error, color: Colors.red),
+     //   );
+     // }
+     else {
+       return Icon(Icons.check);
+       // return Image.file(
+       //   File(image),
+       //   fit: BoxFit.cover,
+       //   errorBuilder: (context, error, stackTrace) =>
+       //   const Icon(Icons.error, color: Colors.red),
+       // );
+     }
+   }
+
 }
 
 class ExpandableText extends StatefulWidget {

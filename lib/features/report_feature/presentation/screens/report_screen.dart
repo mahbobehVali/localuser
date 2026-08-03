@@ -21,6 +21,7 @@ import '../../../../config/color_palette.dart';
 import '../../../../config/texts_style.dart';
 import '../../../../locator.dart';
 import '../../../alert_feature/domain/entity/alert_type_entity.dart';
+import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../../status_summary_feature/domain/entity/wells_data_entity.dart';
 import '../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
 import '../../../well_feature/domain/usecase/alert_count_usecase.dart';
@@ -74,7 +75,14 @@ class ReportScreen extends StatelessWidget {
                           height: 50,
                           decoration:
                           BoxDecoration(border: Border.all(color: Colors.grey)),
-                          child: BlocBuilder<ReportBloc, ReportState>(
+                          child: BlocConsumer<ReportBloc, ReportState>(
+                            listener: (context, state) {
+                              if(state.wellReportStatus is WellReportExit){
+                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+                                  return LoginScreen();
+                                },));
+                              }
+                            },
                             buildWhen: (previous, current) =>
                             previous.oneWell != current.oneWell ||
                                 previous.wellReportStatus != current.wellReportStatus,

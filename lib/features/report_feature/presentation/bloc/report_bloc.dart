@@ -56,8 +56,13 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         emit(state.copyWith(newWellReportStatus: WellReportSuccess(dataState.data)));
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newWellReportStatus: WellReportError(dataState.error!)));
-      }
+        if (dataState.isTokenExpired) {
+          // locator<SharedPrefOperator>().logout(); // ۱. پاک کردن توکن
+          emit(state.copyWith(newWellReportStatus: WellReportExit()));
+        }else {
+          emit(state.copyWith(
+              newWellReportStatus: WellReportError(dataState.error!)));
+        }      }
     });
 
     on<WellSelected>((event, emit) async {

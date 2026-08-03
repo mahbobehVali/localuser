@@ -63,8 +63,11 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
         }
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newAlertStatus: AlertError(dataState.error!)));
-      }
+        if (dataState.isTokenExpired) {
+          emit(state.copyWith(newAlertStatus: AlertExit()));
+        }else {
+          emit(state.copyWith(newAlertStatus: AlertError(dataState.error!)));
+        }      }
     });
 
     on<AlertWellList>((event, emit) async {

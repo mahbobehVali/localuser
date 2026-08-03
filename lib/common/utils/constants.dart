@@ -224,8 +224,10 @@ class Constants {
       step = 10.0;
     } else if (maxAbs > 10) {
       step = 5.0;
-    } else {
+    } else if (maxAbs > 5) {
       step = 2.0;
+    } else {
+      step = 1.0;
     }
 
     // ۲. محاسبه سقف

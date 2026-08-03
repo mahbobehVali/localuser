@@ -71,7 +71,6 @@ class StatusSummaryApiProvider {
         data: data
       );
 
-      print(response.data);
 
       return response;
     } on DioException catch (e) {

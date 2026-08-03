@@ -13,7 +13,7 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
   factory WellFlowMeterModel.fromJson(dynamic json, {bool ignoreAllWell = false}) {
     return WellFlowMeterModel(
 
-        list: WellFlowMeterListModel.fromJson(findFlowMeterElement(json["list"],
+        list: WellFlowMeterListModel.fromJson( findFlowMeterElement(json["list"],
             ignoreAllWell: ignoreAllWell))
     );
   }
@@ -39,6 +39,7 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
       (element) => element["type"] == "total",
       orElse: () => null,
     );
+   print("totalElement${totalElement}");
 
     if (totalElement != null) return totalElement;
 

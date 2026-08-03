@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mahaliii/common/widgets/show_snack_bar.dart';
+import 'package:mahaliii/config/color_palette.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../features/support_feature/presentation/bloc/support_bloc.dart';
@@ -44,7 +45,7 @@ class BottomSheets {
                   ),
                   const SizedBox(width: 10),
                   GlobalElevatedButton(
-                    backColor: Colors.teal,
+                    backColor: ColorPalette.darkBlue,
 
                     onTap: () {
                       Navigator.pop(bc); // بستن باتم شیت
@@ -74,30 +75,44 @@ class BottomSheets {
       status = await Permission.camera.request();
       permissionName = 'دوربین';
     } else {
-      // برای گالری
-      if (Platform.isAndroid && (await Permission.photos.status).isDenied) {
-        status = await Permission.photos.request();
-      } else {
-        status = await Permission.storage.request();
-      }
       permissionName = 'گالری';
+
+      // مدیریت درست دسترسی گالری بر اساس نسخه اندروید
+      if (Platform.isAndroid) {
+        // در اندروید ۱۳ به بالا photo/media استفاده می‌شود
+        status = await Permission.photos.request();
+
+        // اگر photos پشتیبانی نشد (اندروید ۱۲ و پایین‌تر)، storage را چک کن
+        if (status.isDenied) {
+          status = await Permission.storage.request();
+        }
+      } else {
+        // برای iOS
+        status = await Permission.photos.request();
+      }
     }
 
-    // 1. اگر مجوز اعطا شده یا دسترسی محدود داده شده باشد
+    // ۱. اگر دسترسی داده شده باشد
     if (status.isGranted || status.isLimited) {
       return true;
     }
 
-    // 2. اگر کاربر برای همیشه رد کرده باشد، ابتدا باتم شیت را نمایش می‌دهیم.
+    // ۲. اگر کاربر برای همیشه رد کرده باشد (Permanently Denied)
     if (status.isPermanentlyDenied) {
-      // از آنجایی که این متد از لایه Presentation فراخوانی می‌شود، context را دارد.
-      await _showSettingsPrompt(context, permissionName);
+      if (context.mounted) {
+        await _showSettingsPrompt(context, permissionName);
+      }
+      return false;
     }
 
-    // در سایر حالت‌ها (مانند Denied معمولی)، صرفاً false برمی‌گرداند
+    // ۳. اگر دفعه اول/دوم رد کرده باشد (Denied)
+    if (status.isDenied) {
+      // می‌توانید مجدداً درخواست دهید یا پیغام مناسب دهید
+      return false;
+    }
+
     return false;
   }
-
   // Future<void> settingNewPlanBottomSheet(
   //     BuildContext context,
   //     PlanBloc planBloc,
@@ -333,47 +348,65 @@ class BottomSheets {
 
 
 
-  Future<void> imageSupport(BuildContext context,SupportBloc supportBloc) async {
+  Future<void> imageSupport(BuildContext context, SupportBloc supportBloc) async {
+    return showModalBottomSheet(
+      context: context,
+      builder: (ctx) {
+        return BlocProvider.value(
+          value: supportBloc,
+          child: SizedBox(
+            height: 70.h,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                //  دکمه دوربین
+                GlobalElevatedButton(
+                  widget: const Text("دوربین", style: TextStyle(color: Colors.black)),
+                  onTap: () async {
+                    final cameraGranted = await _checkAndRequestPermission(context, ImageSource.camera);
 
-    return  showModalBottomSheet(context: context, builder: (context) {
-      return BlocProvider.value(
-        value: supportBloc,
-        child: SizedBox(
-          height: 70.h,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              GlobalElevatedButton(widget: Text("دوربین",style: TextStyle(color: Colors.black)),onTap: () async {
-                final cameraGranted = await _checkAndRequestPermission(context, ImageSource.camera);
-                if (cameraGranted ) {
-                  supportBloc.add( AddSupportImageClicked());
-                  Navigator.of(context).pop();
+                    if (context.mounted) {
+                      if (cameraGranted) {
+                        supportBloc.add(AddSupportImageClicked());
+                        Navigator.of(context).pop();
+                      } else {
+                        // ShowSnacksBars.snack(
+                        //   context,
+                        //   "برای گرفتن عکس، به دسترسی دوربین نیاز است.",
+                        //   duration: 3,
+                        // );
+                      }
+                    }
+                  },
+                ),
 
-                }
-                else{
+                //  دکمه گالری
+                GlobalElevatedButton(
+                  widget: const Text("گالری", style: TextStyle(color: Colors.black)),
+                  onTap: () async {
+                    final galleryGranted = await _checkAndRequestPermission(context, ImageSource.gallery);
 
-                  ShowSnacksBars.snack(context, "دسترسی به دوربین یا گالری برای انتخاب عکس مورد نیاز است.",duration: 4);
-                  Navigator.of(context).pop();
-
-                }
-
-              },),
-              GlobalElevatedButton(widget: Text("گالری",style: TextStyle(color: Colors.black)),onTap: () {
-                supportBloc.add( AddSupportFileClicked());
-                Navigator.of(context).pop();
-
-
-
-
-              },),
-            ],
+                    if (context.mounted) {
+                      if (galleryGranted) {
+                        supportBloc.add(AddSupportFileClicked());
+                        Navigator.of(context).pop();
+                      } else {
+                        // ShowSnacksBars.snack(
+                        //   context,
+                        //   "برای انتخاب فایل، به دسترسی گالری نیاز است.",
+                        //   duration: 3,
+                        // );
+                      }
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-      );
-    },);
-
+        );
+      },
+    );
   }
-
   // Future<void> imageResume(BuildContext context,ResumeBloc resumeBloc) {
   //
   //   return  showModalBottomSheet(context: context, builder: (context) {

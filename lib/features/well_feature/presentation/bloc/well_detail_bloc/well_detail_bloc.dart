@@ -22,6 +22,7 @@ import '../../../domain/usecase/alert_count_usecase.dart';
 import 'alert_count_status.dart';
 import 'create_time_status.dart';
 import 'finger_status.dart';
+import 'flowmeter_status.dart';
 import 'get_program_status.dart';
 import 'on_off_status.dart';
 
@@ -57,7 +58,8 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     deleteTimeStatus: DeleteTimeInitial(),
     selectedChartTab: 0,
     wellScreenStatus: WellScreenInitial(),
-    userLocalId: null
+    userLocalId: null,
+    flowMeterStatus: FlowMeterInitial()
   )) {
     on<WellStart>((event, emit) async {
       emit(state.copyWith(newWellStatus: WellLoading()));
@@ -69,8 +71,13 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newWellStatus: WellError(dataState.error!)));
-      }
+        if (dataState.isTokenExpired) {
+          // locator<SharedPrefOperator>().logout(); // ۱. پاک کردن توکن
+          emit(state.copyWith(newWellStatus: WellExit()));
+        }else
+        {
+          emit(state.copyWith(newWellStatus: WellError(dataState.error!)));
+        }      }
     });
     on<FingerSocketEvent>(
           (event, emit) async {
@@ -284,6 +291,28 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     //   }
     // });
 
+    on<FlowMeterEvent>((event, emit) async {
+      emit(state.copyWith(newFlowMeterStatus: FlowMeterLoading()));
+
+
+      DataState flowMeterDataState = await wellFlowMeterUseCase(FlowMeterParams(
+          ids: event.flowMeterParams.ids,
+          type: event.flowMeterParams.type));
+      DataState alertDataState = await alertCountUseCase(event.flowMeterParams);
+
+      if (flowMeterDataState is DataSuccess
+          && alertDataState is DataSuccess) {
+
+        emit(state.copyWith(newFlowMeterStatus: FlowMeterSuccess(
+            wellFlowMeterEntity: flowMeterDataState.data,
+        )));
+
+      }
+      if (flowMeterDataState is DataFailed
+          || alertDataState is DataFailed) {
+        emit(state.copyWith(newFlowMeterStatus: FlowMeterError("خطایی رخ داده")));
+      }
+    });
 
     on<GetProgram>((event, emit) async {
       emit(state.copyWith(newGetProgramStatus: GetProgramLoading()));

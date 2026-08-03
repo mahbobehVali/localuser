@@ -35,17 +35,18 @@ class SupportApiProvider {
   }
 
   Future<dynamic> sendSupport(SendNewSupportParams sendNewSupportParams) async {
+    FormData formData=FormData.fromMap({
+      "part":sendNewSupportParams.part,
+      "subject":sendNewSupportParams.subject,
+      "description":sendNewSupportParams.description,
+      "status":sendNewSupportParams.status,
+      if(sendNewSupportParams.payVast!=null) "file":sendNewSupportParams.payVast,
+
+    });
 
     try {
       final response = await dio.post("support/create",
-      data: {
-        "part":sendNewSupportParams.part,
-        "subject":sendNewSupportParams.subject,
-        "description":sendNewSupportParams.description,
-        "status":sendNewSupportParams.status
-
-
-      });
+      data: formData);
       return response;
     } on DioException catch (e) {
       return CheckExceptions.response(e.response);
@@ -64,6 +65,8 @@ class SupportApiProvider {
       });
       return response;
     } on DioException catch (e) {
+      print(e.response);
+      print(e.response?.statusCode);
       return CheckExceptions.response(e.response);
     }
   }
@@ -75,6 +78,7 @@ class SupportApiProvider {
       data: {
         "support_id":id,
       });
+      print(response.data);
       return response;
     } on DioException catch (e) {
       return CheckExceptions.response(e.response);

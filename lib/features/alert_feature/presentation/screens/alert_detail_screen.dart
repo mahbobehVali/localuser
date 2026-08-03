@@ -320,8 +320,9 @@ class AlertDetailScreen extends StatelessWidget {
 
                 )),
               BlocConsumer<AlertBloc, AlertState>(
+                listenWhen: (previous, current) => previous.alertCreateStatus!=current.alertCreateStatus,
 
-                 listener: (context, state) {
+                listener: (context, state) {
                    if(state.alertCreateStatus is AlertCreateSuccess){
                      GlobalSnackBar.show(context, message: "ارسال شد");
                    }

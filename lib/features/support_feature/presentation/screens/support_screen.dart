@@ -19,6 +19,7 @@ import '../../../../common/widgets/pagination_widget.dart';
 import '../../../../common/widgets/show_dialogs.dart';
 import '../../../../locator.dart';
 import '../../../alert_feature/domain/entity/alert_type_entity.dart';
+import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../domain/usecase/support_close_usecase.dart';
 
 class SupportScreen extends StatelessWidget {
@@ -106,6 +107,7 @@ class SupportScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: BlocBuilder<SupportBloc, SupportState>(
+                            buildWhen: (previous, current) => current.selectedSupportStatus!=previous.selectedSupportStatus,
                             builder: (context, state) {
                               return Container(
                                 decoration: BoxDecoration(
@@ -141,7 +143,14 @@ class SupportScreen extends StatelessWidget {
                             decoration: Constants().whiteFiveRadiusDecoration,
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: BlocBuilder<SupportBloc, SupportState>(
+                              child: BlocConsumer<SupportBloc, SupportState>(
+                                listener: (context, state) {
+                                  if(state.supportStatus is SupportExit){
+                                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+                                      return LoginScreen();
+                                    },));
+                                  }
+                                },
                                 buildWhen: (previous, current) => current.supportStatus != previous.supportStatus,
                                 builder: (context, state) {
                                   if (state.supportStatus is SupportSuccess) {

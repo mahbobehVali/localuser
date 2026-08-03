@@ -10,8 +10,9 @@ class SupportDataModel extends SupportDataEntity {
     final String? description,
     final String? date,
     final String? clock,
+    final String? payvast,
 
-  }) : super( id,part,status,subject,description,date,clock);
+  }) : super( id,part,status,subject,description,date,clock,payvast);
 
   factory SupportDataModel.fromJson(dynamic json) {
 
@@ -23,6 +24,7 @@ class SupportDataModel extends SupportDataEntity {
       description: json["description"],
       date: json["date"],
       clock: json["clock"],
+      payvast: json["payvast"],
 
     );
   }

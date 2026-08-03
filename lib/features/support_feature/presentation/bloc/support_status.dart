@@ -23,6 +23,10 @@ class SupportEmpty extends SupportStatus {
   @override
   List<Object> get props => [];
 }
+class SupportExit extends SupportStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class SupportError extends SupportStatus {
   final String error;

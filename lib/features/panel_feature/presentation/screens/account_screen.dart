@@ -16,6 +16,7 @@ import '../../../../common/widgets/account_box.dart';
 import '../../../../common/widgets/account_box_title.dart';
 import '../../../../config/texts_style.dart';
 import '../../../../locator.dart';
+import '../../../auth_feature/presentation/screens/login_screen.dart';
 
 
 class AccountScreen extends StatefulWidget {
@@ -161,6 +162,11 @@ class _AccountScreenState extends State<AccountScreen>{
                                     ShowDialogs().changePasswordShowDialog(context: context, panelBloc: BlocProvider.of<AccountBloc>(context),
                                         serverId: sendSmsSuccess.serverId,newPass: newPassword.text,previousPass: oldPassword.text);
 
+                                  }
+                                  if(state.sendSmsStatus is SendSmsExit){
+                                    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+                                      return LoginScreen();
+                                    },));
                                   }
 
                                   if(state.sendSmsStatus is SendSmsError){

@@ -5,6 +5,7 @@ import 'package:mahaliii/common/params/flowmeter_params.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/repository/status_summary_repository.dart';
 import 'package:mahaliii/features/status_summary_feature/presentation/bloc/status_summary_bloc/last_activity_status.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../common/socket_repository.dart';
 import '../../../../common/utils/constants.dart';
@@ -125,7 +126,29 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                           return const SizedBox();
                         }
                       } else if (state.waterStatus is WaterLoading) {
-                        return const Center(child: CircularProgressIndicator());
+                        return Center(child: Shimmer.fromColors(
+                            baseColor: Colors.red.shade400,
+                            highlightColor: Colors.red.shade200,
+                            child: SizedBox(
+                              height: 100.h,
+                              width: MediaQuery.sizeOf(context).width,
+                              child: ListView.builder(
+
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 3,
+
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      color: Colors.red,
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+
+                        ));
                       } else {
                         return const SizedBox();
                       }

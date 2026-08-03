@@ -12,6 +12,9 @@ class SendSmsInitial extends SendSmsStatus {
 class SendSmsLoading extends SendSmsStatus {
   @override
   List<Object> get props => [];
+}class SendSmsExit extends SendSmsStatus {
+  @override
+  List<Object> get props => [];
 }
 
 class SendSmsError extends SendSmsStatus {

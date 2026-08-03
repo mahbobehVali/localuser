@@ -12,6 +12,10 @@ class WellLoading extends WellStatus {
   @override
   List<Object> get props => [];
 }
+class WellExit extends WellStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class WellError extends WellStatus {
   final String error;

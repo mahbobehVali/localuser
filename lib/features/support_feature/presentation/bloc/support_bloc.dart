@@ -45,8 +45,7 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
     supportCloseStatus: SupportCloseInitial()
   )) {
     on<GetSupportMessage>((event, emit) async {
-      emit(state.copyWith(newSupportStatus: state.supportStatus is SupportSuccess?
-          SupportAgainLoading():SupportLoading(),newSelectedSupportPage: event.flowMeterParams.page));
+      emit(state.copyWith(newSupportStatus: SupportLoading(),newSelectedSupportPage: event.flowMeterParams.page));
 
       DataState dataState = await supportUseCase(event.flowMeterParams);
 
@@ -61,8 +60,12 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
 
       }
       if (dataState is DataFailed) {
-          emit(state.copyWith(newSupportStatus: SupportError(dataState.error!)));
-
+        if (dataState.isTokenExpired) {
+          emit(state.copyWith(newSupportStatus: SupportExit()));
+        }else {
+          emit(
+              state.copyWith(newSupportStatus: SupportError(dataState.error!)));
+        }
       }    });
 
     on<OneSupportStatusClicked>((event, emit) async {
@@ -104,7 +107,7 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
 
         PlatformFile pickedFile = result.files.first;
         int? fileSizeInBytes = pickedFile.size;
-        emit(state.copyWith(newSupportFile: file.path,
+        emit(state.copyWith(newSupportFile: (fileSizeInBytes > Constants.MAX_FILE_SIZE_BYTES)?null:file.path,
             newOverImage: (fileSizeInBytes > Constants.MAX_FILE_SIZE_BYTES)?true:false));
       }
     });
@@ -130,19 +133,19 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
                   title: "crop image")
             ]
         );
-        emit(state.copyWith(newSupportFile: croppedFile?.path,
+        emit(state.copyWith(newSupportFile: (fileSizeInBytes > Constants.MAX_FILE_SIZE_BYTES)?null:file.path,
             newOverImage: (fileSizeInBytes > Constants.MAX_FILE_SIZE_BYTES)?true:false));
 
       }
     });
 
     on<SendNewSupportClicked>((event, emit) async {
-      emit(state.copyWith(newSendSupportStatus: SendSupportLoading()));
+      emit(state.copyWith(newSendSupportStatus: SendSupportLoading(),newSelectedSupportStatus: event.sendNewRequestToSupportParams.status));
       DataState dataState =
       await sendSupportUseCase(event.sendNewRequestToSupportParams);
       if (dataState is DataSuccess) {
         emit(state.copyWith(newSendSupportStatus: const SendSupportSuccess()));
-        add( GetSupportMessage(FlowMeterParams(page: 1)));
+        add( GetSupportMessage(FlowMeterParams(page: 1,status: event.sendNewRequestToSupportParams.status)));
 
 
       }

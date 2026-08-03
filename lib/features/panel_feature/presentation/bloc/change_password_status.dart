@@ -13,6 +13,10 @@ class ChangePasswordLoading extends ChangePasswordStatus {
   @override
   List<Object> get props => [];
 }
+class ChangePasswordExit extends ChangePasswordStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class ChangePasswordError extends ChangePasswordStatus {
   final String error;

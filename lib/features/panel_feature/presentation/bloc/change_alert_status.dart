@@ -13,6 +13,10 @@ class ChangeAlertLoading extends ChangeAlertStatus {
   @override
   List<Object> get props => [];
 }
+class ChangeAlertExit extends ChangeAlertStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class ChangeAlertError extends ChangeAlertStatus {
   final String error;

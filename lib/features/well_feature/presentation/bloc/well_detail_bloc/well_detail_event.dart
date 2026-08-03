@@ -201,3 +201,14 @@ class ResetDeleteStatus extends WellDetailEvent {
   List<Object?> get props => [];
 }
 
+class FlowMeterEvent extends WellDetailEvent {
+  final FlowMeterParams flowMeterParams;
+
+  const FlowMeterEvent(this.flowMeterParams);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
+

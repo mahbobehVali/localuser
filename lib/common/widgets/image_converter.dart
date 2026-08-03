@@ -75,27 +75,26 @@ class ImageConverter {
 
 
   /// get imagePath and convert to multiPart
-  static Future<Object> getMultiPart(String path,String fileName) async {
-    if(path.isEmpty){
+  static Future<Object> getMultiPart(String path, String fileName) async {
+    if (path.isEmpty) {
       return "";
     }
-    // else if (kIsWeb) {
-    //   // برای وب: از بایت‌های فایل استفاده کنید
-    //   Uint8List fileBytes = platformFile.bytes!;
-    //   String fileName = platformFile.name;
-    //
-    //   return MultipartFile.fromBytes(
-    //     fileBytes,
-    //     filename: fileName,
-    //     // contentType: MediaType('application', 'octet-stream'), // در صورت نیاز
-    //   );
-    // }
-    else{
-      return await MultipartFile.fromFile(path,filename: fileName);
+
+    try {
+      // 1. بررسی وجود فایل در دستگاه قبل از ساخت MultipartFile
+      final file = File(path);
+      if (!await file.exists()) {
+        print("❌ Error: File does not exist at path: $path");
+        return "";
+      }
+
+      // 2. ساخت MultipartFile (بدون await)
+      return await MultipartFile.fromFile(path, filename: fileName);
+    } catch (e) {
+      print("❌ Error creating MultipartFile: $e");
+      return "";
     }
-
   }
-
 // /// convert path to base64 image
 // static shouldDeleteImage(String path){
 //   if(path.startsWith("http")){

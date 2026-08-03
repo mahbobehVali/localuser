@@ -165,21 +165,22 @@ class ShowDialogs {
                         listener: (context, state) {
                           if(state.changePasswordStatus is ChangePasswordSuccess){
                             Navigator.of(context).pop();
-                            // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
-                            //   return LoginScreen();
-                            // },));
                             GlobalSnackBar.show(context,message: "رمز عبور با موفقیت تغییر کرد");
 
-
-
                           }
+
                           if(state.changePasswordStatus is ChangePasswordError){
                             Navigator.of(context).pop();
 
                             ChangePasswordError changePasswordError=state.changePasswordStatus as ChangePasswordError;
                             GlobalSnackBar.show(context,message: changePasswordError.error);
 
+                          }
 
+                          if(state.changePasswordStatus is ChangePasswordExit){
+                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+                              return LoginScreen();
+                            },));
                           }
                         },
                         builder: (context, state) {
@@ -1197,9 +1198,10 @@ class ShowDialogs {
                             height: 5.h,
                           ),
                           BlocBuilder<SupportBloc, SupportState>(
-                            buildWhen: (previous, current) =>
-                            previous.supportFile != current.supportFile,
+                            // buildWhen: (previous, current) =>
+                            // previous.supportFile != current.supportFile,
                             builder: (context, state) {
+
                               return SelectImageWidget(
                                 width: 70.w,
                                 height: 70.h,
@@ -1211,7 +1213,8 @@ class ShowDialogs {
                             },
                           ),
                           BlocBuilder<SupportBloc, SupportState>(builder: (context, state) {
-                            return Visibility(visible: state.overImage,child: Text("حجم فایل بیشتر از یک مگابایت نباشد.",style: TextStyle(color: Colors.red),));
+                            return Visibility(visible: state.overImage,
+                                child: Text("حجم فایل بیشتر از یک مگابایت نباشد.",style: TextStyle(color: Colors.red),));
                           },),
                           SizedBox(
                             height: 25.h,
@@ -1248,18 +1251,17 @@ class ShowDialogs {
                                 builder: (context, state) {
                                   return GlobalElevatedButton(
                                     width: 100.w,
-                                    onTap:state.overImage==true?null: () async {
+                                    onTap:() async {
                                       if (newSupportKey.currentState!.validate()) {
 
-                                        dynamic file =
-                                        await ImageConverter.getMultiPart(
+                                        dynamic file = await ImageConverter.getMultiPart(
                                             state.supportFile,
                                             state.supportFile.split("/").last);
+
                                         supportBloc.add(
                                             SendNewSupportClicked(
                                                 SendNewSupportParams(
                                                     part:alertTypeEntity.id,
-                                                    // state.selectedDepartment,
                                                     subject:
                                                     subjectController.text,
                                                     status: 0,

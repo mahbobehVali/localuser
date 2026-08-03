@@ -19,6 +19,10 @@ final class AlertEmpty extends AlertStatus {
   @override
   List<Object> get props => [];
 }
+final class AlertExit extends AlertStatus {
+  @override
+  List<Object> get props => [];
+}
 final class AlertSuccess extends AlertStatus {
   final AlertsEntity alertsEntity;
 

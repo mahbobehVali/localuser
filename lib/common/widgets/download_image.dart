@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as path;
 
+import '../../config/color_palette.dart';
 import 'directory_path.dart';
 
 class PayvastSupportFile extends StatefulWidget {
@@ -83,35 +84,42 @@ class _PayvastSupportFileState extends State<PayvastSupportFile> {
   }
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text("فایل پیوست"),
-        IconButton(
-            onPressed: () {
-              fileExists && downloading == false
-                  ? openFile()
-                  :(downloading?cancelDownload():startDownload());
-            },
-            icon: fileExists && downloading == false
-                ? Icon(Icons.file_copy_outlined, color: Colors.green) // اگر شرط اول درست باشد، این آیکون برگردانده می‌شود
-                : (downloading // اگر شرط اول غلط باشد، این شرط جدید ارزیابی می‌شود
-                ? Stack(
-              alignment: Alignment.center,
-              children: [
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: BoxBorder.all(color: ColorPalette.inverseGrey)
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text("فایل پیوست"),
+          IconButton(
+              onPressed: () {
+                fileExists && downloading == false
+                    ? openFile()
+                    :(downloading?cancelDownload():startDownload());
+              },
+              icon: fileExists && downloading == false
+                  ? Icon(Icons.file_copy_outlined, color: Colors.green) // اگر شرط اول درست باشد، این آیکون برگردانده می‌شود
+                  : (downloading // اگر شرط اول غلط باشد، این شرط جدید ارزیابی می‌شود
+                  ? Stack(
+                alignment: Alignment.center,
+                children: [
 
-                CircularProgressIndicator(
-                  value: progress,
-                  strokeWidth: 3,
-                  backgroundColor: Colors.grey,
-                  valueColor: const AlwaysStoppedAnimation<Color>(
-                      Colors.blue),
-                ),
-                Icon(Icons.close)
-              ],
-            ) // در اینجا باید آیکون متناسب با 'downloading == true' بیاید
-                : Icon(Icons.save_alt) // و اینجا آیکون متناسب با 'fileExists == false && downloading == false' (که در شرط اول پوشش داده نشده)
-            ) ),
-      ],
+                  CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: 3,
+                    backgroundColor: Colors.grey,
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.blue),
+                  ),
+                  Icon(Icons.close)
+                ],
+              ) // در اینجا باید آیکون متناسب با 'downloading == true' بیاید
+                  : Icon(Icons.save_alt) // و اینجا آیکون متناسب با 'fileExists == false && downloading == false' (که در شرط اول پوشش داده نشده)
+              ) ),
+        ],
+      ),
     );
   }
 }

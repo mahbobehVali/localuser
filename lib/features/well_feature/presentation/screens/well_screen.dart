@@ -9,6 +9,7 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/screens/well_detail_screen.dart';
 
 import '../../../../locator.dart';
+import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
 import '../../domain/repository/wells_repository.dart';
 import '../../domain/usecase/alert_count_usecase.dart';
@@ -56,7 +57,14 @@ class _WellScreenState extends State<WellScreen> {
               SizedBox(height: 34.h),
 
               Expanded(
-                child: BlocBuilder<WellDetailBloc, WellDetailState>(
+                child: BlocConsumer<WellDetailBloc, WellDetailState>(
+                  listener: (context, state) {
+                    if(state.wellStatus is WellExit){
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+                        return LoginScreen();
+                      },));
+                    }
+                  },
                   builder: (context, state) {
                     if(state.wellStatus is WellSuccess){
                       WellSuccess statusSummarySuccess=state.wellStatus as WellSuccess;

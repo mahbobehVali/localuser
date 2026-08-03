@@ -38,8 +38,12 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newSendSmsStatus: SendSmsError(dataState.error!)));
-      }
+        if (dataState.isTokenExpired) {
+          emit(state.copyWith(newSendSmsStatus: SendSmsExit()));
+        }else {
+          emit(
+              state.copyWith(newSendSmsStatus: SendSmsError(dataState.error!)));
+        }      }
     });
 
     on<ChangePasswordEvent>((event, emit) async {
@@ -48,12 +52,18 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
       DataState dataState = await changePasswordUseCase(event.changePasswordParams);
 
       if (dataState is DataSuccess) {
-        emit(state.copyWith(newChangePasswordStatus: ChangePasswordSuccess()));
+
+          emit(
+              state.copyWith(newChangePasswordStatus: ChangePasswordSuccess()));
 
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newChangePasswordStatus: ChangePasswordError(dataState.error!)));
-      }
+        if (dataState.isTokenExpired) {
+          emit(state.copyWith(newChangePasswordStatus: ChangePasswordExit()));
+        }else {
+          emit(state.copyWith(
+              newChangePasswordStatus: ChangePasswordError(dataState.error!)));
+        }      }
     });
     on<ChangeEditEvent>((event, emit) async {
       emit(state.copyWith(newEdit: event.edit));
@@ -76,8 +86,12 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newChangeAlertStatus: ChangeAlertError(dataState.error!)));
-      }
+        if (dataState.isTokenExpired) {
+          emit(state.copyWith(newChangeAlertStatus: ChangeAlertExit()));
+        }else {
+          emit(state.copyWith(
+              newChangeAlertStatus: ChangeAlertError(dataState.error!)));
+        }      }
 
     });
   }

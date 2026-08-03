@@ -20,6 +20,7 @@ import 'package:persian_number_utility/persian_number_utility.dart';
 import '../../../../common/widgets/account_box_title.dart';
 import '../../../../common/widgets/export_to_excel.dart';
 import '../../../../common/widgets/pagination_widget.dart';
+import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../domain/entity/alert_data_entity.dart';
 import '../bloc/alert_bloc.dart';
 
@@ -86,7 +87,15 @@ class AlertScreen extends StatelessWidget {
                         SizedBox(height: 10,),
 
                         Expanded(
-                          child: BlocBuilder<AlertBloc, AlertState>(
+                          child: BlocConsumer<AlertBloc, AlertState>(
+                            listenWhen: (previous, current) => current.alertStatus!=previous.alertStatus,
+                            listener: (context, state) {
+                              if(state.alertStatus is AlertExit){
+                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+                                  return LoginScreen();
+                                },));
+                              }
+                            },
                             buildWhen: (previous, current) => current.alertStatus!=previous.alertStatus,
                             builder: (context, state) {
                               if(state.alertStatus is AlertSuccess){
@@ -118,8 +127,8 @@ class AlertScreen extends StatelessWidget {
                                                 decoration:  Constants().boxDecoration,
                                                 child: Row(
                                                   children: [
-                                                    Expanded(flex: 4,child: Text("نام چاه")),
-                                                    Expanded(flex: 4,child: Text("نوع هشدار")),
+                                                    Expanded(flex: 5,child: Text("نام چاه")),
+                                                    Expanded(flex: 5,child: Text("نوع هشدار")),
                                                     Expanded(flex: 2,child: Text("ساعت")),
                                                     Expanded(flex: 3,child: Text("تاریخ")),
                                                     Expanded(flex: 4,child: Text("وضعیت")),
@@ -139,9 +148,9 @@ class AlertScreen extends StatelessWidget {
 
                                                   ),child: Row(
                                                   children: [
-                                                    Expanded(flex: 4,child: Text(data[index-1].wellName!)),
+                                                    Expanded(flex: 5,child: Text(data[index-1].wellName!)),
 
-                                                    Expanded(flex: 4,child: Text(data[index-1].message!)),
+                                                    Expanded(flex: 5,child: Text(data[index-1].message!)),
                                                     Expanded(flex: 2,child: Text(data[index-1].clock!.toPersianDigit())),
 
                                                     Expanded(flex: 3,child: Text(data[index-1].date!.toPersianDigit())),

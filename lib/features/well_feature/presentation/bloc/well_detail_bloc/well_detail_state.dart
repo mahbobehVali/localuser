@@ -20,6 +20,7 @@ class WellDetailState {
   final DeleteTimeStatus? deleteTimeStatus;
   final int selectedChartTab;
   final WellScreenStatus wellScreenStatus;
+  final FlowMeterStatus flowMeterStatus;
 
   WellDetailState({
     required this.fingerStatus,
@@ -40,6 +41,7 @@ class WellDetailState {
     required this.deleteTimeStatus,
     required this.selectedChartTab,
     required this.wellScreenStatus,
+    required this.flowMeterStatus,
   });
 
   WellDetailState copyWith(
@@ -61,7 +63,8 @@ class WellDetailState {
         OnOffStatus? newOnOffStatus,
         DeleteTimeStatus? newDeleteTimeStatus,
         int? newSelectedChartTab,
-        WellScreenStatus? newWellScreenStatus
+        WellScreenStatus? newWellScreenStatus,
+        FlowMeterStatus? newFlowMeterStatus
 
       }) {
     return WellDetailState(
@@ -82,7 +85,8 @@ class WellDetailState {
       onOffStatus: newOnOffStatus??onOffStatus,
       deleteTimeStatus: newDeleteTimeStatus??deleteTimeStatus,
         selectedChartTab: newSelectedChartTab??selectedChartTab,
-      wellScreenStatus: newWellScreenStatus??wellScreenStatus
+      wellScreenStatus: newWellScreenStatus??wellScreenStatus,
+      flowMeterStatus: newFlowMeterStatus??flowMeterStatus
 
     );
   }

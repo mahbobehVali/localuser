@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../common/widgets/global_snackbar.dart';
+import '../../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../bloc/account_bloc.dart';
 import '../../bloc/change_alert_status.dart';
 
@@ -34,6 +35,11 @@ class RadioRow extends StatelessWidget {
           GlobalSnackBar.show( context,message: changeAlertError.error);
 
 
+        }
+        if(state.changeAlertStatus is ChangeAlertExit){
+          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+            return LoginScreen();
+          },));
         }
       },
       builder: (context, state) {

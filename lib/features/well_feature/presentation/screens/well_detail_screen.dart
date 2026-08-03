@@ -11,6 +11,7 @@ import 'package:mahaliii/features/status_summary_feature/domain/usecase/wells_li
 import 'package:mahaliii/features/well_feature/domain/usecase/flow_meter_usecase.dart';
 import 'package:mahaliii/features/well_feature/domain/usecase/get_program_usecase.dart';
 import 'package:mahaliii/features/well_feature/domain/usecase/well_work_usecase.dart';
+import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/flowmeter_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/pump_performance_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/widgets/program_widget.dart';
@@ -114,6 +115,13 @@ class _WellDetailScreenState extends State<WellDetailScreen>
           FlowMeterParams(
             type: 2,
             time: 2,
+            ids: [widget.wellsDataEntity.deviceId!],
+          ),
+        ),
+      )..add(
+        FlowMeterEvent(
+          FlowMeterParams(
+            type: 6,
             ids: [widget.wellsDataEntity.deviceId!],
           ),
         ),
@@ -243,6 +251,179 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                     return selectedTab==0?
                     Column(
                       children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            // height: 400,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("میزان حجم آب عبوری دبی سنج",style: TextStyleP.f12Regular,),
+                                      // BlocBuilder<WellDetailBloc, WellDetailState>(
+                                      //   buildWhen: (previous, current) =>
+                                      //   current.selectedChartTab!=previous.selectedChartTab,
+                                      //   builder: (context, state) {
+                                      //     return SegmentedButton(
+                                      //
+                                      //         onSelectionChanged: (Set<int> newSelected) {
+                                      //           BlocProvider.of<WellDetailBloc>(context).add(
+                                      //               WellWorkHourStart(FlowMeterParams(
+                                      //                 type: newSelected.first,
+                                      //                 ids:[widget.wellsDataEntity.deviceId!],
+                                      //               )));
+                                      //
+                                      //         },
+                                      //         segments: [
+                                      //           ButtonSegment(value: 0,label: Text("امروز")),
+                                      //           ButtonSegment(value: 2,label: Text("هفته")),
+                                      //
+                                      //         ], selected:{state.selectedChartTab});
+                                      //   },
+                                      // )
+                                    ],
+                                  ),
+                                  BlocBuilder<WellDetailBloc,WellDetailState>(
+                                    builder: (context, state) {
+                                      final status = state.flowMeterStatus;
+                                      if (status is FlowMeterSuccess) {
+
+                                        final flowMeter = status.wellFlowMeterEntity.list;
+                                        final xLabels = flowMeter.xAxis;
+                                        final yValues = flowMeter.yAxis;
+
+                                        if (xLabels == null || yValues == null || xLabels.isEmpty || yValues.isEmpty) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(32),
+                                            child: const Center(child: Text("داده ای وجود ندارد")),
+                                          );
+                                        }
+
+                                        final scale = Constants().getScale(yValues);
+
+                                        List<FlSpot> spots = List.generate(
+                                          xLabels.length,
+                                              (j) => j < yValues.length && yValues[j] != null ? FlSpot(j.toDouble(), yValues[j].toDouble()) : null,
+                                        ).whereType<FlSpot>().toList();
+
+                                        if (spots.isEmpty) {
+                                          return Padding(
+                                          padding: const EdgeInsets.all(32),
+                                          child: const Center(child: Text("دیتایی وجود ندارد")),
+                                        );
+                                        }
+
+                                        int totalItems = xLabels.length;
+                                        double columnWidth = 80.0;
+                                        double calculatedChartWidth = (totalItems * columnWidth).clamp(350.0, 2000.0);
+                                        List<String> capacity=[];
+
+                                        List<BarChartGroupData> chartGroups = List.generate(xLabels.length, (index) {
+                                          final double yVal = index < yValues.length ? yValues[index].toDouble() : 0.0;
+
+                                          const Color normalColor = Colors.blue;
+
+                                            return BarChartGroupData(
+                                              x: index,
+                                              barRods: [
+                                                BarChartRodData(
+                                                  toY: yVal,
+                                                  color: normalColor,
+                                                  width: 12,
+                                                  borderRadius: BorderRadius.circular(4),
+                                                ),
+                                              ],
+                                            );
+
+
+                                        });
+                                        return Column(
+                                          children: [
+                                            Directionality(
+                                              textDirection: TextDirection.ltr,
+                                              child: SingleChildScrollView(
+                                                scrollDirection: Axis.horizontal,
+                                                child: Container(
+                                                    width: calculatedChartWidth,
+
+                                                    height: 300,
+                                                    padding: const EdgeInsets.only(top: 40, right: 18.0,bottom: 10),
+                                                    child: BarChart(
+                                                      BarChartData(
+                                                        extraLinesData: ExtraLinesData(
+                                                          horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
+                                                        ),
+                                                        maxY: scale['maxY'],
+                                                        //  تنظیم هوشمند مبدأ روی صفر (در صورت نداشتن مقدار منفی)
+                                                        minY: (scale['minY'] != null && scale['minY']! < 0) ? scale['minY'] : 0.0,
+
+                                                        alignment: BarChartAlignment.spaceAround,
+                                                        gridData: FlGridData(
+                                                          show: false,
+                                                          verticalInterval: scale['step'],
+                                                          getDrawingHorizontalLine: (value) {
+                                                            return const FlLine(
+                                                              strokeWidth: 1,
+                                                              color: Colors.grey,
+                                                            );
+                                                          },
+                                                        ),
+                                                        borderData: FlBorderData(
+                                                          border: const Border(bottom: BorderSide(), left: BorderSide()),
+                                                        ),
+                                                        titlesData: FlTitlesData(
+                                                          show: true,
+                                                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                          bottomTitles: Constants().axisBottomTitles(xLabels, "nothing"),
+                                                          leftTitles: Constants().leftTitles(
+                                                            interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
+                                                            scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                                          ),
+                                                        ),
+                                                        barGroups: chartGroups,
+                                                      ),
+                                                    )
+                                                ),
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Indicator(color: ColorPalette.inverseGrey, text: 'حجم مصرف بیش از حد مجاز'),
+                                                Indicator(color: ColorPalette.darkBlue, text: 'حجم مصرفی'),
+                                              ],
+
+                                            ),
+                                            SizedBox(height: 16.h,)
+                                          ],
+                                        );
+                                      }
+                                      if (status is FlowMeterLoading) return const Center(child: CircularProgressIndicator());
+                                      if (status is FlowMeterError) return Center(child: Text(status.error));
+                                      if (status is FlowMeterInitial) {
+                                        return Center(child: Padding(
+                                          padding: const EdgeInsets.all(15),
+                                          child: Text("لطفاً فیلتر مورد نیاز خود را اعمال کنید"),
+                                        ));
+                                      }
+                                      return const SizedBox.shrink();
+                                    },
+                                  )
+
+
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
 
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -305,7 +486,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                             (currentXValues==null || currentXValues.isEmpty)
                                         ) {
                                           return  Center(child: Padding(
-                                            padding: const EdgeInsets.only(top: 8.0),
+                                            padding: const EdgeInsets.all(32),
                                             child: Text("داده ای وجود ندارد"),
                                           ));
                                         }

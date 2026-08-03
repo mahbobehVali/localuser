@@ -16,7 +16,7 @@ class SelectImageWidget extends StatelessWidget {
   });
 
   // از final استفاده می شود زیرا این ها ویژگی های StatelessWidget هستند
-  final String image;
+  final String? image;
   final GestureTapCallback? onTap;
   final double? borderRadius;
   final double? clipBorderRadius;
@@ -36,41 +36,28 @@ class SelectImageWidget extends StatelessWidget {
             border: BoxBorder.all(color: ColorPalette.inverseGrey),),
         
         
-        child:  Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Icon(Icons.upload_file),
-              SizedBox(height: 10.h),
-              Text("بارگذاری فایل ضمیمه")
-            ],
-          ),
-        ),
+        child:  _buildImageContent()
       ),
     );
   }
 
   // متد کمکی برای مدیریت منطق نمایش تصویر
   Widget _buildImageContent() {
-    if (image.isEmpty) {
-      return const Icon(
-        Icons.add_photo_alternate_outlined,
-        size: 30,
-        color: Colors.grey,
-      );
-    } else if (image.startsWith("http")) {
-      return Image.network(
-        image,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) =>
-        const Icon(Icons.error, color: Colors.red),
+    if (image==null || image!.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Icon(Icons.upload_file),
+            SizedBox(height: 10.h),
+            Text("بارگذاری فایل ضمیمه")
+          ],
+        ),
       );
     } else {
-      return Image.file(
-        File(image),
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) =>
-        const Icon(Icons.error, color: Colors.red),
+      return Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Icon(Icons.check),
       );
     }
   }
