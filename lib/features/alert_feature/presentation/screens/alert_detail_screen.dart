@@ -40,7 +40,7 @@ class AlertDetailScreen extends StatelessWidget {
           locator<AlertDetailUseCase>(),
           locator<AlertCreateUseCase>(),
         );
-        alertBloc.add(AlertDetailEvent(alertDataEntity.id!));
+        alertBloc.add(AlertDetailEvent(alertDataEntity.id!,alertDataEntity.status!));
         return alertBloc;
       },
   child: Scaffold(
@@ -48,7 +48,7 @@ class AlertDetailScreen extends StatelessWidget {
       body: SizedBox(
         width: double.infinity,
         child: Padding(
-          padding:  EdgeInsets.all(16),
+          padding:  EdgeInsets.symmetric(horizontal: 16.w,vertical: 32.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -85,7 +85,7 @@ class AlertDetailScreen extends StatelessWidget {
                               ? "جدید"
                               : alertDataEntity.status == 1
                               ? "در حال بررسی"
-                              : "پاسخ داده شده",
+                              : "رفع شده",
                         ),
                       ),
                     ],
@@ -355,7 +355,10 @@ class AlertDetailScreen extends StatelessWidget {
                                 backColor: ColorPalette.darkBlue,
                                 onTap:
                                 createController.text.isEmpty ||
-                                    state.alert == null ? null :
+                                    state.alert ==  null?(){
+                                      GlobalSnackBar.show(context, message: "متن پیام و وضعیت هشدار را مشخص کنید");
+
+                                    }  :
                                     () {
                                       print("sffdf");
                                       BlocProvider.of<AlertBloc>(context).add(

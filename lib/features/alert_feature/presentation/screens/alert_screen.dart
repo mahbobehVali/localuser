@@ -155,7 +155,7 @@ class AlertScreen extends StatelessWidget {
                                                       ),
                                                       child: Text(data[index-1].status==0 ?"جدید":
                                                       data[index-1].status==1?"در حال بررسی":
-                                                      "پاسخ داده شده",textAlign: TextAlign.center,),
+                                                      "رفع شده",textAlign: TextAlign.center,),
                                                     )),
 
                                                   ],

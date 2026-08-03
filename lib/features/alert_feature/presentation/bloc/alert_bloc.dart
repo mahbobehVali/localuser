@@ -120,9 +120,8 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
     });
 
     on<AlertDetailEvent>((event, emit) async {
-      print("ffff");
 
-      emit(state.copyWith(newAlertDetailStatus: AlertDetailLoading()));
+      emit(state.copyWith(newAlertDetailStatus: AlertDetailLoading(),newAlert: event.status));
       DataState dataState = await alertDetailUseCase(event.id);
       if (dataState is DataSuccess) {
         if(dataState.data.isEmpty){
