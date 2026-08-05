@@ -43,6 +43,17 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
 
     if (totalElement != null) return totalElement;
 
+
+
+
+    final oneElement = list.firstWhere(
+      (element) => element["type"] == "one-well",
+      orElse: () => null,
+    );
+   print("oneElement${oneElement}");
+
+    if (oneElement != null) return oneElement;
+
    // final deviceElement = list.firstWhere(
    //       (element) => element["deviceId"] !=null && element["deviceId"].toString().isNotEmpty,
    //   orElse: () => null,

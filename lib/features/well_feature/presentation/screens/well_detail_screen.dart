@@ -316,10 +316,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         ).whereType<FlSpot>().toList();
 
                                         if (spots.isEmpty) {
-                                          return Padding(
-                                          padding: const EdgeInsets.all(32),
-                                          child: const Center(child: Text("دیتایی وجود ندارد")),
-                                        );
+                                          return Constants.noData();
                                         }
                                         if(state.flowMeterTodayStatus is FlowMeterTodaySuccess){
                                           FlowMeterTodaySuccess flowMeterTodaySuccess=state.flowMeterTodayStatus as FlowMeterTodaySuccess;
@@ -348,7 +345,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         List<BarChartGroupData> chartGroups = List.generate(xLabels.length, (index) {
                                           final double yVal = index < yValues.length ? yValues[index].toDouble() : 0.0;
 
-                                          const Color normalColor = Colors.blue;
+                                           Color normalColor = ColorPalette.darkBlue;
 
                                             return BarChartGroupData(
                                               x: index,
@@ -357,7 +354,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   toY: yVal,
                                                   color: normalColor,
                                                   width: 12,
-                                                  borderRadius: BorderRadius.circular(4),
+                                                  borderRadius: BorderRadius.circular(2),
                                                 ),
                                               ],
                                             );
@@ -384,7 +381,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         ),
                                                         borderData: FlBorderData(show: true, border: const Border(bottom: BorderSide(), left: BorderSide())),
                                                         titlesData: FlTitlesData(
-                                                          bottomTitles: Constants().axisBottomTitles(xLabels, "nothing"),
+                                                          bottomTitles: Constants().axisBottomTitles(xLabels, "day"),
 
                                                           rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                                           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -698,7 +695,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         width: 500,
                                         decoration: BoxDecoration(
                                             border: Border.all(color: ColorPalette.grey),
-                                            borderRadius: BorderRadius.circular(5)
+                                            borderRadius: BorderRadius.circular(3)
 
                                         ),
                                         child: ListView.builder(

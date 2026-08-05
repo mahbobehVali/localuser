@@ -303,7 +303,8 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       DataState flowMeterDataState = await wellFlowMeterUseCase(event.flowMeterParams);
 
       if (flowMeterDataState is DataSuccess) {
-        if(flowMeterDataState.data.isEmpty){
+        print("flowMeterDataState.data${flowMeterDataState.data}");
+        if(flowMeterDataState.data is List ){
           emit(state.copyWith(newFlowMeterStatus: FlowMeterEmpty()));
 
         }else{
