@@ -1,10 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mahaliii/common/widgets/show_snack_bar.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:permission_handler/permission_handler.dart';
 

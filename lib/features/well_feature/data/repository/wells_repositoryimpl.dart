@@ -61,10 +61,15 @@ class WellsRepositoryImpl extends WellsRepository {
 
     try {
       Response response = await wellsApiProvider.flowMeter(flowMeterParams);
+      if(response.data["list"].isEmpty){
+        return DataSuccess("");
+      }else{
+        WellFlowMeterEntity flowMeterEntity=WellFlowMeterModel.fromJson(response.data,ignoreAllWell: ignoreAllWell);
 
-      WellFlowMeterEntity flowMeterEntity=WellFlowMeterModel.fromJson(response.data,ignoreAllWell: ignoreAllWell);
+        return DataSuccess(flowMeterEntity);
+      }
 
-      return DataSuccess(flowMeterEntity);
+
     } on AppException catch (e) {
       return CheckExceptions.getError(e);
     }

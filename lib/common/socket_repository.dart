@@ -6,6 +6,7 @@ import 'package:persian_number_utility/persian_number_utility.dart';
 import 'package:socket_io_client/socket_io_client.dart' as i_o;
 
 import '../features/status_summary_feature/data/model/water_model.dart';
+import '../features/well_feature/data/model/well_flowmeter_one_model.dart';
 import '../locator.dart';
 
 Future<dynamic> getToken() async {
@@ -36,6 +37,7 @@ class SocketRepository {
   final _createTimeController = StreamController<dynamic>.broadcast();
   final _deleteTimeController = StreamController<dynamic>.broadcast();
   final _onAndOffTimeController = StreamController<dynamic>.broadcast();
+  final _todayController = StreamController<dynamic>.broadcast();
 
   // گرفتن استریم‌ها در صفحات/بلاک‌ها
   Stream<dynamic> get dashboardStatusCheckFinger => _statusControllerCheckFinger.stream;
@@ -43,6 +45,7 @@ class SocketRepository {
   Stream<dynamic> get createTimeStream => _createTimeController.stream;
   Stream<dynamic> get deleteTimeStream => _deleteTimeController.stream;
   Stream<dynamic> get onAndOffTimeStream => _onAndOffTimeController.stream;
+  Stream<dynamic> get todayStream => _todayController.stream;
 
   /// ۱. این متد را فقط یک‌بار در ابتدای برنامه یا ورود کاربر صدا می‌زنید
   Future<void> initAndConnect(String pin) async {
@@ -58,6 +61,7 @@ class SocketRepository {
     isConnecting = true;
 
     String token = await getToken();
+    print(token);
 
     _socket = i_o.io('https://www.abyarinovin.ir',
         i_o.OptionBuilder()
@@ -101,9 +105,27 @@ class SocketRepository {
           _waterController.add(WaterModel.fromJson(data));
           print(' Data Water successfully added to stream');
         } catch (e) {
-          print('JSON Parsing Error: $e');
+          print('JSON 1 Parsing Error: $e');
         }      }
     });
+
+    _socket!.on("flowmeter/today", (data) {
+      if (data != null && !_todayController.isClosed) {
+        // تبدیل به مدل و اضافه کردن به استریم آب
+        try {
+          final model=WellFlowMeterOneModel.fromJson(data);
+          print("model cre");
+
+          _todayController.add(model);
+          print("add");
+
+          print(' Data Water Today successfully added to stream');
+        } catch (e,s) {
+
+          print('JSON 2 Parsing Error: $e');
+        }      }
+    });
+
 
     _socket!.on("program/add", (data) {
       if (data != null && !_createTimeController.isClosed) {

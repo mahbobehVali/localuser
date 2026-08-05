@@ -19,8 +19,11 @@ class WellDetailState {
   final OnOffStatus? onOffStatus;
   final DeleteTimeStatus? deleteTimeStatus;
   final int selectedChartTab;
+  final int selectedChartVolumeTab;
   final WellScreenStatus wellScreenStatus;
   final FlowMeterStatus flowMeterStatus;
+  final int today;
+  final FlowMeterTodayStatus flowMeterTodayStatus;
 
   WellDetailState({
     required this.fingerStatus,
@@ -40,8 +43,11 @@ class WellDetailState {
     required this.onOffStatus,
     required this.deleteTimeStatus,
     required this.selectedChartTab,
+    required this.selectedChartVolumeTab,
     required this.wellScreenStatus,
     required this.flowMeterStatus,
+    required this.today,
+    required this.flowMeterTodayStatus,
   });
 
   WellDetailState copyWith(
@@ -63,8 +69,11 @@ class WellDetailState {
         OnOffStatus? newOnOffStatus,
         DeleteTimeStatus? newDeleteTimeStatus,
         int? newSelectedChartTab,
+        int? newSelectedChartVolumeTab,
         WellScreenStatus? newWellScreenStatus,
-        FlowMeterStatus? newFlowMeterStatus
+        FlowMeterStatus? newFlowMeterStatus,
+        int? newToday,
+        FlowMeterTodayStatus? newFlowMeterTodayStatus
 
       }) {
     return WellDetailState(
@@ -85,8 +94,11 @@ class WellDetailState {
       onOffStatus: newOnOffStatus??onOffStatus,
       deleteTimeStatus: newDeleteTimeStatus??deleteTimeStatus,
         selectedChartTab: newSelectedChartTab??selectedChartTab,
+      selectedChartVolumeTab: newSelectedChartVolumeTab??selectedChartVolumeTab,
       wellScreenStatus: newWellScreenStatus??wellScreenStatus,
-      flowMeterStatus: newFlowMeterStatus??flowMeterStatus
+      flowMeterStatus: newFlowMeterStatus??flowMeterStatus,
+      today: newToday??today,
+      flowMeterTodayStatus: newFlowMeterTodayStatus??flowMeterTodayStatus
 
     );
   }

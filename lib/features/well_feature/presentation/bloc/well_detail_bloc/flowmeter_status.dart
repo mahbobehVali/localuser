@@ -1,5 +1,7 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:mahaliii/features/well_feature/data/model/well_flowmeter_one_model.dart';
+import 'package:mahaliii/features/well_feature/domain/entity/well_flowmeter_one_entity.dart';
 
 import '../../../domain/entity/well_flowmeter_entity.dart';
 
@@ -34,6 +36,10 @@ class FlowMeterInitial extends FlowMeterStatus {
   @override
   List<Object> get props => [];
 }
+class FlowMeterEmpty extends FlowMeterStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class FlowMeterError extends FlowMeterStatus {
   final String error;
@@ -44,11 +50,13 @@ class FlowMeterError extends FlowMeterStatus {
   List<Object> get props => [error];
 }
 
+
 class FlowMeterSuccess extends FlowMeterStatus {
-  final WellFlowMeterEntity wellFlowMeterEntity;
+  final WellFlowMeterEntity? wellFlowMeterEntity;
 
 
-  const FlowMeterSuccess({required this.wellFlowMeterEntity});
+
+  const FlowMeterSuccess({ this.wellFlowMeterEntity});
 
   // // متد copyWith برای اینکه وقتی یکی آمد، قبلی پاک نشود
   // FlowMeterSuccess copyWith({

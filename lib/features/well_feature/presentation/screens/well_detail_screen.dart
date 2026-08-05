@@ -12,6 +12,7 @@ import 'package:mahaliii/features/well_feature/domain/usecase/flow_meter_usecase
 import 'package:mahaliii/features/well_feature/domain/usecase/get_program_usecase.dart';
 import 'package:mahaliii/features/well_feature/domain/usecase/well_work_usecase.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/flowmeter_status.dart';
+import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/flowmeter_today_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/pump_performance_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/widgets/program_widget.dart';
@@ -121,7 +122,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       )..add(
         FlowMeterEvent(
           FlowMeterParams(
-            type: 6,
+            type: 0,
             ids: [widget.wellsDataEntity.deviceId!],
           ),
         ),
@@ -267,27 +268,29 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text("میزان حجم آب عبوری دبی سنج",style: TextStyleP.f12Regular,),
-                                      // BlocBuilder<WellDetailBloc, WellDetailState>(
-                                      //   buildWhen: (previous, current) =>
-                                      //   current.selectedChartTab!=previous.selectedChartTab,
-                                      //   builder: (context, state) {
-                                      //     return SegmentedButton(
-                                      //
-                                      //         onSelectionChanged: (Set<int> newSelected) {
-                                      //           BlocProvider.of<WellDetailBloc>(context).add(
-                                      //               WellWorkHourStart(FlowMeterParams(
-                                      //                 type: newSelected.first,
-                                      //                 ids:[widget.wellsDataEntity.deviceId!],
-                                      //               )));
-                                      //
-                                      //         },
-                                      //         segments: [
-                                      //           ButtonSegment(value: 0,label: Text("امروز")),
-                                      //           ButtonSegment(value: 2,label: Text("هفته")),
-                                      //
-                                      //         ], selected:{state.selectedChartTab});
-                                      //   },
-                                      // )
+                                      BlocBuilder<WellDetailBloc, WellDetailState>(
+                                        buildWhen: (previous, current) =>
+                                        current.selectedChartVolumeTab!=previous.selectedChartVolumeTab,
+                                        builder: (context, state) {
+                                          return SegmentedButton(
+
+                                              onSelectionChanged: (Set<int> newSelected) {
+                                                BlocProvider.of<WellDetailBloc>(context).add(
+                                                  FlowMeterEvent(
+                                                    FlowMeterParams(
+                                                      type: newSelected.first,
+                                                      ids: [widget.wellsDataEntity.deviceId!],
+                                                    ),
+                                                  ));
+
+                                              },
+                                              segments: [
+                                                ButtonSegment(value: 0,label: Text("امروز")),
+                                                ButtonSegment(value: 6,label: Text("هفته")),
+
+                                              ], selected:{state.selectedChartVolumeTab});
+                                        },
+                                      )
                                     ],
                                   ),
                                   BlocBuilder<WellDetailBloc,WellDetailState>(
@@ -295,22 +298,21 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                       final status = state.flowMeterStatus;
                                       if (status is FlowMeterSuccess) {
 
-                                        final flowMeter = status.wellFlowMeterEntity.list;
+                                        final flowMeter = status.wellFlowMeterEntity!.list;
                                         final xLabels = flowMeter.xAxis;
                                         final yValues = flowMeter.yAxis;
+                                        final lastApiX=xLabels!.last;
+                                        final lastApiY=yValues!.last.toDouble();
 
-                                        if (xLabels == null || yValues == null || xLabels.isEmpty || yValues.isEmpty) {
-                                          return Padding(
-                                            padding: const EdgeInsets.all(32),
-                                            child: const Center(child: Text("داده ای وجود ندارد")),
-                                          );
+                                        if (xLabels.isEmpty || yValues.isEmpty) {
+                                          return Constants.noData();
                                         }
 
                                         final scale = Constants().getScale(yValues);
 
                                         List<FlSpot> spots = List.generate(
                                           xLabels.length,
-                                              (j) => j < yValues.length && yValues[j] != null ? FlSpot(j.toDouble(), yValues[j].toDouble()) : null,
+                                              (j) => j < yValues.length && yValues[j] != null ? FlSpot( j.toDouble(), yValues[j].toDouble()) : null,
                                         ).whereType<FlSpot>().toList();
 
                                         if (spots.isEmpty) {
@@ -319,11 +321,29 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                           child: const Center(child: Text("دیتایی وجود ندارد")),
                                         );
                                         }
+                                        if(state.flowMeterTodayStatus is FlowMeterTodaySuccess){
+                                          FlowMeterTodaySuccess flowMeterTodaySuccess=state.flowMeterTodayStatus as FlowMeterTodaySuccess;
+                                          final socketX=flowMeterTodaySuccess.wellFlowMeterTodayOneEntity!.xAxis;
+                                          final socketY=flowMeterTodaySuccess.wellFlowMeterTodayOneEntity!.yAxis!.toDouble();
+                                          if(lastApiX==socketX){
+                                            if(lastApiY==socketY){
+
+                                            }else{
+                                              final avgY=(lastApiY+socketY)/2;
+                                              spots[spots.length-1]=FlSpot(spots.length-1.toDouble(), avgY);
+                                            }
+                                          }else{
+                                            spots.add(FlSpot(spots.length.toDouble(), flowMeterTodaySuccess.wellFlowMeterTodayOneEntity!.yAxis!.toDouble()));
+                                            xLabels.add(socketX.toString());
+
+                                          }
+
+
+                                        }
 
                                         int totalItems = xLabels.length;
                                         double columnWidth = 80.0;
                                         double calculatedChartWidth = (totalItems * columnWidth).clamp(350.0, 2000.0);
-                                        List<String> capacity=[];
 
                                         List<BarChartGroupData> chartGroups = List.generate(xLabels.length, (index) {
                                           final double yVal = index < yValues.length ? yValues[index].toDouble() : 0.0;
@@ -355,7 +375,53 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
                                                     height: 300,
                                                     padding: const EdgeInsets.only(top: 40, right: 18.0,bottom: 10),
-                                                    child: BarChart(
+                                                    child: state.selectedChartVolumeTab==0?
+                                                    LineChart(
+
+                                                      LineChartData(
+                                                        extraLinesData: ExtraLinesData(
+                                                          horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
+                                                        ),
+                                                        borderData: FlBorderData(show: true, border: const Border(bottom: BorderSide(), left: BorderSide())),
+                                                        titlesData: FlTitlesData(
+                                                          bottomTitles: Constants().axisBottomTitles(xLabels, "nothing"),
+
+                                                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                          leftTitles: Constants().leftTitles(
+                                                            interval: scale["maxY"]! > 1000 ? 55.w : 40.w,
+                                                            scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                                          ),
+                                                        ),
+                                                        gridData: const FlGridData(show: false),
+
+                                                        lineBarsData: [
+                                                          LineChartBarData(
+                                                            preventCurveOverShooting: true,
+                                                            preventCurveOvershootingThreshold: 0,
+                                                            dotData: const FlDotData(show: false ),
+                                                            isCurved: true,
+                                                            belowBarData: BarAreaData(
+                                                              show: true,
+                                                              gradient: LinearGradient(
+                                                                colors: [ColorPalette.darkBlue.withValues(alpha: 0.9), ColorPalette.darkBlue.withValues(alpha: 0.5)],
+                                                                begin: Alignment.topCenter,
+                                                                end: Alignment.bottomCenter,
+                                                              ),
+                                                            ),
+                                                            color: ColorPalette.darkBlue,
+                                                            barWidth: 2.5,
+                                                            isStrokeCapRound: true,
+                                                            spots: spots,
+                                                          ),
+                                                        ],
+
+                                                        maxY: scale["maxY"],
+                                                        minY: scale["minY"],
+                                                      ),
+                                                      duration: const Duration(milliseconds: 250),
+                                                    ):
+                                                    BarChart(
                                                       BarChartData(
                                                         extraLinesData: ExtraLinesData(
                                                           horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
@@ -407,6 +473,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         );
                                       }
                                       if (status is FlowMeterLoading) return const Center(child: CircularProgressIndicator());
+                                      if (status is FlowMeterEmpty) {
+                                        return Constants.noData();
+                                      }
                                       if (status is FlowMeterError) return Center(child: Text(status.error));
                                       if (status is FlowMeterInitial) {
                                         return Center(child: Padding(
@@ -485,10 +554,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         if ((currentYValues==null || currentYValues.isEmpty) ||
                                             (currentXValues==null || currentXValues.isEmpty)
                                         ) {
-                                          return  Center(child: Padding(
-                                            padding: const EdgeInsets.all(32),
-                                            child: Text("داده ای وجود ندارد"),
-                                          ));
+                                          return  Center(child: Constants.noData());
                                         }
                                         final scale = successState.previousWellWorkEntity==null?Constants().getScale(currentYValues):
                                         Constants().getChartScale(currentYValues,previousYValues);
@@ -625,9 +691,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                     final baseListX = isFlowMeterBigger ? flowMeterX : currentWorkX;
                                     return flowMeter.list.xAxis!.isEmpty && currentWork.list.xAxis!.isEmpty
                                   ?
-                                    SizedBox(
-                                        height: 100,
-                                        child: Center(child: Text("داده ای وجود ندارد"))):
+                                    Constants.noData():
                                     SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Container(
@@ -692,7 +756,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                 children: [
                                                   Expanded(flex: 2, child: Text(currentDate.toString().toPersianDigit())),
                                                   Expanded(flex: 2, child: Text(workHours)),
-                                                  Expanded(child: Text(flowVolume)),
+                                                  Expanded(child: Directionality(textDirection: TextDirection.ltr,child: Text(flowVolume,textAlign: TextAlign.right,))),
                                                   Expanded(child: Text(alertCount)),
                                                 ],
                                               ),

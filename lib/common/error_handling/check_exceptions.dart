@@ -13,28 +13,33 @@ class CheckExceptions {
       case 200:
         return response;
 
+        //نام کاربری اشتباه است
       case 400:
         throw UnauthenticatedException();
 
+        //  رمز عبور اشتباه است
+        // حساب کاربری شما غیرفعال هست
+        // کد اعتبارسنجی اشتباه
       case 401:
         throw NotAllowedToEnterException(response: response);
 
-        //شماره شما در سامانه ثبت نشده(فراموشی رمز)
-    //نظر خود را ثبت کرده اید(نظر در مورد مشاوره)
-    //   case 404:
-    //     throw UnauthenticatedException();
+          //شماره شما در سامانه ثبت نشده(فراموشی رمز)
+      //نظر خود را ثبت کرده اید(نظر در مورد مشاوره)
+      //   case 404:
+      //     throw UnauthenticatedException();
 
-      //مهلت کد اعتبارسنجی به پایان رسیده
+        //کد اعتبارسنجی منقضی
       case 408:
         throw VerificationCodeExpiredException();
 
-      //قبلا ثبت نام کردی
-    //رمز فعلی اشتباه در حساب کاربری
-      case 422:
+        //ثبت نام: کد ملی یا شماره تکراری
+      case 409:
         throw AlreadyRegisteredException(response: response);
-   //15 دقیقه دیگر تلاش کنید
-      case 429:
-        throw OverLimitException(response: response);
+
+
+        // رمز عبور قبلی درست نیست
+      case 422:
+        throw WrongPreviousPasswordException(response: response);
 
       case 500:
         throw ServerException(response: response);
@@ -68,20 +73,35 @@ class CheckExceptions {
       case VerificationCodeExpiredException:
         return DataFailed(error: appException.message);
 
+
       ///Already registered
 
       case AlreadyRegisteredException:
         return DataFailed(
-            error: password==true?
-            appException.response!.data["message"]:
+            error:
+            // password==true?
+            appException.response!.data["errors"][0]
             // appException.response!.data["errors"]["mobile"][0]
-            "خطایی رخ داده"
+            // "خطایی رخ داده"
 
         );
-      ///Request more than the limit
 
-      case OverLimitException:
-        return DataFailed(error: appException.message);
+      case WrongPreviousPasswordException:
+        return DataFailed(
+            error:
+            appException.response!.data["message"]
+
+        );
+
+      case AlreadyRegisteredException:
+        return DataFailed(
+            error:
+            // password==true?
+            appException.response!.data["message"]
+          // appException.response!.data["errors"]["mobile"][0]
+          // "خطایی رخ داده"
+
+        );
 
       /// server error
       case ServerException:

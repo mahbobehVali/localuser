@@ -43,13 +43,24 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
 
     if (totalElement != null) return totalElement;
 
-    // // اگر total نبود، دنبال onwell می‌گرده
+   // final deviceElement = list.firstWhere(
+   //       (element) => element["deviceId"] !=null && element["deviceId"].toString().isNotEmpty,
+   //   orElse: () => null,
+   // );
+   // print("totalElement${totalElement}");
+   //
+   // if (deviceElement != null) return deviceElement;
+   //
+
+   // // اگر total نبود، دنبال onwell می‌گرده
     // final onwellElement = list.firstWhere(
     //   (element) => element["type"] == "one-well",
     //   orElse: () => null,
     // );
     //
     // if (onwellElement != null) return onwellElement;
+
+
 
     // اگر هیچ‌کدوم نبودن خطا میده
     throw Exception("Neither 'total' nor 'onwell' flow meter was found.");

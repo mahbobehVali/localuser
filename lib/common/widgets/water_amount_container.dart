@@ -56,7 +56,9 @@ class WaterAmountContainer extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 5,),
-                Text(amount.toPersianDigit(),style:  TextStyleP.f16Bold),
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                    child: Text(amount.toPersianDigit(),style:  TextStyleP.f16Bold,textAlign: TextAlign.left,)),
               ],
             ),
           ],

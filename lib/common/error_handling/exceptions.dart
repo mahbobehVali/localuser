@@ -22,6 +22,12 @@ class NotAllowedToEnterException extends AppException {
             message: message ?? "کد اعتبارسنجی اشتباه است");
 }
 
+class WrongPreviousPasswordException extends AppException {
+  WrongPreviousPasswordException({String? message, super.response})
+      : super(
+            message: message ?? "شماره موبایل یا کد ملی اشتباه است");
+}
+
 class UnauthenticatedException extends AppException {
   UnauthenticatedException({String? message, super.response})
       : super(
@@ -36,13 +42,6 @@ class AlreadyRegisteredException extends AppException {
                 "شما قبلا ثبت نام کرده اید");
 }
 
-
-class OverLimitException extends AppException {
-  OverLimitException({String? message, super.response})
-      : super(
-            message: message ??
-                "درخواست بیشتر از حد مجاز، لطفا 15 دقیقه دیگر تلاش کنید.");
-}
 
 // class DataParsingException extends AppException {
 //   DataParsingException({String? message_bloc})

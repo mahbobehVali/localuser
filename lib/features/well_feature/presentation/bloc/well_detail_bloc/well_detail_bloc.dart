@@ -23,6 +23,7 @@ import 'alert_count_status.dart';
 import 'create_time_status.dart';
 import 'finger_status.dart';
 import 'flowmeter_status.dart';
+import 'flowmeter_today_status.dart';
 import 'get_program_status.dart';
 import 'on_off_status.dart';
 
@@ -57,9 +58,12 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     onOffStatus: OnOffInitial(),
     deleteTimeStatus: DeleteTimeInitial(),
     selectedChartTab: 0,
+    selectedChartVolumeTab: 0,
     wellScreenStatus: WellScreenInitial(),
     userLocalId: null,
-    flowMeterStatus: FlowMeterInitial()
+    flowMeterStatus: FlowMeterInitial(),
+    today: -1,
+    flowMeterTodayStatus: FlowMeterTodayInitial()
   )) {
     on<WellStart>((event, emit) async {
       emit(state.copyWith(newWellStatus: WellLoading()));
@@ -134,6 +138,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       },
       transformer: restartable(), // 👈 حتما اضافه شود تا استریم‌های قبلی کنسل شوند
     );
+
 
     on<StatusEvent>((event, emit) {
       if (event.status == 0) {
@@ -292,27 +297,59 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     // });
 
     on<FlowMeterEvent>((event, emit) async {
-      emit(state.copyWith(newFlowMeterStatus: FlowMeterLoading()));
+      emit(state.copyWith(newFlowMeterStatus: FlowMeterLoading(),newSelectedChartVolumeTab: event.flowMeterParams.type));
 
 
-      DataState flowMeterDataState = await wellFlowMeterUseCase(FlowMeterParams(
-          ids: event.flowMeterParams.ids,
-          type: event.flowMeterParams.type));
-      DataState alertDataState = await alertCountUseCase(event.flowMeterParams);
+      DataState flowMeterDataState = await wellFlowMeterUseCase(event.flowMeterParams);
 
-      if (flowMeterDataState is DataSuccess
-          && alertDataState is DataSuccess) {
+      if (flowMeterDataState is DataSuccess) {
+        if(flowMeterDataState.data.isEmpty){
+          emit(state.copyWith(newFlowMeterStatus: FlowMeterEmpty()));
 
-        emit(state.copyWith(newFlowMeterStatus: FlowMeterSuccess(
-            wellFlowMeterEntity: flowMeterDataState.data,
-        )));
+        }else{
+          emit(state.copyWith(newFlowMeterStatus: FlowMeterSuccess(
+              wellFlowMeterEntity: flowMeterDataState.data
+          )));
+        }
+
+        add(FlowMeterToday());
 
       }
-      if (flowMeterDataState is DataFailed
-          || alertDataState is DataFailed) {
+      if (flowMeterDataState is DataFailed) {
         emit(state.copyWith(newFlowMeterStatus: FlowMeterError("خطایی رخ داده")));
       }
     });
+
+    on<FlowMeterToday>((event, emit) async {
+      // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
+      // if (state.onOffStatus is! OnOffSuccess) {
+      //   emit(state.copyWith(newOnOffStatus: OnOffSuccess()));
+      // }
+      // ارسال درخواست مخصوص این صفحه
+      // emit(state.copyWith(newOnOffStatus: OnOffLoading()));
+
+      // socketRepository.onAndOff(event.createTimeParams);
+
+      // ۲. مدیریت استریم با emit.forEach
+      await emit.forEach<dynamic>(
+        // socketRepository.onAndOffTimeStream,
+        socketRepository.todayStream,
+        onData: (today) {
+          print("today$today");
+          // دیتای دریافتی را به وضعیت موفقیت می‌بریم
+          return state.copyWith(
+              newFlowMeterTodayStatus: FlowMeterTodaySuccess(wellFlowMeterTodayOneEntity: today));
+        },
+        onError: (error, stackTrace) {
+          print("❌ BLoC Stream Error: $error");
+          return state.copyWith(
+            newFlowMeterTodayStatus: FlowMeterTodayError(error.toString()),
+          );
+        },
+      );
+
+    });
+
 
     on<GetProgram>((event, emit) async {
       emit(state.copyWith(newGetProgramStatus: GetProgramLoading()));

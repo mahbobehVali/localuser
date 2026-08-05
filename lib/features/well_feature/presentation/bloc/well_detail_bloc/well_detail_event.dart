@@ -211,4 +211,13 @@ class FlowMeterEvent extends WellDetailEvent {
   List<Object?> get props => [];
 }
 
+class FlowMeterToday extends WellDetailEvent {
+
+  const FlowMeterToday();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
 

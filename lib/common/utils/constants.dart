@@ -41,6 +41,14 @@ class Constants {
   }
 
 
+  static Widget noData(){
+    return Padding(
+      padding: EdgeInsets.all(32),
+      child: Center(child: Text("داده ای وجود ندارد")),
+    );
+  }
+
+
   // static bool isValidEmail(String email) {
   //   if(email.isEmpty) {
   //     return true;
