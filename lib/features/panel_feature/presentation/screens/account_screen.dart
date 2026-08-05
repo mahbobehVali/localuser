@@ -145,6 +145,7 @@ class _AccountScreenState extends State<AccountScreen>{
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+
                           AccountBoxTitle(title: "رمز عبور",titleIcon: "assets/icons/Password.png"),
                           BlocBuilder<AccountBloc,AccountState>(
                             buildWhen: (previous, current) => previous.edit!=current.edit,
@@ -200,7 +201,9 @@ class _AccountScreenState extends State<AccountScreen>{
                                onTap: () {
                                  BlocProvider.of<AccountBloc>(context).add(ChangeEditEvent(true));
                                },
-                               child: Image.asset("assets/icons/edit.png"));
+                               child: Image.asset("assets/icons/edit.png")
+                               // child: Image.asset("assets/icons/edit.png")
+                           );
 
                           },)
 

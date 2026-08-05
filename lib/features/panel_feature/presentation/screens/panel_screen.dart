@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -53,7 +54,7 @@ class _PanelScreenState extends State<PanelScreen> {
                         Row(
                           children: [
                             IconContainer(
-                              icon: Image.asset("assets/icons/user.png"),
+                              icon: Image.asset("assets/icons/user-square.png"),
                               color: Colors.transparent,
                               width: 24,
                               height: 24,
@@ -90,7 +91,9 @@ class _PanelScreenState extends State<PanelScreen> {
                         Row(
                           children: [
                             IconContainer(
-                              icon: Image.asset("assets/icons/user.png"),
+                              // icon: Icon(Icons.account_box_outlined),
+                              // icon: Icon(CupertinoIcons.person_crop_square),
+                              icon: Image.asset("assets/icons/user-square.png"),
                               color: Colors.transparent,
                               width: 24,
                               height: 24,
@@ -131,7 +134,8 @@ class _PanelScreenState extends State<PanelScreen> {
                           child: Row(
                             children: [
                               IconContainer(
-                                icon: Image.asset("assets/icons/Logout.png"),
+                                icon: Icon(Icons.logout_rounded),
+                                // icon: Image.asset("assets/icons/Logout.png"),
                                 color: Colors.transparent,
                                 width: 24,
                                 height: 24,

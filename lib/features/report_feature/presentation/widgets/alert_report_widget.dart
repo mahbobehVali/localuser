@@ -22,7 +22,7 @@ class AlertsReportChartWidget extends StatelessWidget {
           final countByType = status.alertCountEntity.countByType;
 
           if (countByType == null || countByType.isEmpty) {
-            return const Center(child: Text("دیتایی وجود ندارد"));
+            return Constants.noData();
           }
 
           List count = countByType.map((e) => e.count).toList();

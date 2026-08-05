@@ -999,7 +999,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                   children: [
                                     IconContainer(
                                       icon: Image.asset("assets/icons/pomp.png"),
-                                      color: Color(0xffECF1F9),
+                                      color: ColorPalette.iconContainerColor,
                                       width: 24,
                                       height: 24,
                                     ),

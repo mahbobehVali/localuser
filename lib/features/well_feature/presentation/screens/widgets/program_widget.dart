@@ -44,8 +44,9 @@ class Program extends StatelessWidget {
                   Row(
                     children: [
                       IconContainer(
-                        icon: Image.asset("assets/icons/calender.png"),
-                        color: Color(0xffECF1F9),
+                        icon: Icon(Icons.edit_calendar_outlined),
+                        // icon: Image.asset("assets/icons/calender.png"),
+                        color: ColorPalette.iconContainerColor,
                         width: 24,
                         height: 24,
                       ),

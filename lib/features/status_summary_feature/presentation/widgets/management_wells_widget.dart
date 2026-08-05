@@ -65,7 +65,7 @@ class ManagementWellsWidget extends StatelessWidget {
                           children: [
                             IconContainer(
                               icon: Icon(Icons.location_on_outlined),
-                              color: Color(0xffECF1F9),
+                              color: ColorPalette.iconContainerColor,
                               width: 24,
                               height: 24,
                             ),
