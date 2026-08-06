@@ -1,7 +1,5 @@
 
 import 'package:equatable/equatable.dart';
-import 'package:mahaliii/features/well_feature/data/model/well_flowmeter_one_model.dart';
-import 'package:mahaliii/features/well_feature/domain/entity/well_flowmeter_one_entity.dart';
 
 import '../../../domain/entity/well_flowmeter_entity.dart';
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../common/widgets/shimmer_class.dart';
 import '../../../../common/widgets/water_amount_container.dart';
 import '../bloc/report_bloc.dart';
 import '../bloc/report_command_status.dart';
@@ -25,9 +26,7 @@ class KeyIndexWidget extends StatelessWidget {
                 return  WaterAmountContainer(title: "حجم کل آب مصرف شده",amount: reportFlowMeterSuccess.reportFlowMeter.list.total.toString());
 
               }else  if(state.reportFlowMeterStatus is ReportFlowMeterLoading){
-                return SizedBox(
-                    height: 60.h,
-                    child: Center(child: CircularProgressIndicator(),));
+                return ShimmerClass.shimmerContainer(height: 100);
               }else {
                 return  WaterAmountContainer(title: "حجم کل آب مصرف شده",amount: "-",meter: false,);
               }
@@ -43,10 +42,7 @@ class KeyIndexWidget extends StatelessWidget {
                 return  WaterAmountContainer(title: "مجموع ساعات کارکرد پمپ ها",amount: "${reportCommandSuccess.reportFlowMeter.list.totalOn.toString()} ساعت",meter: false,);
 
               }else  if(state.reportCommandStatus is ReportCommandLoading){
-                return SizedBox(
-                    height: 60.h,
-
-                    child: Center(child: CircularProgressIndicator(),));
+                return ShimmerClass.shimmerContainer(height: 100);
               }else {
                 return  WaterAmountContainer(title: "مجموع ساعات کارکرد پمپ ها",amount: "-",meter: false,);
 
@@ -62,9 +58,7 @@ class KeyIndexWidget extends StatelessWidget {
                 return  WaterAmountContainer(title: "تعداد هشدارهای صادر شده",amount: reportCountSuccess.alertCountEntity.totalCount.toString(),meter: false,);
 
               }else  if(state.reportCountStatus is ReportCountLoading){
-                return SizedBox(
-                    height: 60.h,
-                    child: Center(child: CircularProgressIndicator(),));
+                return ShimmerClass.shimmerContainer(height: 100);
               }else {
                 return  WaterAmountContainer(title: "تعداد هشدارهای صادر شده",amount: "-",meter: false,);
 

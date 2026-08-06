@@ -284,6 +284,7 @@ class ReportScreen extends StatelessWidget {
                         ids: state.oneWell
                       ))) ..add(GetAlertCount(FlowMeterParams(
                           page: 1,
+                          time: -1,
                           type: 5,
                           endDate: state.endDate,
                           startDate: state.startDate,
@@ -391,7 +392,7 @@ class ReportScreen extends StatelessWidget {
                           children: [
                             // Text("حجم مصرف ${state.oneWell?.wellName ?? ""}", style: TextStyleP.f12Regular),
                             const SizedBox(height: 10),
-                            const VolumeReportChartWidget(),
+                             VolumeReportChartWidget(),
                           ],
                         ),
                       );
@@ -404,7 +405,7 @@ class ReportScreen extends StatelessWidget {
                           children: [
                             // Text("حجم مصرف ${state.oneWell?.wellName ?? ""}", style: TextStyleP.f12Regular),
                             const SizedBox(height: 10),
-                            const VolumeReportChartWidget(),
+                             VolumeReportChartWidget(),
                           ],
                         ),
                       );
@@ -418,7 +419,7 @@ class ReportScreen extends StatelessWidget {
                           children: [
                             Text("ساعات کار پمپ", style: TextStyleP.f12Regular),
                             const SizedBox(height: 10),
-                            const PumpHoursChartWidget(),
+                             PumpHoursChartWidget(),
                           ],
                         ),
                       );
@@ -432,7 +433,7 @@ class ReportScreen extends StatelessWidget {
                           children: [
                             Text("هشدارهای ارسال شده", style: TextStyleP.f12Regular),
                             const SizedBox(height: 10),
-                            const AlertsReportChartWidget(),
+                             AlertsReportChartWidget(),
                           ],
                         ),
                       );

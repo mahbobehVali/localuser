@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../config/color_palette.dart';
@@ -33,61 +35,74 @@ class LastActivityWidget extends StatelessWidget {
         }
       }
     }
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("جدول اطلاعات دستوردهی به دستگاه", style: TextStyleP.f12Regular),
+            IconButton(
+                onPressed: () {
+                  exportActivityToExcel(context, flatList);
 
-      child: Container(
-        width: 500,
-        decoration: BoxDecoration(
-            border: Border.all(color: ColorPalette.grey),
-            borderRadius: BorderRadius.circular(5)
-
+                },
+                icon:Icon(Icons.file_download_outlined))
+          ],
         ),
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.zero,
-          itemCount: flatList.length+1,
-          itemBuilder: (context, index) {
-            return
-              index==0? Container(
-                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+        SizedBox(height: 10.h),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
 
-                decoration: BoxDecoration(
-                  color: ColorPalette.lightGrey,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(flex: 2,child: Text("نام چاه",style: TextStyleP.f10Regular)),
+          child: SizedBox(
+            width: 500,
 
-                    Expanded(flex: 1,child: Text("وضعیت",style: TextStyleP.f10Regular)),
-                    Expanded(flex: 3,child: Text("توسط",style: TextStyleP.f10Regular)),
-                    Expanded(flex: 2,child: Text("تاریخ",style: TextStyleP.f10Regular)),
-                    Expanded(child: Text("ساعت",style: TextStyleP.f10Regular)),
-                    // Expanded(child: Text("نوع دستور",style: TextStyleP.f10Regular)),
-                  ],
-                ),
-              ):
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
-                decoration: BoxDecoration(
-                    border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width:index==flatList.length-1?0:1))
-                ),
-                child: Row(
-                  children: [
-                    Expanded(flex: 2,child: Text(flatList[index-1].wellName)),
-                    Expanded(flex: 1,child: Text(flatList[index-1].status)),
-                    Expanded(flex: 3,child: Text(flatList[index-1].name)),
-                    Expanded(flex: 2,child: Text(flatList[index-1].date.toPersianDigit())),
-                    Expanded(child: Text(flatList[index-1].time.toPersianDigit())),
-                    // Expanded(child: Text(flatList[index-1].type)),
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              itemCount: flatList.length+1,
+              itemBuilder: (context, index) {
+                return
+                  index==0? Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 10),
 
-                  ],
-                ),
-              );
-          },
+                    decoration: BoxDecoration(
+                      color: ColorPalette.lightGrey,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(flex: 2,child: Text("نام چاه",style: TextStyleP.f10Regular)),
+
+                        Expanded(flex: 1,child: Text("وضعیت",style: TextStyleP.f10Regular)),
+                        Expanded(flex: 3,child: Text("توسط",style: TextStyleP.f10Regular)),
+                        Expanded(flex: 2,child: Text("تاریخ",style: TextStyleP.f10Regular)),
+                        Expanded(child: Text("ساعت",style: TextStyleP.f10Regular)),
+                        // Expanded(child: Text("نوع دستور",style: TextStyleP.f10Regular)),
+                      ],
+                    ),
+                  ):
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
+                    decoration: BoxDecoration(
+                        border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width:index==flatList.length-1?0:1))
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(flex: 2,child: Text(flatList[index-1].wellName)),
+                        Expanded(flex: 1,child: Text(flatList[index-1].status)),
+                        Expanded(flex: 3,child: Text(flatList[index-1].name)),
+                        Expanded(flex: 2,child: Text(flatList[index-1].date.toPersianDigit())),
+                        Expanded(child: Text(flatList[index-1].time.toPersianDigit())),
+                        // Expanded(child: Text(flatList[index-1].type)),
+
+                      ],
+                    ),
+                  );
+              },
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }

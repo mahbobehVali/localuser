@@ -473,3 +473,12 @@ class LastActivitySlot {
 
   LastActivitySlot(this.wellName, this.date, this.time,this.name,this.status,this.type);
 }
+
+class VolumeSlot {
+  final String? name;
+  final String? status;
+  final int? amount;
+  final int? capacity;
+
+  VolumeSlot({this.name, this.status, this.amount, this.capacity});
+}

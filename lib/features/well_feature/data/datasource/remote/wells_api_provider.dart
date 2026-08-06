@@ -32,8 +32,12 @@ class WellsApiProvider {
   }
 
   Future<dynamic> alertCount(FlowMeterParams flowMeterParams) async {
+    print(flowMeterParams.startDate);
+    print(flowMeterParams.endDate);
+    print(flowMeterParams.ids);
 
     var data =flowMeterParams.time==-1? {
+
       "startDate":flowMeterParams.startDate,
       "endDate":flowMeterParams.endDate,
       "ids":"${flowMeterParams.ids}",
@@ -44,6 +48,7 @@ class WellsApiProvider {
     };
     try {
       final response = await dio.get("alert/count",queryParameters:data);
+      print("response=============${response.data}");
       return response;
     } on DioException catch (e) {
 

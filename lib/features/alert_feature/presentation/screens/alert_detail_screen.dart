@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mahaliii/common/widgets/global_snackbar.dart';
-import 'package:persian_number_utility/persian_number_utility.dart';
-
 import 'package:mahaliii/common/params/send_new_request_to_support_params.dart';
 import 'package:mahaliii/common/utils/constants.dart';
 import 'package:mahaliii/common/widgets/global_elevated_button.dart';
+import 'package:mahaliii/common/widgets/global_snackbar.dart';
 import 'package:mahaliii/common/widgets/icon_container.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/config/texts_style.dart';
-import 'package:mahaliii/locator.dart';
-
 import 'package:mahaliii/features/alert_feature/domain/entity/alert_data_entity.dart';
 import 'package:mahaliii/features/alert_feature/domain/usecase/alert_create_usecase.dart';
 import 'package:mahaliii/features/alert_feature/domain/usecase/alert_detail_usecase.dart';
@@ -22,6 +18,8 @@ import 'package:mahaliii/features/alert_feature/presentation/bloc/alert_detail_s
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/area_usecase.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/region_usecase.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/usecase/wells_list_usecase.dart';
+import 'package:mahaliii/locator.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
 
 class AlertDetailScreen extends StatelessWidget {
    AlertDetailScreen({super.key,required this.alertDataEntity});

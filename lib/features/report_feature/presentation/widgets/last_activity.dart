@@ -20,46 +20,32 @@ class LastActivity extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: Constants().whiteFiveRadiusDecoration,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("آخرین فعالیت های انجام شده", style: TextStyleP.f12Regular),
-          SizedBox(height: 10.h),
-          Container(
-            decoration: BoxDecoration(border: Border.all(color: ColorPalette.grey), borderRadius: BorderRadius.circular(5)),
-            child: BlocBuilder<ReportBloc, ReportState>(
-              buildWhen: (prev, curr) =>
-              prev.selectedLastActivityPage != curr.selectedLastActivityPage ||
-                  prev.userActivityReportStatus != curr.userActivityReportStatus,
-              builder: (context, state) {
-                print(state.userActivityReportStatus);
-                final status = state.userActivityReportStatus;
-                if (status is UserActivityReportSuccess) {
-                  return Column(
-                    children: [
-                      LastActivityWidget(lastActivityEntity: status.lastActivityEntity),
-                      PaginationWidget(
-                        selected: state.selectedLastActivityPage!,
-                        lastPage: status.lastActivityEntity.lastPage!,
-                        onPageChanged: (newPage) {
-                          context.read<ReportBloc>().add(UserActivityReportStart(state.flowMeterParams!.copyWith(newPage: newPage)));
-                        },
-                      )
-                    ],
-                  );
-                }
-                if (status is UserActivityReportEmpty) {
-                  return SizedBox(
-                    height: 200,
-                    child: Center(child: Text("فعالیتی وجود ندارد", style: TextStyleP.f16Medium)),
-                  );
-                }
-                if (status is UserActivityReportError) return Center(child: Text(status.error));
-                return const Center(child: SizedBox.shrink());
-              },
-            ),
-          ),
-        ],
+      child: BlocBuilder<ReportBloc, ReportState>(
+        buildWhen: (prev, curr) =>
+        prev.selectedLastActivityPage != curr.selectedLastActivityPage ||
+            prev.userActivityReportStatus != curr.userActivityReportStatus,
+        builder: (context, state) {
+          final status = state.userActivityReportStatus;
+          if (status is UserActivityReportSuccess) {
+            return Column(
+              children: [
+                LastActivityWidget(lastActivityEntity: status.lastActivityEntity),
+                PaginationWidget(
+                  selected: state.selectedLastActivityPage!,
+                  lastPage: status.lastActivityEntity.lastPage!,
+                  onPageChanged: (newPage) {
+                    context.read<ReportBloc>().add(UserActivityReportStart(state.flowMeterParams!.copyWith(newPage: newPage)));
+                  },
+                )
+              ],
+            );
+          }
+          if (status is UserActivityReportEmpty) {
+            return Constants.noData();
+          }
+          if (status is UserActivityReportError) return Center(child: Text(status.error));
+          return const Center(child: SizedBox.shrink());
+        },
       ),
     );
   }

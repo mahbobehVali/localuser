@@ -2,6 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/common/widgets/export_to_excel.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/constants.dart';
@@ -11,7 +13,8 @@ import '../bloc/report_bloc.dart';
 import '../bloc/report_command_status.dart';
 
 class PumpHoursChartWidget extends StatelessWidget {
-  const PumpHoursChartWidget({super.key});
+   PumpHoursChartWidget({super.key});
+  List<VolumeSlot> flatList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +67,14 @@ class PumpHoursChartWidget extends StatelessWidget {
                           minY: scale['minY'],
                           alignment: BarChartAlignment.spaceAround,
                           gridData: const FlGridData(show: false),
+                          barTouchData: BarTouchData(
+                              handleBuiltInTouches: true,
+                              touchTooltipData: BarTouchTooltipData(
+                                getTooltipColor: (group) => ColorPalette.lightGrey,
+                                fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
+                                fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                              )
+                          ),
                           borderData: FlBorderData(border: const Border(bottom: BorderSide(), left: BorderSide())),
                           titlesData: FlTitlesData(
                             show: true,
@@ -83,41 +94,59 @@ class PumpHoursChartWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Text("جدول اطلاعات تکمیلی نمودار", style: TextStyleP.f12Regular),
-              ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemCount: yValues.length + 1,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Container(
-                      padding: const EdgeInsets.all(10),
-                      color: ColorPalette.lightGrey,
-                      child: Row(
-                        children: [
-                          Expanded(flex: 2, child: Text("تاریخ", style: TextStyleP.f10Regular)),
-                          Expanded(flex: 3, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular)),
-                        ],
-                      ),
-                    );
-                  }
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                    decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
-                    child: Row(
-                      children: [
-                        Expanded(flex: 2, child: Text(xLabels[index - 1])),
-                        Expanded(flex: 3, child: Text('\u200E${yValues[index - 1].toString().toPersianDigit()}')),
-                      ],
-                    ),
-                  );
-                },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("جدول اطلاعات تکمیلی نمودار", style: TextStyleP.f12Regular),
+                  IconButton(
+                      onPressed: () {
+                        exportPumpToExcel(context, flatList,state.oneWell.length);
+
+                      },
+                      icon:Icon(Icons.file_download_outlined))
+                ],
+              ),
+              Padding(
+                padding:  EdgeInsets.only(bottom: 30.h),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemCount: yValues.length + 1,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Container(
+                        padding: const EdgeInsets.all(10),
+                        color: ColorPalette.lightGrey,
+                        child: Row(
+                          children: [
+                            Expanded(flex: 3, child: Text( state.oneWell.length==1? "تاریخ":"چاه", style: TextStyleP.f10Regular)),
+                            Expanded(flex: 2, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular)),
+                          ],
+                        ),
+                      );
+                    }else{
+                      flatList.add(VolumeSlot(name: xLabels[index-1].toString().toPersianDigit(),status: yValues[index-1].toString().toPersianDigit()));
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                        decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 3, child: Text(xLabels[index - 1].toString().toPersianDigit())),
+                            Expanded(flex: 2, child: Text('\u200E${yValues[index - 1].toString().toPersianDigit()}')),
+                          ],
+                        ),
+                      );
+                    }
+
+                  },
+                ),
               )
             ],
           );
         }
-        if (status is ReportCommandLoading) return const Center(child: CircularProgressIndicator());
+        if (status is ReportCommandLoading) return ShimmerClass.shimmerChartAndListVertical(height: 50);
         if (status is ReportCommandError) return Center(child: Text(status.error));
         return const SizedBox.shrink();
       },

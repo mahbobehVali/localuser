@@ -1,6 +1,5 @@
 
 
-import '../../domain/entity/well_flowmeter_list_entity.dart';
 import '../../domain/entity/well_flowmeter_one_entity.dart';
 
 class WellFlowMeterOneModel extends WellFlowMeterOneEntity {

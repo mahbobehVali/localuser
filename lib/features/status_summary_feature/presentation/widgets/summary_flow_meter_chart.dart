@@ -154,7 +154,8 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                           lineTouchData: LineTouchData(
                                             touchTooltipData: LineTouchTooltipData(
                                               getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
-
+                                              fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
+                                              fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
                                             ),
                                             handleBuiltInTouches: true,
                                           ),
@@ -218,9 +219,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                         );
                       }
                       else if (state.reportFlowMeterStatus is SummaryFlowMeterLoading) {
-                        return state.selectedChartTab == 0
-                            ?  ShimmerClass.lineChartShimmer()
-                            :  ShimmerClass.barChartShimmer() ;
+                        return ShimmerClass.lineChartShimmer();
                       } else if (state.reportFlowMeterStatus is SummaryFlowMeterError) {
                         SummaryFlowMeterError reportFlowMeterError = state.reportFlowMeterStatus as SummaryFlowMeterError;
                         return Center(child: Text(reportFlowMeterError.error));

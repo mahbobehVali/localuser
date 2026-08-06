@@ -2,6 +2,9 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/common/widgets/export_to_excel.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/constants.dart';
 import '../../../../config/color_palette.dart';
@@ -11,7 +14,8 @@ import '../bloc/report_bloc.dart';
 import '../bloc/report_count_status.dart';
 
 class AlertsReportChartWidget extends StatelessWidget {
-  const AlertsReportChartWidget({super.key});
+   AlertsReportChartWidget({super.key});
+  List<VolumeSlot> flatList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +75,14 @@ class AlertsReportChartWidget extends StatelessWidget {
                           minY: scale['minY'],
                           alignment: BarChartAlignment.spaceAround,
                           gridData: const FlGridData(show: false),
+                          barTouchData: BarTouchData(
+                              handleBuiltInTouches: true,
+                              touchTooltipData: BarTouchTooltipData(
+                                getTooltipColor: (group) => ColorPalette.lightGrey,
+                                fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
+                                fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                              )
+                          ),
                           borderData: FlBorderData(border: const Border(bottom: BorderSide(), left: BorderSide())),
                           titlesData: FlTitlesData(
                             show: true,
@@ -89,7 +101,18 @@ class AlertsReportChartWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Text("جدول اطلاعات تکمیلی نمودار", style: TextStyleP.f12Regular),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("جدول اطلاعات تکمیلی نمودار", style: TextStyleP.f12Regular),
+                  IconButton(
+                      onPressed: () {
+                        exportAlertReportToExcel(context, flatList);
+
+                      },
+                      icon:Icon(Icons.file_download_outlined))
+                ],
+              ),
               const SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(border: Border.all(color: ColorPalette.grey), borderRadius: BorderRadius.circular(5)),
@@ -98,35 +121,42 @@ class AlertsReportChartWidget extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: countByType.length + 1,
                   itemBuilder: (context, index) {
+
                     if (index == 0) {
                       return Container(
                         padding: const EdgeInsets.all(10),
                         color: ColorPalette.lightGrey,
                         child: Row(
                           children: [
-                            Expanded(flex: 2, child: Text("نوع هشدار", style: TextStyleP.f10Regular)),
+                            Expanded(flex: 3, child: Text("نوع هشدار", style: TextStyleP.f10Regular)),
                             Expanded(flex: 2, child: Text("تعداد هشدارها", style: TextStyleP.f10Regular)),
                           ],
                         ),
                       );
+                    }else{
+                      flatList.add(VolumeSlot(
+                          name: typeName[index - 1],
+                          status: countByType[index - 1].count.toString().toPersianDigit()
+                      ));
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                        decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 3,child: Text(typeName[index - 1])),
+                            Expanded(flex: 2,child: Text(countByType[index - 1].count.toString().toPersianDigit())),
+                          ],
+                        ),
+                      );
                     }
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                      decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
-                      child: Row(
-                        children: [
-                          Expanded(child: Text(typeName[index - 1])),
-                          Expanded(child: Text(countByType[index - 1].count.toString())),
-                        ],
-                      ),
-                    );
+
                   },
                 ),
               )
             ],
           );
         }
-        if (status is ReportCountLoading) return const Center(child: CircularProgressIndicator());
+        if (status is ReportCountLoading) return ShimmerClass.shimmerChartAndListVertical(height: 50);
         if (status is ReportCountError) return Center(child: Text(status.error));
         return const SizedBox.shrink();
       },

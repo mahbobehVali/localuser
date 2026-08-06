@@ -54,7 +54,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       return switch (i) {
         0 =>
             PieChartSectionData(
-              color: Color(0xff5F8CC5),
+              color: ColorPalette.darkBlue,
               value: (on ?? 0).toDouble(),
               title: '',
               titleStyle: TextStyle(
@@ -441,6 +441,14 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                       ),
                                                     ),
                                                     gridData: const FlGridData(show: false),
+                                                    lineTouchData: LineTouchData(
+                                                      touchTooltipData: LineTouchTooltipData(
+                                                        getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
+                                                        fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
+                                                        fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                                      ),
+                                                      handleBuiltInTouches: true,
+                                                    ),
                                                     lineBarsData: [
                                                       LineChartBarData(
                                                         preventCurveOverShooting: true,
@@ -491,6 +499,15 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         );
                                                       },
                                                     ),
+                                                    barTouchData: BarTouchData(
+                                                        handleBuiltInTouches: true,
+                                                        touchTooltipData: BarTouchTooltipData(
+                                                          getTooltipColor: (group) => ColorPalette.lightGrey,
+                                                          fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
+                                                          fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                                      )
+                                                    ),
+
                                                     borderData: FlBorderData(
                                                       border: const Border(bottom: BorderSide(), left: BorderSide()),
                                                     ),
@@ -638,6 +655,14 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                             color: Colors.grey
                                                         );
                                                       },
+                                                    ),
+                                                    barTouchData: BarTouchData(
+                                                        handleBuiltInTouches: true,
+                                                        touchTooltipData: BarTouchTooltipData(
+                                                          getTooltipColor: (group) => ColorPalette.lightGrey,
+                                                          fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
+                                                          fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                                        )
                                                     ),
                                                     borderData: FlBorderData(
                                                       border: const Border(bottom: BorderSide(),left: BorderSide()),
@@ -874,7 +899,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    Indicator(color: Color(0xff5F8CC5), text: 'مجموع ساعات روشن بودن', isSquare: false),
+                                    Indicator(color: ColorPalette.darkBlue, text: 'مجموع ساعات روشن بودن', isSquare: false),
                                     Indicator(color: Colors.grey.shade400, text: 'مجموع ساعات خاموش بودن', isSquare: false),
                                   ],
                                 ),

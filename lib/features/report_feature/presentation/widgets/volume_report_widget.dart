@@ -2,6 +2,8 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/common/widgets/export_to_excel.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/constants.dart';
@@ -12,7 +14,9 @@ import '../bloc/report_bloc.dart';
 import '../bloc/report_flow_meter_status.dart';
 
 class VolumeReportChartWidget extends StatelessWidget {
-  const VolumeReportChartWidget({super.key});
+   VolumeReportChartWidget({super.key});
+
+  List<VolumeSlot> flatList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +30,7 @@ class VolumeReportChartWidget extends StatelessWidget {
           final yValues = flowMeter.yAxis;
 
           if (xLabels == null || yValues == null || xLabels.isEmpty || yValues.isEmpty) {
-            return const Center(child: Text("دیتایی وجود ندارد"));
+            return Constants.noData();
           }
 
           final scale = Constants().getScale(yValues);
@@ -36,7 +40,7 @@ class VolumeReportChartWidget extends StatelessWidget {
                 (j) => j < yValues.length && yValues[j] != null ? FlSpot(j.toDouble(), yValues[j].toDouble()) : null,
           ).whereType<FlSpot>().toList();
 
-          if (spots.isEmpty) return const Center(child: Text("دیتایی وجود ندارد"));
+          if (spots.isEmpty) return Constants.noData();
 
           int totalItems = xLabels.length;
           double columnWidth = 80.0;
@@ -49,8 +53,8 @@ class VolumeReportChartWidget extends StatelessWidget {
             final capacityList = status.capacityEntity.capacityListEntity;
             final bool hasMultipleCapacity = capacityList != null && state.selectedReportIndex==1 ;
 
-            const Color normalColor = Colors.blue;
-            const Color exceedColor = Colors.red;
+             Color normalColor = ColorPalette.darkBlue;
+             Color exceedColor = ColorPalette.lightGrey;
 
             // اگر ظرفیت‌ها بیشتر از ۱ عدد نبود (نمودار معمولی)
             if (!hasMultipleCapacity) {
@@ -151,6 +155,14 @@ class VolumeReportChartWidget extends StatelessWidget {
                             borderData: FlBorderData(
                               border: const Border(bottom: BorderSide(), left: BorderSide()),
                             ),
+                            barTouchData: BarTouchData(
+                                handleBuiltInTouches: true,
+                                touchTooltipData: BarTouchTooltipData(
+                                  getTooltipColor: (group) => ColorPalette.lightGrey,
+                                  fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
+                                  fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                )
+                            ),
                             titlesData: FlTitlesData(
                               show: true,
                               rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -207,7 +219,14 @@ class VolumeReportChartWidget extends StatelessWidget {
                             ),
                           ),
                           gridData: const FlGridData(show: false),
-
+                          lineTouchData: LineTouchData(
+                            touchTooltipData: LineTouchTooltipData(
+                              getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
+                              fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
+                              fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                            ),
+                            handleBuiltInTouches: true,
+                          ),
                           lineBarsData: [
                             LineChartBarData(
                               preventCurveOverShooting: true,
@@ -222,6 +241,7 @@ class VolumeReportChartWidget extends StatelessWidget {
                                   end: Alignment.bottomCenter,
                                 ),
                               ),
+
                               color: ColorPalette.darkBlue,
                               barWidth: 2.5,
                               isStrokeCapRound: true,
@@ -238,7 +258,18 @@ class VolumeReportChartWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Text("جدول اطلاعات تکمیلی نمودار ", style: TextStyleP.f12Regular),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("جدول اطلاعات تکمیلی نمودار ", style: TextStyleP.f12Regular),
+                  IconButton(
+                    onPressed: () {
+                      exportVolumeToExcel(context, flatList, state.selectedReportIndex!);
+                      
+                    },
+                      icon:Icon(Icons.file_download_outlined))
+                ],
+              ),
               SizedBox(height: 8.h,),
 
               SingleChildScrollView(
@@ -251,6 +282,28 @@ class VolumeReportChartWidget extends StatelessWidget {
                     shrinkWrap: true,
                     itemCount: yValues.length + 1,
                     itemBuilder: (context, index) {
+                      String statusMessage = "نرمال";
+
+                      if (state.selectedReportIndex == 1) {
+                        final item = status.capacityEntity.capacityListEntity![index - 1];
+                        final currentY = yValues[index - 1];
+                        final totalLength = xLabels.length;
+
+                        if (currentY > (item.disconnectCapacity! * totalLength)) {
+                          statusMessage = "اخطار";
+                        } else if (currentY > (item.capacity! * totalLength)) {
+                          statusMessage = "بیش از حد مجاز";
+                        }
+                      }
+
+                      // flatList.add(
+                      //   VolumeSlot(
+                      //     xLabels[index - 1].toString().toPersianDigit(),
+                      //     capacity[index - 1],
+                      //     yValues[index - 1],
+                      //     statusMessage,
+                      //   ),
+                      // );
 
                       if (index == 0) {
                         return Container(
@@ -270,7 +323,6 @@ class VolumeReportChartWidget extends StatelessWidget {
                       final val = yValues[index - 1];
 
                       if (state.selectedReportIndex==1){
-                        print("yes");
 
                          capacity.add(yValues[index - 1] >
                          status.capacityEntity.capacityListEntity![index-1].disconnectCapacity!*xLabels.length ? "اخطار" :
@@ -290,13 +342,13 @@ class VolumeReportChartWidget extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(flex:4,child: Text(xLabels[index - 1].toString().toPersianDigit())),
-                            Expanded(flex:3,child: Text('\u200E$val', textAlign: TextAlign.start)),
+                            Expanded(flex:3,child: Text('\u200E$val'.toString().toPersianDigit(), textAlign: TextAlign.start)),
 
                             if(state.selectedReportIndex==1)
                               Expanded(flex:4,child: Text(
                                   (val > status.capacityEntity.capacityListEntity![index-1].capacity!*xLabels.length)?
                                       (val-(status.capacityEntity.capacityListEntity![index-1].capacity!*xLabels.length)).toString().toPersianDigit()
-                                      : "0.0"
+                                      : "۰.۰"
 
                             )),
                             Expanded(flex:2,child: Text(capacity[index-1], textAlign: TextAlign.start)),
@@ -310,7 +362,7 @@ class VolumeReportChartWidget extends StatelessWidget {
             ],
           );
         }
-        if (status is ReportFlowMeterLoading) return const Center(child: CircularProgressIndicator());
+        if (status is ReportFlowMeterLoading) return ShimmerClass.shimmerChartAndListVertical();
         if (status is ReportFlowMeterError) return Center(child: Text(status.error));
         if (status is ReportFlowMeterInitial) {
           return Center(child: Padding(

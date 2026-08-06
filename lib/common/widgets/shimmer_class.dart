@@ -390,6 +390,68 @@ class ShimmerClass {
     );
   }
 
+  static Shimmer shimmerChartAndListVertical({double height = 50}) {
+    return Shimmer.fromColors(
+      baseColor: ColorPalette.lightGrey.withValues(alpha: 0.3),
+      highlightColor: ColorPalette.lightGrey,
+      direction: ShimmerDirection.rtl,
+      child: Column(
+        children: [
+          Container(
+            height: 300,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Column(
+              children: [
+                // خطوط متقاطع پس‌زمینه + خط موج‌دار نمودار
+                Expanded(
+                  child: CustomPaint(
+                    size: Size.infinite,
+                    painter: _ChartLinePainter(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // محور پایین
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(
+                    6,
+                        (index) => Container(
+                      width: 24,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: ColorPalette.lightGrey,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(10),
+            itemCount: 4,
+            itemBuilder: (context, index) {
+              return Container(
+                height: height.h,
+                margin: const EdgeInsets.symmetric(vertical: 10),
+
+                decoration: BoxDecoration(
+                  color: ColorPalette.lightGrey,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              );
+            },
+          )
+        ],
+
+      ),
+    );
+  }
+
 }
 
 // نقاش اختصاصی برای کشیدن شکل خط نمودار

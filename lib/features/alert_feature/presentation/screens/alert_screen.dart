@@ -68,7 +68,7 @@ class AlertScreen extends StatelessWidget {
                         final alertSuccess = state.alertStatus as AlertSuccess;
                         final allData = alertSuccess.alertsEntity.data!;
 
-                        if (allData.isNotEmpty) exportToExcel(context,allData);
+                        if (allData.isNotEmpty) exportAlertToExcel(context,allData);
                       }
                     });
                       },

@@ -6,7 +6,6 @@ import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/repository/status_summary_repository.dart';
 import 'package:mahaliii/features/status_summary_feature/presentation/bloc/status_summary_bloc/last_activity_status.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../../../common/socket_repository.dart';
 import '../../../../common/utils/constants.dart';
