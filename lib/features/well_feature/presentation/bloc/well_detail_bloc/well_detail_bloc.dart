@@ -278,23 +278,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       }
     });
 
-    // on<AlertCount>((event, emit) async {
-    //   emit(state.copyWith(newAlertCountStatus: AlertCountLoading()));
-    //
-    //
-    //   DataState dataState = await alertCountUseCase(event.flowMeterParams);
-    //
-    //
-    //
-    //   if (dataState is DataSuccess) {
-    //
-    //     emit(state.copyWith(newAlertCountStatus: AlertCountSuccess(dataState.data)));
-    //
-    //   }
-    //   if (dataState is DataFailed ) {
-    //     emit(state.copyWith(newAlertCountStatus: AlertCountError(dataState.error??"")));
-    //   }
-    // });
 
     on<FlowMeterEvent>((event, emit) async {
       emit(state.copyWith(newFlowMeterStatus: FlowMeterLoading(),newSelectedChartVolumeTab: event.flowMeterParams.type));
@@ -303,7 +286,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       DataState flowMeterDataState = await wellFlowMeterUseCase(event.flowMeterParams);
 
       if (flowMeterDataState is DataSuccess) {
-        print("flowMeterDataState.data${flowMeterDataState.data}");
         if(flowMeterDataState.data is List ){
           emit(state.copyWith(newFlowMeterStatus: FlowMeterEmpty()));
 

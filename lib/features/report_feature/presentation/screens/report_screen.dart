@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/params/flowmeter_params.dart';
 import 'package:mahaliii/common/widgets/global_elevated_button.dart';
 import 'package:mahaliii/common/widgets/global_snackbar.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/features/report_feature/domain/usecase/get_capacity_usecase.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/report_flow_meter_status.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/well_report_status.dart';
@@ -135,7 +136,7 @@ class ReportScreen extends StatelessWidget {
                                 );
                               }
 
-                              if (status is WellReportLoading) return const Center(child: CircularProgressIndicator());
+                              if (status is WellReportLoading) return ShimmerClass.shimmerContainer(height: 50);
                               if (status is WellReportError) return Center(child: Text(status.error));
                               return const SizedBox.shrink();
                             },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/socket_repository.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
@@ -113,8 +114,9 @@ class _WellScreenState extends State<WellScreen> {
                             ),
                           );
                         },);
-                    }else if(state.wellStatus is WellLoading){
-                      return Center(child: CircularProgressIndicator());
+                    }
+                    else if(state.wellStatus is WellLoading){
+                      return ShimmerClass.shimmerListviewVertical(height: 40);
 
                     }else if(state.wellStatus is WellError){
                       WellError wellError=state.wellStatus as WellError;

@@ -6,6 +6,7 @@ import 'package:mahaliii/config/color_palette.dart';
 
 import '../../../../common/params/flowmeter_params.dart';
 import '../../../../common/utils/constants.dart';
+import '../../../../common/widgets/shimmer_class.dart';
 import '../../../../config/texts_style.dart';
 import '../bloc/status_summary_bloc/report_flowmeter_status.dart';
 import '../bloc/status_summary_bloc/status_summary_bloc.dart';
@@ -217,7 +218,9 @@ class SummaryFlowMeterChart extends StatelessWidget {
                         );
                       }
                       else if (state.reportFlowMeterStatus is SummaryFlowMeterLoading) {
-                        return const Center(child: CircularProgressIndicator());
+                        return state.selectedChartTab == 0
+                            ?  ShimmerClass.lineChartShimmer()
+                            :  ShimmerClass.barChartShimmer() ;
                       } else if (state.reportFlowMeterStatus is SummaryFlowMeterError) {
                         SummaryFlowMeterError reportFlowMeterError = state.reportFlowMeterStatus as SummaryFlowMeterError;
                         return Center(child: Text(reportFlowMeterError.error));

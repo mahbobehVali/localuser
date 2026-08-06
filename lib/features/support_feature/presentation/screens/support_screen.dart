@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/params/flowmeter_params.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/support_feature/domain/entity/support_data_entity.dart';
@@ -265,12 +266,7 @@ class SupportScreen extends StatelessWidget {
                                       ],
                                     );
                                   } else if (state.supportStatus is SupportLoading) {
-                                    return const Center(
-                                      child: Padding(
-                                        padding: EdgeInsets.all(20.0),
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
+                                    return ShimmerClass.shimmerListviewVertical(height: 50);
                                   } else if (state.supportStatus is SupportAgainLoading) {
                                     return const Center(
                                       child: SizedBox(),

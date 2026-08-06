@@ -55,7 +55,6 @@ class FlowMeterSuccess extends FlowMeterStatus {
   final WellFlowMeterEntity? wellFlowMeterEntity;
 
 
-
   const FlowMeterSuccess({ this.wellFlowMeterEntity});
 
   // // متد copyWith برای اینکه وقتی یکی آمد، قبلی پاک نشود

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
 
 import '../../../../common/widgets/icon_container.dart';
 import '../../../../config/color_palette.dart';
@@ -98,7 +99,7 @@ class ManagementWellsWidget extends StatelessWidget {
                     },);
                 }
                 else if(state.statusSummaryStatus is StatusSummaryLoading){
-                  return Center(child: CircularProgressIndicator());
+                  return ShimmerClass.shimmerListviewVertical(height: 70,count: 4);
 
                 }
                 else if(state.statusSummaryStatus is StatusSummaryError){

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/params/flowmeter_params.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/repository/status_summary_repository.dart';
 import 'package:mahaliii/features/status_summary_feature/presentation/bloc/status_summary_bloc/last_activity_status.dart';
@@ -126,29 +127,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                           return const SizedBox();
                         }
                       } else if (state.waterStatus is WaterLoading) {
-                        return Center(child: Shimmer.fromColors(
-                            baseColor: Colors.red.shade400,
-                            highlightColor: Colors.red.shade200,
-                            child: SizedBox(
-                              height: 100.h,
-                              width: MediaQuery.sizeOf(context).width,
-                              child: ListView.builder(
-
-                                scrollDirection: Axis.horizontal,
-                                itemCount: 3,
-
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      color: Colors.red,
-                                    ),
-                                  );
-                                },
-                              ),
-                            )
-
-                        ));
+                        return ShimmerClass.shimmerListviewHor(height: 100);
                       } else {
                         return const SizedBox();
                       }
@@ -197,12 +176,10 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                             );
                           }
                           else if(state.lastActivityStatus is LastActivityLoading){
-                            return Center(child: SizedBox());
+                            return ShimmerClass.shimmerListviewVertical(height: 40,count: 4);
 
                           }else if(state.lastActivityStatus is LastActivityEmpty){
-                            return SizedBox(
-                              height: 100.h,
-                              child: Center(child: Text("فعالیتی وجود ندارد",style: TextStyleP.f16Medium)),);
+                            return Constants.noData();
 
                           }else if(state.lastActivityStatus is LastActivityError){
                             LastActivityError lastActivityError=state.lastActivityStatus as LastActivityError;

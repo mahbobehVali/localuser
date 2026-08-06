@@ -20,6 +20,7 @@ import 'package:persian_number_utility/persian_number_utility.dart';
 import '../../../../common/widgets/account_box_title.dart';
 import '../../../../common/widgets/export_to_excel.dart';
 import '../../../../common/widgets/pagination_widget.dart';
+import '../../../../common/widgets/shimmer_class.dart';
 import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../domain/entity/alert_data_entity.dart';
 import '../bloc/alert_bloc.dart';
@@ -206,7 +207,7 @@ class AlertScreen extends StatelessWidget {
                                 );
                               }
                               else if(state.alertStatus is AlertLoading){
-                                return Center(child: CircularProgressIndicator());
+                                return ShimmerClass.shimmerListviewVertical(height: 50);
 
                               }else if(state.alertStatus is AlertEmpty){
                                 return SizedBox(

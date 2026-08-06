@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/utils/constants.dart';
+import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../../common/widgets/global_elevated_button.dart';
@@ -134,7 +135,7 @@ class Program extends StatelessWidget {
           ],
         );
       }else if(state.getProgramStatus is GetProgramLoading){
-        return Center(child: CircularProgressIndicator(),);
+        return ShimmerClass.shimmerTable();
       }else if(state.getProgramStatus is GetProgramError){
         GetProgramError getProgramError=state.getProgramStatus as GetProgramError;
         return Center(child: Text(getProgramError.error),);
@@ -165,11 +166,16 @@ class Program extends StatelessWidget {
       height: 70,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.symmetric(
+          horizontal: BorderSide( color: ColorPalette.lightGrey)
+           ),
         // color: Colors.red
       ),
       child: Container(
-        decoration: empty==0?null:BoxDecoration(border: Border.all(width: 1)),
+        decoration: empty==0?null:BoxDecoration(
+            border: Border.all(color: ColorPalette.mediumGrey),
+            borderRadius: BorderRadius.circular(5)
+        ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(

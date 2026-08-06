@@ -78,6 +78,9 @@ class _MyAppState extends State<MyApp> {
 
                   fontFamily: 'IranYekan',
                   scaffoldBackgroundColor: ColorPalette.backColor,
+                  switchTheme: SwitchThemeData(
+
+                  ),
 
                   appBarTheme: AppBarTheme(
                       backgroundColor: ColorPalette.backColor,
