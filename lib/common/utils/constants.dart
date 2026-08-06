@@ -332,6 +332,7 @@ class Constants {
       List<dynamic> customTitles,
       String day,
       ) {
+    print("sdfsfsffdff$day");
     final int index = value.toInt();
 
     // ۱. کنترل محدوده اندیس
@@ -356,10 +357,36 @@ class Constants {
     }
     else if (day == "date") {
       final parts = titleString.split('/');
-      // اگر ۳ بخش داشت (سال/ماه/روز)، روز (اندیس 2) رو بردار
-      displayText = parts.length > 2 ? parts[2] : titleString;
-    }
-    else if (day == "week") {
+
+      if (parts.length > 1) {
+        print("parts.length > 1");
+        // ۱. بررسی یکسان بودن ماه در کل لیست customTitles
+        final firstParts = customTitles.first?.toString().split('/') ?? [];
+        final firstMonth = firstParts.length > 1 ? firstParts[1] : null;
+
+        final bool isSameMonthForAll = customTitles.every((element) {
+          final p = element?.toString().split('/') ?? [];
+          return p.length > 1 && p[1] == firstMonth;
+        });
+
+        // ۲. تصمیم‌گیری بر اساس یکسان بودن یا نبودن ماه
+        if (isSameMonthForAll) {
+          print("isSameMonthForAll");
+          // اگر ماه در کل لیست یکسان بود -> روز را نشان بده
+          displayText = parts.length > 2 ? parts[2] : titleString;
+        } else {
+          // اگر ماه متغیر بود -> نام ماه را نشان بده
+          final monthNum = int.tryParse(parts[1]) ?? 0;
+          if (monthNum >= 1 && monthNum <= 12) {
+            displayText = Constants().monthNames[monthNum - 1];
+          } else {
+            displayText = titleString;
+          }
+        }
+      } else {
+        displayText = titleString;
+      }
+    }    else if (day == "week") {
       displayText = (index < Constants().weekDayNames.length)
           ? Constants().weekDayNames[index].name
           : titleString;
@@ -477,8 +504,8 @@ class LastActivitySlot {
 class VolumeSlot {
   final String? name;
   final String? status;
-  final int? amount;
-  final int? capacity;
+  final String? amount;
+  final String? capacity;
 
   VolumeSlot({this.name, this.status, this.amount, this.capacity});
 }

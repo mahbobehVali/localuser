@@ -8,6 +8,7 @@ import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/features/report_feature/domain/usecase/get_capacity_usecase.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/report_flow_meter_status.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/well_report_status.dart';
+import 'package:mahaliii/features/report_feature/presentation/widgets/volume_detail_report_widget.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/usecase/last_activity_usecase.dart';
 import 'package:mahaliii/features/well_feature/domain/usecase/flow_meter_usecase.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
@@ -405,7 +406,7 @@ class ReportScreen extends StatelessWidget {
                           children: [
                             // Text("حجم مصرف ${state.oneWell?.wellName ?? ""}", style: TextStyleP.f12Regular),
                             const SizedBox(height: 10),
-                             VolumeReportChartWidget(),
+                             VolumeDetailReportChartWidget(),
                           ],
                         ),
                       );

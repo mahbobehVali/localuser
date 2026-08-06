@@ -101,7 +101,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       final bool ignoreAllWell = state.selectedReportIndex == 0;
       emit(state.copyWith(newReportFlowMeterStatus: ReportFlowMeterLoading(),
                           newFlowMeterParams: event.flowMeterParams));
-      DataState dataState = await wellFlowMeterUseCase(event.flowMeterParams,ignoreAllWell: ignoreAllWell);
+      DataState dataState = await wellFlowMeterUseCase(event.flowMeterParams,
+          ignoreAllWell: ignoreAllWell);
       DataState capacityDataState = await getCapacityUseCase(event.flowMeterParams);
 
       if (dataState is DataSuccess) {

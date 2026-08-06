@@ -85,10 +85,10 @@ Future<void> exportVolumeToExcel(BuildContext context, List<dynamic> reportList,
     item.status == 1 ? "در حال بررسی" :
     "پاسخ داده شده";
     List<CellValue> row = [
-      TextCellValue(item.date ?? ''),
-      TextCellValue(item.clock ?? ''),
-      if(selectedReportIndex==1) TextCellValue(item.clock ?? ''),
-      TextCellValue(statusText),
+      TextCellValue(item.name ?? ''),
+      TextCellValue(item.amount ?? ''),
+      if(selectedReportIndex==1) TextCellValue(item.capacity ?? ''),
+      TextCellValue(item.status ?? ''),
     ];
     sheetObject.appendRow(row);
   }
