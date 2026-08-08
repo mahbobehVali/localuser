@@ -75,29 +75,28 @@ class LastActivityWidget extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Expanded(flex: 2,child: Text("نام چاه",style: TextStyleP.f10Regular)),
+                        Expanded(flex: 2,child: Text("نام چاه",style: TextStyleP.f12Regular)),
 
-                        Expanded(flex: 1,child: Text("وضعیت",style: TextStyleP.f10Regular)),
-                        Expanded(flex: 3,child: Text("توسط",style: TextStyleP.f10Regular)),
-                        Expanded(flex: 2,child: Text("تاریخ",style: TextStyleP.f10Regular)),
-                        Expanded(child: Text("ساعت",style: TextStyleP.f10Regular)),
-                        // Expanded(child: Text("نوع دستور",style: TextStyleP.f10Regular)),
+                        Expanded(flex: 1,child: Text("وضعیت",style: TextStyleP.f12Regular)),
+                        Expanded(flex: 3,child: Text("توسط",style: TextStyleP.f12Regular)),
+                        Expanded(flex: 2,child: Text("تاریخ",style: TextStyleP.f12Regular)),
+                        Expanded(flex: 1,child: Text("ساعت",style: TextStyleP.f12Regular)),
                       ],
                     ),
                   ):
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
                     decoration: BoxDecoration(
-                        border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width:index==flatList.length-1?0:1))
+                        border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey,
+                           ))
                     ),
                     child: Row(
                       children: [
-                        Expanded(flex: 2,child: Text(flatList[index-1].wellName)),
-                        Expanded(flex: 1,child: Text(flatList[index-1].status)),
-                        Expanded(flex: 3,child: Text(flatList[index-1].name)),
-                        Expanded(flex: 2,child: Text(flatList[index-1].date.toPersianDigit())),
-                        Expanded(child: Text(flatList[index-1].time.toPersianDigit())),
-                        // Expanded(child: Text(flatList[index-1].type)),
+                        Expanded(flex: 2,child: Text(flatList[index-1].wellName,style: TextStyleP.f10Regular)),
+                        Expanded(flex: 1,child: Text(flatList[index-1].status,style: TextStyleP.f10Regular)),
+                        Expanded(flex: 3,child: Text(flatList[index-1].name,style: TextStyleP.f10Regular)),
+                        Expanded(flex: 2,child: Text(flatList[index-1].date.toPersianDigit(),style: TextStyleP.f10Regular)),
+                        Expanded(flex: 1,child: Text(flatList[index-1].time.toPersianDigit(),style: TextStyleP.f10Regular)),
 
                       ],
                     ),

@@ -231,10 +231,9 @@ class ShowDialogs {
             textDirection: TextDirection.rtl,
             child: AlertDialog(
 
-
               backgroundColor: Colors.white,
-
               content: SizedBox(
+                height: 400.h,
                 width: MediaQuery.of(context).size.width, // برای تنظیم ابعاد
                 child: Scaffold(
                   backgroundColor: Colors.transparent,
@@ -245,8 +244,8 @@ class ShowDialogs {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("برنامه زمانی چاه ${wellsDataEntity.wellName}"),
-                          SizedBox(height: 14,),
+                          Text("برنامه زمانی چاه ${wellsDataEntity.wellName}",style: TextStyleP.f14Medium,),
+                          SizedBox(height: 14.h),
 
                           Text("انتخاب روز"),
                           BlocBuilder<WellDetailBloc, WellDetailState>(
@@ -318,7 +317,7 @@ class ShowDialogs {
                                 },
                               ),
 
-                              const SizedBox(width: 10),
+                               SizedBox(width: 10.w),
 
                               // 🕒 فیلد ساعت پایان
                               BlocBuilder<WellDetailBloc, WellDetailState>(
@@ -355,7 +354,7 @@ class ShowDialogs {
                             ],
                           ),
 
-                          SizedBox(height: 30,),
+                          SizedBox(height: 30.h),
 
                           BlocConsumer<WellDetailBloc, WellDetailState>(
                             listenWhen: (previous, current) {
@@ -414,21 +413,32 @@ class ShowDialogs {
                                 Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Expanded(child:
-                                  RefuseButton(onTap: () {
+                                  Expanded(
 
-                                    wellDetailBloc.add(DayClicked(AlertTypeEntity("",-1)));
-                                    if(state.startHour!.isNotEmpty ) {
-                                      wellDetailBloc.add(ChangeStartClock(""));
-                                    }
-                                    if(state.endHour!.isNotEmpty ) {
-                                      wellDetailBloc.add(ChangeEndClock(""));
-                                    }
-                                    Navigator.of(dialogContext).pop();
-                                  },)),
-                                  SizedBox(width: 30.w),
-                                  Expanded(child: GlobalElevatedButton(widget: state.createTimeStatus is CreateTimeLoading?
-                                  CircularProgressIndicator(): Text("ثبت زمان"),
+                                    child: GlobalElevatedButton(
+                                      borderRadius: BorderRadius.circular(2.5),
+                                      backColor: Colors.grey[300]!,
+                                      onTap:  () {
+
+                                        wellDetailBloc.add(DayClicked(AlertTypeEntity("",-1)));
+                                        if(state.startHour!.isNotEmpty ) {
+                                          wellDetailBloc.add(ChangeStartClock(""));
+                                        }
+                                        if(state.endHour!.isNotEmpty ) {
+                                          wellDetailBloc.add(ChangeEndClock(""));
+                                        }
+                                        Navigator.of(dialogContext).pop();
+                                      },
+                                      widget: const Text("انصراف", style: TextStyle(color: Colors.black)),
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Expanded(
+                                      flex:2,
+                                      child: GlobalElevatedButton(
+                                    backColor: ColorPalette.darkBlue,
+                                    widget: state.createTimeStatus is CreateTimeLoading?
+                                  CircularProgressIndicator(): Text("ثبت زمان",style: TextStyle(color: ColorPalette.black),),
                                     onTap:(state.daySelected.id==-1) ||
                                         state.startHour!.isEmpty || state.endHour!.isEmpty || isLoading? null:() {
                                       bool hasConflict = checkConflictForDay(programDayEntity: programDayEntity,
@@ -496,7 +506,7 @@ class ShowDialogs {
                   backgroundColor: Colors.white,
 
                   content: SizedBox(
-                    height: 300,
+                    height: 300.h,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -505,18 +515,18 @@ class ShowDialogs {
                         SizedBox(height: 14,),
 
                         Text("آیا اطمینان دارید که می‌خواهید زمان مورد نظر خود را حذف کنید؟"),
-                        SizedBox(height: 14,),
+                        SizedBox(height: 14.h),
                         Text("روز $dayName"),
-                        SizedBox(height: 14,),
+                        SizedBox(height: 14.h),
 
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            ClockBox(clock:"ساعت شروع",time: startTime,),
-                            ClockBox(clock:"ساعت پایان",time: endTime,),
+                            Expanded(child: ClockBox(clock:"ساعت شروع",time: startTime,)),
+                            Expanded(child: ClockBox(clock:"ساعت پایان",time: endTime,)),
                           ],
                         ),
-                        SizedBox(height: 20,),
+                        SizedBox(height: 20.h),
 
                         BlocConsumer<WellDetailBloc, WellDetailState>(
                           listenWhen: (previous, current) {
@@ -577,6 +587,7 @@ class ShowDialogs {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
+
                                   child: GlobalElevatedButton(
                                     borderRadius: BorderRadius.circular(2.5),
                                     backColor: Colors.grey[300]!,
@@ -587,8 +598,10 @@ class ShowDialogs {
                                     widget: const Text("انصراف", style: TextStyle(color: Colors.black)),
                                   ),
                                 ),
-                                SizedBox(width: 30.w),
-                                Expanded(child: GlobalElevatedButton(
+                                SizedBox(width: 10.w),
+                                Expanded(
+                                    flex: 2,
+                                    child: GlobalElevatedButton(
                                   onTap:isLoading?null: () {
 
                                     wellDetailBloc.add(DeleteTime(

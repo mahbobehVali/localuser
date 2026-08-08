@@ -31,13 +31,14 @@ class Program extends StatelessWidget {
         final maxRows = displayDays.map((e) => e.periods!.length).reduce((a, b) => a > b ? a : b);
 
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               height: 70.h,
-              padding: EdgeInsets.only(left: 8),
+              padding: EdgeInsets.symmetric(horizontal: 18),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(5),
+                color: ColorPalette.white,
+                borderRadius: BorderRadius.circular(8),
               ),
 
               child: Row(
@@ -47,7 +48,6 @@ class Program extends StatelessWidget {
                     children: [
                       IconContainer(
                         icon: Icon(Icons.edit_calendar_outlined),
-                        // icon: Image.asset("assets/icons/calender.png"),
                         color: ColorPalette.iconContainerColor,
                         width: 24,
                         height: 24,
@@ -81,15 +81,24 @@ class Program extends StatelessWidget {
                 ],
               ),
             ),
+            SizedBox(height: 20.h,),
 
             maxRows==0? Center(child: Text("برنامه ای وجود ندارد")):
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: displayDays.length * 150,
+              child: Container(
+                width:1100,
+                decoration: BoxDecoration(
+                color: ColorPalette.white,
+                borderRadius: BorderRadius.circular(8),
+                ),
+                padding: EdgeInsets.all(10.sp),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
+                    Text("جدول برنامه ریزی هفتگی دستگاه",
+                      style: TextStyleP.f14Medium.copyWith(color: Colors.black),),
+                    SizedBox(height: 12.h,),
                     Row(
                       children: displayDays.map((day) {
                         return _header(day.dayName!);
@@ -153,6 +162,7 @@ class Program extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: ColorPalette.lightGrey,
+        
       ),
       child: Text(
         title,

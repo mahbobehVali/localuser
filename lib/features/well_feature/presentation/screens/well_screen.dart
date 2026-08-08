@@ -46,7 +46,7 @@ class _WellScreenState extends State<WellScreen> {
           return wellBloc;
         },
         child: Padding(
-          padding: const EdgeInsets.only(top: 64,left: 12,right: 12,bottom: 30),
+          padding:  EdgeInsets.symmetric(vertical: 64.h,horizontal: 12.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children:[
@@ -97,16 +97,22 @@ class _WellScreenState extends State<WellScreen> {
                               },
                             child: Container(
                               padding: EdgeInsets.symmetric(horizontal: 12.w,vertical: 12.h),
-                              margin: EdgeInsets.all(5),
+                              margin: EdgeInsets.symmetric(vertical: 5.h),
                               decoration: BoxDecoration(
                                 color: ColorPalette.tGrey,
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(5.sp),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
 
-                                  Text(statusSummarySuccess.wellsEntity[index].data!.wellName!),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.circle,size: 7.sp,),
+                                      SizedBox(width: 18.w,),
+                                      Text(statusSummarySuccess.wellsEntity[index].data!.wellName!,style: TextStyleP.f14Bold,),
+                                    ],
+                                  ),
                                   Icon(Icons.arrow_forward_ios),
 
                                 ],

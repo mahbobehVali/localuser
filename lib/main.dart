@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
               theme: ThemeData(
                   radioTheme: RadioThemeData(
 
-                    fillColor: WidgetStateProperty.all(ColorPalette.darkBlue), // رنگی که می‌خوای (مثلاً قرمز)
+                    fillColor: WidgetStateProperty.all(ColorPalette.darkBlue)
                   ),
 
                   segmentedButtonTheme: SegmentedButtonThemeData(
@@ -68,10 +68,13 @@ class _MyAppState extends State<MyApp> {
                         foregroundColor: Colors.black,
                         selectedForegroundColor: Colors.black,
                         selectedBackgroundColor: ColorPalette.darkBlue,
-                        side: BorderSide.none,
+                        side: BorderSide(
+                            color:ColorPalette.lightGrey
+                        ),
 
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(3),
+                          // side: BorderSide(color: ColorPalette.lightGrey)
                         ))
                 ),
 

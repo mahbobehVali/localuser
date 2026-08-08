@@ -54,6 +54,10 @@ class ManagementWellsWidget extends StatelessWidget {
 
                     itemCount: statusSummarySuccess.wellsEntity.length,
                     itemBuilder: (context, index) {
+                      final wellData = statusSummarySuccess.wellsEntity[index].data;
+                      final isWellOn = wellData?.statusWell == 1;
+                      final alertCount = wellData?.alert ?? 0;
+
                       return Container(
                         padding: EdgeInsets.all(10),
                         margin: EdgeInsets.all(5),
@@ -82,12 +86,23 @@ class ManagementWellsWidget extends StatelessWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text("وضعیت: ${statusSummarySuccess.wellsEntity[index].data?.statusWell==1?"روشن":"خاموش"}",
-                                      style: TextStyle(color: statusSummarySuccess.wellsEntity[index].data?.statusWell==1?
-                                          ColorPalette.darkGreen:ColorPalette.darkRed),),
-
-                                      statusSummarySuccess.wellsEntity[index].data?.alert==0?Text("هشدار فعال: ندارد"): Text(" هشدار فعال: ${statusSummarySuccess.wellsEntity[index].data?.alert} عدد"),
-
+                                      Text.rich(
+                                        TextSpan(
+                                          text: 'وضعیت: ',
+                                          style: const TextStyle(color: Colors.black),
+                                          children: [
+                                            TextSpan(
+                                              text: isWellOn ? 'روشن' : 'خاموش',
+                                              style: TextStyle(
+                                                color: isWellOn ? ColorPalette.darkGreen : ColorPalette.darkRed,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        alertCount == 0 ? 'هشدار فعال: ندارد' : 'هشدار فعال: $alertCount عدد',
+                                      ),
                                     ],
                                   )
                                 ],

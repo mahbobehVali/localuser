@@ -225,6 +225,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                   BlocBuilder<WellDetailBloc, WellDetailState>(
                     builder: (context, state) {
                       return SegmentedButton(
+                          style: SegmentedButton.styleFrom(
+                              backgroundColor: ColorPalette.lightGrey,
+                          ),
 
 
                           onSelectionChanged: (Set<int> newSelected) {
@@ -238,13 +241,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                           ], selected:{state.selectedWellTab});
                     },
                   ),
-                  SizedBox(height: 26),
-
-                  Text(
-                    "خلاصه وضعیت چاه ${widget.wellsDataEntity.wellName}",
-                    style: TextStyleP.f16Medium,
-                  ),
-                  SizedBox(height: 26),
+                  SizedBox(height: 26.h),
                   BlocSelector<WellDetailBloc, WellDetailState, int>(
                     selector: (state) => state.selectedWellTab,
 
@@ -252,9 +249,15 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                     builder: (context, selectedTab) {
                     return selectedTab==0?
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
+                        Text(
+                          "خلاصه وضعیت چاه ${widget.wellsDataEntity.wellName}",
+                          style: TextStyleP.f16Medium,
+                        ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          padding:  EdgeInsets.symmetric(vertical: 8.h),
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -913,131 +916,157 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                     builder: (context, state) {
                       return Container(
                       child: state.userLocalId == null
-                          ? Container(
-                        padding: EdgeInsets.all(16),
-                        margin: EdgeInsets.all(16),
+                          ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "کنترل ${widget.wellsDataEntity.wellName}",
+                                style: TextStyleP.f16Medium,
+                              ),
+                              SizedBox(height: 55.h),
+                              Container(
+                              padding: EdgeInsets.all(16.sp),
 
-                        decoration: BoxDecoration(
-                          // color: wellsDataEntity.userLocalId==null?Colors.redAccent:Colors.blue,
-                          border: Border.all(),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                              // color: wellsDataEntity.userLocalId==null?Colors.redAccent:Colors.blue,
+                              boxShadow: [
+                                BoxShadow(
+                                  offset: Offset(1, 1),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
+                                  color: ColorPalette.lightGrey.withValues(alpha:5)
 
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Row(
-                              children: [
-                                Image.asset("assets/icons/finger-scan.png"),
-                                SizedBox(width: 10),
-
-                                Text("اثر انگشت"),
+                                )
                               ],
-                            ),
-                            SizedBox(height: 51),
-                            BlocConsumer<WellDetailBloc, WellDetailState>(
-                              listenWhen: (previous, current) => previous.fingerStatus != current.fingerStatus,
-                              listener: (context, state) {
-                                final status = state.fingerStatus;
+                              borderRadius: BorderRadius.circular(5),
+                              ),
 
-                                if (status is FingerLoading || status is FingerRequestAccepted) {
-                                  if (!_controller.isAnimating) {
-                                    _controller.reset();
-                                    _controller.forward();
-                                  }
-                                } else if (status is FingerSuccess || status is FingerError || status is FingerRequestFailed) {
-                                  _controller.stop();
-                                }
+                              child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
 
-                                if (status is FingerError) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(status.error.isNotEmpty ? status.error : "پاسخی از سمت دستگاه دریافت نشد."),
-                                      backgroundColor: Colors.red,
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                }
-                              },
-                              builder: (context, state) {
-                                final fingerStatus = state.fingerStatus;
-                                print("fingerStatus$fingerStatus");
+                                Row(
+                                  children: [
+                                    IconContainer(icon: Image.asset("assets/icons/finger-scan.png",scale: 0.7,),
+                                      color: ColorPalette.tGrey,
+                                   ),
+                                    SizedBox(width: 10),
 
-                                // بررسی اینکه آیا فرآیند در حال اجراست یا خیر
-                                // final bool isLoading = fingerStatus is FingerLoading ||
-                                //     fingerStatus is FingerRequestAccepted;
+                                    Text("اثر انگشت",style: TextStyleP.f14Medium),
+                                  ],
+                                ),
+                                SizedBox(height: 51.h),
+                                BlocConsumer<WellDetailBloc, WellDetailState>(
+                                  listenWhen: (previous, current) => previous.fingerStatus != current.fingerStatus,
+                                  listener: (context, state) {
+                                    final status = state.fingerStatus;
 
-                                // ۱. حالت موفقیت‌آمیز
-                                if (fingerStatus is FingerSuccess) {
-                                  return fingerStatus.status == 1 || fingerStatus.status == "1"
-                                      ? const Text("اثر انگشت با موفقیت ثبت شد.")
-                                      : _buildActionButton(
-                                    message: "عدم پاسخ مناسب از دستگاه، مجدد تلاش کنید.",
-                                    isDisabled: false,
-                                  );
-                                }
+                                    if (status is FingerLoading || status is FingerRequestAccepted) {
+                                      if (!_controller.isAnimating) {
+                                        _controller.reset();
+                                        _controller.forward();
+                                      }
+                                    } else if (status is FingerSuccess || status is FingerError || status is FingerRequestFailed) {
+                                      _controller.stop();
+                                    }
 
-                                // ۲. حالت درخواست پذیرفته شد (دستگاه منتظر لمس انگشت است)
-                                else if (fingerStatus is FingerRequestAccepted) {
-                                  return Column(
-                                    children: [
-                                      const Text("دستگاه آماده است. لطفا اثر انگشت خود را روی سنسور بگذارید."),
-                                      const SizedBox(height: 15),
-                                      _buildProgressBar(),
-                                      const SizedBox(height: 15),
-                                      _buildActionButton(
-                                        message: "",
-                                        isDisabled: true, // دکمه غیرفعال در زمان تایمر
-                                      ),
-                                    ],
-                                  );
-                                }
+                                    if (status is FingerError) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(status.error.isNotEmpty ? status.error : "پاسخی از سمت دستگاه دریافت نشد."),
+                                          backgroundColor: Colors.red,
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    final fingerStatus = state.fingerStatus;
+                                    print("fingerStatus$fingerStatus");
 
-                                // ۳. حالت لودینگ و برقراری ارتباط اولیه
-                                else if (fingerStatus is FingerLoading) {
-                                  return Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildProgressBar(),
-                                      const SizedBox(height: 15),
-                                      _buildActionButton(
-                                        message: "در حال درخواست به دستگاه، لطفاً کمی منتظر بمانید...",
-                                        isDisabled: true, // دکمه غیرفعال در زمان تایمر
-                                      ),
-                                    ],
-                                  );
-                                }
+                                    // بررسی اینکه آیا فرآیند در حال اجراست یا خیر
+                                    // final bool isLoading = fingerStatus is FingerLoading ||
+                                    //     fingerStatus is FingerRequestAccepted;
 
-                                // ۴. حالت خطا یا پایان تایمر
-                                else if (fingerStatus is FingerError) {
-                                  return _buildActionButton(
-                                    message: "خطایی رخ داده یا زمان به پایان رسیده است.",
-                                    isDisabled: false, // فعال شدن مجدد دکمه
-                                  );
-                                }
+                                    // ۱. حالت موفقیت‌آمیز
+                                    if (fingerStatus is FingerSuccess) {
+                                      return fingerStatus.status == 1 || fingerStatus.status == "1"
+                                          ? const Text("اثر انگشت با موفقیت ثبت شد.")
+                                          : _buildActionButton(
+                                        message: "عدم پاسخ مناسب از دستگاه، مجدد تلاش کنید.",
+                                        isDisabled: false,
+                                      );
+                                    }
 
-                                // ۵. حالت اولیه (شروع)
-                                else{
-                                  return _buildActionButton(
-                                    message: "برای کنترل دستگاه ابتدا باید اثر انگشت خود را ثبت نمایید.",
-                                    isDisabled: false,
-                                  );
-                                }
-                              },
-                            )
-                          ],
-                        ),
-                      )
+                                    // ۲. حالت درخواست پذیرفته شد (دستگاه منتظر لمس انگشت است)
+                                    else if (fingerStatus is FingerRequestAccepted) {
+                                      return Column(
+                                        children: [
+                                          const Text("دستگاه آماده است. لطفا اثر انگشت خود را روی سنسور بگذارید."),
+                                          const SizedBox(height: 15),
+                                          _buildProgressBar(),
+                                          const SizedBox(height: 15),
+                                          _buildActionButton(
+                                            message: "",
+                                            isDisabled: true, // دکمه غیرفعال در زمان تایمر
+                                          ),
+                                        ],
+                                      );
+                                    }
+
+                                    // ۳. حالت لودینگ و برقراری ارتباط اولیه
+                                    else if (fingerStatus is FingerLoading) {
+                                      return Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          _buildProgressBar(),
+                                          const SizedBox(height: 15),
+                                          _buildActionButton(
+                                            message: "در حال درخواست به دستگاه، لطفاً کمی منتظر بمانید...",
+                                            isDisabled: true, // دکمه غیرفعال در زمان تایمر
+                                          ),
+                                        ],
+                                      );
+                                    }
+
+                                    // ۴. حالت خطا یا پایان تایمر
+                                    else if (fingerStatus is FingerError) {
+                                      return _buildActionButton(
+                                        message: "خطایی رخ داده یا زمان به پایان رسیده است.",
+                                        isDisabled: false, // فعال شدن مجدد دکمه
+                                      );
+                                    }
+
+                                    // ۵. حالت اولیه (شروع)
+                                    else{
+                                      return _buildActionButton(
+                                        message: "برای کنترل دستگاه ابتدا باید اثر انگشت خود را ثبت نمایید.",
+                                        isDisabled: false,
+                                      );
+                                    }
+                                  },
+                                )
+                              ],
+                                                      ),
+                                                    ),
+                            ],
+                          )
                           : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            "کنترل ${widget.wellsDataEntity.wellName}",
+                            style: TextStyleP.f16Medium,
+                          ),
+                          SizedBox(height: 8.h),
 
                           Text(
                             "با استفاده از کنترل‌های زیر می‌توانید به دستگاه دستور دهید.",
                             style: TextStyleP.f12Regular,
                           ),
 
-                          SizedBox(height: 32),
+                          SizedBox(height: 32.h),
 
                           ///switch
                           Container(
@@ -1102,26 +1131,12 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                           SizedBox(height: 32),
 
                           ///program
-                          Container(
-                            color: ColorPalette.white,
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 8,bottom: 18,right: 8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("جدول برنامه‌ریزی هفتگی دستگاه",style: TextStyleP.f12Regular,),
-                                  // SizedBox(height: 10),
-                                  Program(wellsDataEntity: widget.wellsDataEntity,),
-
-                                ],
-                              ),
-                            ),
-                          ),
+                          Program(wellsDataEntity: widget.wellsDataEntity,),
 
                         ],
                       )
                     );
-  },
+                },
                   );
                   },)
 
@@ -1141,11 +1156,12 @@ class _WellDetailScreenState extends State<WellDetailScreen>
     return Column(
       children: [
         if (message.isNotEmpty) ...[
-          Text(message),
+          Text(message,style: TextStyleP.f12Regular),
           const SizedBox(height: 20),
         ],
         GlobalElevatedButton(
-          widget: const Text("ثبت اثر انگشت"),
+          widget:  Text("ثبت اثر انگشت",style: TextStyle(color: ColorPalette.black),),
+          backColor: ColorPalette.darkBlue,
           // با پاس دادن null به onTap، دکمه غیرفعال می‌شود
           onTap: isDisabled ? null : _startProcess,
         ),

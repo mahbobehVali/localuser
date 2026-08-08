@@ -33,84 +33,23 @@ class _PanelScreenState extends State<PanelScreen> {
                   padding: EdgeInsets.only(bottom: 40.h),
                   child: Text("پنل کاربری",style: TextStyleP.f16Medium,),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                      return AccountScreen();
-                    },));
-                  },
-                  child: Container(
-                    height: 40.h,
-                    padding: EdgeInsets.symmetric(horizontal: 18),
-                    decoration: BoxDecoration(
-                      color: ColorPalette.tGrey,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
 
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                      children: [
-                        Row(
-                          children: [
-                            IconContainer(
-                              icon: Image.asset("assets/icons/user-square.png"),
-                              color: Colors.transparent,
-                              width: 24,
-                              height: 24,
-                            ),
-                            SizedBox(width: 9),
-
-                            Text("اطلاعات حساب کاربری"),
-                          ],
-                        ),
-
-                      ],
-                    ),
-                  ),
-                ),
+                RowBox(onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                    return AccountScreen();
+                  },));
+                },
+                    image: "assets/icons/user-square.png",
+                    title: "اطلاعات حساب کاربری"),
                 SizedBox(height: 32.h),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                      return SupportScreen();
-                    },));
-                  },
-                  child: Container(
-                    height: 40.h,
-                    padding: EdgeInsets.symmetric(horizontal: 18),
-                    decoration: BoxDecoration(
-                      color: ColorPalette.tGrey,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                      children: [
-                        Row(
-                          children: [
-                            IconContainer(
-                              // icon: Icon(Icons.account_box_outlined),
-                              // icon: Icon(CupertinoIcons.person_crop_square),
-                              icon: Image.asset("assets/icons/user-square.png"),
-                              color: Colors.transparent,
-                              width: 24,
-                              height: 24,
-                            ),
-                            SizedBox(width: 9),
-
-                            Text("پشتیبانی"),
-                          ],
-                        ),
-
-                      ],
-                    ),
-                  ),
-                ),
+                RowBox(onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                    return SupportScreen();
+                  },));
+                },
+                image: "assets/icons/user-square.png",
+                title: "پشتیبانی"),
                 SizedBox(height: 32.h),
-
-
 
                 BlocProvider<LogoutCubit>(
                   create: (context) => LogoutCubit(),
@@ -153,6 +92,58 @@ class _PanelScreenState extends State<PanelScreen> {
               ],
             ),
           )),
+    );
+  }
+}
+
+class RowBox extends StatelessWidget {
+  const RowBox({
+    super.key,
+    required this.onTap,
+    required this.image,
+    required this.title,
+
+  });
+
+  final GestureTapCallback onTap;
+  final String image;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap:onTap,
+      child: Container(
+        height: 40.h,
+        padding: EdgeInsets.symmetric(horizontal: 18),
+        decoration: BoxDecoration(
+          color: ColorPalette.tGrey,
+          borderRadius: BorderRadius.circular(8),
+        ),
+
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+          children: [
+            Row(
+              children: [
+                IconContainer(
+
+                  icon: Image.asset(image),
+                  color: Colors.transparent,
+                  width: 24,
+                  height: 24,
+                ),
+                SizedBox(width: 9.w),
+                Text(title)
+              ],
+            ),
+            
+            Icon(Icons.navigate_next)
+
+          ],
+        ),
+      ),
     );
   }
 }
