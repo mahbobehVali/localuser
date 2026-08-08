@@ -21,6 +21,7 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
 }
 
  dynamic findFlowMeterElement(List<dynamic> list,{bool ignoreAllWell = false}) {
+  print("!ignoreAllWell${!ignoreAllWell}");
    // ۱. بررسی شرط all-well فقط در صورتی که نادیده گرفته نشده باشد
    if (!ignoreAllWell) {
      final allElement = list.firstWhere(

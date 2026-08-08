@@ -107,17 +107,18 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                               children: [
                                 WaterAmountContainer(
                                   title: "حجم کل آب مصرف شده",
-                                  amount: waterSuccess.waterData!.total!.toString(),
+                                  amount: "${waterSuccess.waterData!.total!.toString()} m³",
+
                                 ),
                                 const SizedBox(width: 8),
                                 WaterAmountContainer(
                                   title: "حجم آب مصرف شده ماه",
-                                  amount: waterSuccess.waterData!.monthly!.toString(),
+                                  amount: "${waterSuccess.waterData!.monthly!.toString()} m³",
                                 ),
                                 const SizedBox(width: 8),
                                 WaterAmountContainer(
                                   title: "حجم آب مصرف شده امروز",
-                                  amount: waterSuccess.waterData!.today!.toString(),
+                                  amount:"${waterSuccess.waterData!.today!.toString()} m³",
                                 ),
                               ],
                             ),

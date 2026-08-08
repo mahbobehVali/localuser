@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/widgets/icon_container.dart';
 import '../../../../config/color_palette.dart';
@@ -101,7 +102,7 @@ class ManagementWellsWidget extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        alertCount == 0 ? 'هشدار فعال: ندارد' : 'هشدار فعال: $alertCount عدد',
+                                        alertCount == 0 ? 'هشدار فعال: ندارد' : 'هشدار فعال: ${alertCount.toString().toPersianDigit()} عدد',
                                       ),
                                     ],
                                   )

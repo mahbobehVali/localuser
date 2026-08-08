@@ -20,13 +20,18 @@ class KeyIndexWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           BlocBuilder<ReportBloc, ReportState>(
+// تنها در صورتی ری‌بیلد انجام می‌شود که وضعیت قبلی Success نبوده باشد
+            buildWhen: (previous, current) {
+              return previous.reportFlowMeterStatus is! ReportFlowMeterSuccess;
+            },
             builder: (context, state) {
               if(state.reportFlowMeterStatus is ReportFlowMeterSuccess){
                 ReportFlowMeterSuccess reportFlowMeterSuccess=state.reportFlowMeterStatus as ReportFlowMeterSuccess;
-                return  WaterAmountContainer(title: "حجم کل آب مصرف شده",amount: reportFlowMeterSuccess.reportFlowMeter.list.total.toString());
+                return  WaterAmountContainer(title: "حجم کل آب مصرف شده",
+                    amount: "${reportFlowMeterSuccess.reportFlowMeter.list.total.toString()} m³");
 
               }else  if(state.reportFlowMeterStatus is ReportFlowMeterLoading){
-                return ShimmerClass.shimmerContainer(height: 100);
+                return ShimmerClass.shimmerContainer(height: 100.h);
               }else {
                 return  WaterAmountContainer(title: "حجم کل آب مصرف شده",amount: "-",meter: false,);
               }
@@ -39,17 +44,18 @@ class KeyIndexWidget extends StatelessWidget {
             builder: (context, state) {
               if(state.reportCommandStatus is ReportCommandSuccess){
                 ReportCommandSuccess reportCommandSuccess=state.reportCommandStatus as ReportCommandSuccess;
-                return  WaterAmountContainer(title: "مجموع ساعات کارکرد پمپ ها",amount: "${reportCommandSuccess.reportFlowMeter.list.totalOn.toString()} ساعت",meter: false,);
+                return  WaterAmountContainer(title: "مجموع ساعات کارکرد پمپ ها",
+                  amount: "${reportCommandSuccess.reportFlowMeter.list.totalOn}",unit: "ساعت",meter: false,);
 
               }else  if(state.reportCommandStatus is ReportCommandLoading){
-                return ShimmerClass.shimmerContainer(height: 100);
+                return ShimmerClass.shimmerContainer(height: 100.h);
               }else {
                 return  WaterAmountContainer(title: "مجموع ساعات کارکرد پمپ ها",amount: "-",meter: false,);
 
               }
             },
           ),
-          SizedBox(width: 5,),
+          SizedBox(width: 5.w),
 
           BlocBuilder<ReportBloc, ReportState>(
             builder: (context, state) {
@@ -58,7 +64,7 @@ class KeyIndexWidget extends StatelessWidget {
                 return  WaterAmountContainer(title: "تعداد هشدارهای صادر شده",amount: reportCountSuccess.alertCountEntity.totalCount.toString(),meter: false,);
 
               }else  if(state.reportCountStatus is ReportCountLoading){
-                return ShimmerClass.shimmerContainer(height: 100);
+                return ShimmerClass.shimmerContainer(height: 100.h);
               }else {
                 return  WaterAmountContainer(title: "تعداد هشدارهای صادر شده",amount: "-",meter: false,);
 

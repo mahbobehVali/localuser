@@ -123,7 +123,7 @@ class AlertScreen extends StatelessWidget {
                                               if(index>0) data=alertSuccess.alertsEntity.data!;
 
                                               return index==0? Container(
-                                                padding: const EdgeInsets.all(12),
+                                                padding:  EdgeInsets.all(12.sp),
 
                                                 decoration:  Constants().boxDecoration,
                                                 child: Row(
@@ -142,10 +142,10 @@ class AlertScreen extends StatelessWidget {
                                                   },));
                                                 },
                                                 child: Container(
-                                                  padding: const EdgeInsets.all(12),
+                                                  padding:  EdgeInsets.all(12.sp),
 
                                                   decoration: BoxDecoration(
-                                                    border: BoxBorder.fromLTRB(bottom: BorderSide(color: Color(0xffD7D7D7))),
+                                                    border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.tGrey)),
 
                                                   ),child: Row(
                                                   children: [

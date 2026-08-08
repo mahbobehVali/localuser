@@ -313,7 +313,7 @@ class ReportScreen extends StatelessWidget {
               ),
               SizedBox(height: 10),
 
-              Text("شاخص های کلیدی برای بازه انتخابی",style: TextStyleP.f12Regular,),
+              Text("شاخص های کلیدی برای بازه انتخابی",style: TextStyleP.f14Bold,),
               SizedBox(height: 10),
 
               KeyIndexWidget(),
@@ -337,12 +337,13 @@ class ReportScreen extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: Colors.grey),
+                        // border: Border.all(color: ColorPalette.lightGrey),
+                        color: ColorPalette.lightGrey
                       ),
                       child: DropdownButton<AlertTypeEntity>(
                         underline: const SizedBox(),
                         isExpanded: true,
-                        padding: EdgeInsets.only(right: 15.w, left: 5),
+                        padding: EdgeInsets.only(right: 15.w, left: 5.w),
                         value: selectedItem,
                         items: state.reportIndexList.map((alert) {
                           // ۱. شرط غیرفعال بودن این آیتم خاص را بررسی می‌کنیم
@@ -376,8 +377,7 @@ class ReportScreen extends StatelessWidget {
                   );
                 },
               ),
-              SizedBox( height: 10,
-              ),
+              SizedBox( height: 12.h,),
 
               BlocBuilder<ReportBloc, ReportState>(
                 // buildWhen: (prev, curr) => prev.selectedReportIndex != curr.selectedReportIndex,
