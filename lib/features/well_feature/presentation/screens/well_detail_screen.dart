@@ -429,7 +429,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                     ),
                                                     borderData: FlBorderData(
                                                       show: true,
-                                                      border: const Border(bottom: BorderSide(), left: BorderSide()),
+                                                      border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                                                     ),
                                                     titlesData: FlTitlesData(
                                                       bottomTitles: Constants().axisBottomTitles(xLabels, "day"),
@@ -665,8 +665,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         )
                                                     ),
                                                     borderData: FlBorderData(
-                                                      border: const Border(bottom: BorderSide(),left: BorderSide()),
-                                                    ),
+                                                      border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),                                                    ),
                                                     titlesData: FlTitlesData(
                                                       show: true,
                                                       rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),

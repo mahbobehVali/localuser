@@ -159,7 +159,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                             LastActivitySuccess lastActivitySuccess=state.lastActivityStatus as LastActivitySuccess;
                             return Column(
                               children: [
-                                LastActivityWidget(lastActivityEntity: lastActivitySuccess.lastActivityEntity),
+                                LastActivityWidget(lastActivityEntity: lastActivitySuccess.lastActivityEntity,report: false,),
                                 PaginationWidget(selected: state.selectedPage,
                                     lastPage: lastActivitySuccess.lastActivityEntity.lastPage!,
                                     onPageChanged: (newPage) {

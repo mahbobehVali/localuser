@@ -100,7 +100,7 @@ class VolumeReportChartWidget extends StatelessWidget {
                           extraLinesData: ExtraLinesData(
                             horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
                           ),
-                          borderData: FlBorderData(show: true, border: const Border(bottom: BorderSide(), left: BorderSide())),
+                          borderData: FlBorderData(show: true, border: Border(bottom: BorderSide(color: ColorPalette.lightGrey))),
                           titlesData: FlTitlesData(
                             bottomTitles: Constants().axisBottomTitles(
                               xLabels,

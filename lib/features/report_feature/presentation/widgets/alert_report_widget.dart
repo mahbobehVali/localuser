@@ -83,7 +83,7 @@ class AlertsReportChartWidget extends StatelessWidget {
                                 fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
                               )
                           ),
-                          borderData: FlBorderData(border: const Border(bottom: BorderSide(), left: BorderSide())),
+                          borderData: FlBorderData(border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey))),
                           titlesData: FlTitlesData(
                             show: true,
                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),

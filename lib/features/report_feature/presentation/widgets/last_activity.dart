@@ -29,7 +29,8 @@ class LastActivity extends StatelessWidget {
           if (status is UserActivityReportSuccess) {
             return Column(
               children: [
-                LastActivityWidget(lastActivityEntity: status.lastActivityEntity),
+
+                LastActivityWidget(lastActivityEntity: status.lastActivityEntity,report:true),
                 PaginationWidget(
                   selected: state.selectedLastActivityPage!,
                   lastPage: status.lastActivityEntity.lastPage!,

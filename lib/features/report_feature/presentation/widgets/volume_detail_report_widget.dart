@@ -6,7 +6,6 @@ import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
-
 import '../../../../common/utils/constants.dart';
 import '../../../../common/widgets/indicator_widget.dart';
 import '../../../../config/color_palette.dart';
@@ -194,7 +193,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                               },
                             ),
                             borderData: FlBorderData(
-                              border: const Border(bottom: BorderSide(), left: BorderSide()),
+                              border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                             ),
                             barTouchData: BarTouchData(
                                 handleBuiltInTouches: true,

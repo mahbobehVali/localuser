@@ -82,7 +82,9 @@ class ManagementWellsWidget extends StatelessWidget {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text("وضعیت: ${statusSummarySuccess.wellsEntity[index].data?.statusWell==1?"روشن":"خاموش"}"),
+                                      Text("وضعیت: ${statusSummarySuccess.wellsEntity[index].data?.statusWell==1?"روشن":"خاموش"}",
+                                      style: TextStyle(color: statusSummarySuccess.wellsEntity[index].data?.statusWell==1?
+                                          ColorPalette.darkGreen:ColorPalette.darkRed),),
 
                                       statusSummarySuccess.wellsEntity[index].data?.alert==0?Text("هشدار فعال: ندارد"): Text(" هشدار فعال: ${statusSummarySuccess.wellsEntity[index].data?.alert} عدد"),
 

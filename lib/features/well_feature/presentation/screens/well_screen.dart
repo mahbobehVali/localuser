@@ -51,7 +51,7 @@ class _WellScreenState extends State<WellScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children:[
               Text("لیست چاه‌های تحت مدیریت",style: TextStyleP.f16Medium,),
-              SizedBox(height: 30.h),
+              SizedBox(height: 16.h),
 
               Text("برای دسترسی به اطلاعات چاه مورد نظر خود بر روی آن کلیک کنید.",style: TextStyleP.f12Regular,),
 
@@ -96,10 +96,10 @@ class _WellScreenState extends State<WellScreen> {
                                 );
                               },
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 5,vertical: 10),
+                              padding: EdgeInsets.symmetric(horizontal: 12.w,vertical: 12.h),
                               margin: EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                border: Border.all(color: ColorPalette.inverseGrey),
+                                color: ColorPalette.tGrey,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(

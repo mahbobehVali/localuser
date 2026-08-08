@@ -12,9 +12,11 @@ class LastActivityWidget extends StatelessWidget {
   const LastActivityWidget({
     super.key,
     required this.lastActivityEntity,
+    required this.report,
   });
 
   final LastActivityEntity lastActivityEntity;
+  final bool report;
 
   @override
   Widget build(BuildContext context) {
@@ -37,19 +39,21 @@ class LastActivityWidget extends StatelessWidget {
     }
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text("جدول اطلاعات دستوردهی به دستگاه", style: TextStyleP.f12Regular),
-            IconButton(
-                onPressed: () {
-                  exportActivityToExcel(context, flatList);
+       if(report)
+         Row(
+           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+           children: [
+             Text("جدول اطلاعات دستوردهی به دستگاه", style: TextStyleP.f12Regular),
+             IconButton(
+                 onPressed: () {
+                   exportActivityToExcel(context, flatList);
 
-                },
-                icon:Icon(Icons.file_download_outlined))
-          ],
-        ),
-        SizedBox(height: 10.h),
+                 },
+                 icon:Icon(Icons.file_download_outlined))
+           ],
+         ),
+         SizedBox(height: 10.h),
+
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
 

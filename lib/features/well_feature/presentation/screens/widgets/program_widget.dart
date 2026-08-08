@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/utils/constants.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
+import 'package:mahaliii/config/texts_style.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../../common/widgets/global_elevated_button.dart';
@@ -151,11 +152,11 @@ class Program extends StatelessWidget {
       height: 50,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: ColorPalette.inverseGrey,
+        color: ColorPalette.lightGrey,
       ),
       child: Text(
         title,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyleP.f12Regular,
       ),
     );
   }

@@ -149,13 +149,13 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                           ),
                                           borderData: FlBorderData(
                                             show: true,
-                                            border: const Border(bottom: BorderSide(), left: BorderSide()),
+                                            border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                                           ),
                                           lineTouchData: LineTouchData(
                                             touchTooltipData: LineTouchTooltipData(
                                               getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
-                                              fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
-                                              fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                              fitInsideHorizontally: true,
+                                              fitInsideVertically: true,
                                             ),
                                             handleBuiltInTouches: true,
                                           ),

@@ -27,8 +27,46 @@ class PumpHoursChartWidget extends StatelessWidget {
           final yValues = flowMeter.yAxis;
 
           if (xLabels == null || xLabels.isEmpty || yValues == null || yValues.isEmpty) {
-            return const Center(child: Text("دیتایی وجود ندارد"));
+            return Constants.noData();
           }
+
+          if(state.oneWell.length==1){
+            final firstParts = xLabels.first?.toString().split('/') ?? [];
+            final firstMonth = firstParts.length > 1 ? firstParts[1] : null;
+            final bool isSameMonthForAll = xLabels.every((element) {
+              final p = element.toString().split('/');
+              return p.length > 1 && p[1] == firstMonth;
+            });
+            for (int i = 0; i < yValues.length; i++) {
+              final val = yValues[i];
+              final parts = xLabels[i].split('/');
+              final monthNum = int.tryParse(parts[1]) ?? 0;
+
+              String name =  isSameMonthForAll?
+              xLabels[i].toString().toPersianDigit():Constants().monthNames[monthNum - 1];
+
+              final amount= val.toString().toPersianDigit()  ;
+              flatList.add(VolumeSlot(
+                  name: name,
+                  amount: amount
+              ));
+
+            }
+          }
+
+          for (int i = 0; i < yValues.length; i++) {
+            final val = yValues[i];
+
+            String name = xLabels[i].toString().toPersianDigit();
+
+            final amount= val.toString().toPersianDigit()  ;
+            flatList.add(VolumeSlot(
+                name: name,
+                amount: amount
+            ));
+
+          }
+
 
           final scale = Constants().getScale(yValues);
           double chartWidth = (xLabels.length * 20.0).clamp(MediaQuery.sizeOf(context).width, double.infinity);
@@ -75,7 +113,7 @@ class PumpHoursChartWidget extends StatelessWidget {
                                 fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
                               )
                           ),
-                          borderData: FlBorderData(border: const Border(bottom: BorderSide(), left: BorderSide())),
+                          borderData: FlBorderData(border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey))),
                           titlesData: FlTitlesData(
                             show: true,
                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -126,15 +164,16 @@ class PumpHoursChartWidget extends StatelessWidget {
                         ),
                       );
                     }else{
-                      flatList.add(VolumeSlot(name: xLabels[index-1].toString().toPersianDigit(),status: yValues[index-1].toString().toPersianDigit()));
+
+                      final item = flatList[index - 1];
 
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                         decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
                         child: Row(
                           children: [
-                            Expanded(flex: 3, child: Text(xLabels[index - 1].toString().toPersianDigit())),
-                            Expanded(flex: 2, child: Text('\u200E${yValues[index - 1].toString().toPersianDigit()}')),
+                            Expanded(flex: 3, child: Text(item.name.toString().toPersianDigit())),
+                            Expanded(flex: 2, child: Text('\u200E${item.amount}')),
                           ],
                         ),
                       );

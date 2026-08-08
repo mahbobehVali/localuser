@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/widgets/show_dialogs.dart';
+import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/panel_feature/presentation/cubit/logout_cubit.dart';
 import 'package:mahaliii/features/panel_feature/presentation/screens/account_screen.dart';
@@ -42,7 +43,7 @@ class _PanelScreenState extends State<PanelScreen> {
                     height: 40.h,
                     padding: EdgeInsets.symmetric(horizontal: 18),
                     decoration: BoxDecoration(
-                      color: Color(0xffD3D9E0),
+                      color: ColorPalette.tGrey,
                       borderRadius: BorderRadius.circular(8),
                     ),
 
@@ -68,7 +69,7 @@ class _PanelScreenState extends State<PanelScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 32),
+                SizedBox(height: 32.h),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
@@ -79,7 +80,7 @@ class _PanelScreenState extends State<PanelScreen> {
                     height: 40.h,
                     padding: EdgeInsets.symmetric(horizontal: 18),
                     decoration: BoxDecoration(
-                      color: Color(0xffD3D9E0),
+                      color: ColorPalette.tGrey,
                       borderRadius: BorderRadius.circular(8),
                     ),
 
@@ -107,7 +108,7 @@ class _PanelScreenState extends State<PanelScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 32),
+                SizedBox(height: 32.h),
 
 
 
@@ -126,7 +127,7 @@ class _PanelScreenState extends State<PanelScreen> {
                           height: 40.h,
                           padding: EdgeInsets.symmetric(horizontal: 18),
                           decoration: BoxDecoration(
-                            color: Color(0xffD3D9E0),
+                            color: ColorPalette.tGrey,
                             borderRadius: BorderRadius.circular(8),
                           ),
 

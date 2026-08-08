@@ -746,7 +746,7 @@ class ShowDialogs {
 
                   return AlertDialog(
                     content: SizedBox(
-                      height: 100.h,
+                      height: 50.h,
                       child: Text("آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟"),
                     ),
                     actions: [
@@ -760,9 +760,9 @@ class ShowDialogs {
                           Expanded(
                             child: GlobalElevatedButton(
                               borderRadius: BorderRadius.circular(2.5),
-                              backColor: const Color(0xff5F8CC5),
+                              backColor: ColorPalette.darkBlue,
                               onTap: isLoading
-                                  ? null // در زمان لودینگ دکمه غیرفعال باشد
+                                  ? null
                                   : () {
                                 wellDetailBloc.add(SwitchClicked(
                                   value,
