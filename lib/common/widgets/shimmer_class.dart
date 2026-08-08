@@ -26,7 +26,7 @@ class ShimmerClass {
         ));
   }
 
-  static Shimmer shimmerListviewHor({double width=115,double height=170,
+  static Shimmer shimmerListviewHor({double width=115,double height=170,int count=5,
     BorderRadiusGeometry borderRadius = const BorderRadius.all(Radius.circular(15))
   }) {
     return Shimmer.fromColors(
@@ -39,7 +39,7 @@ class ShimmerClass {
         child: ListView.builder(
           physics: NeverScrollableScrollPhysics(),
           scrollDirection: Axis.horizontal,
-          itemCount: 6,
+          itemCount: count,
           itemBuilder: (context, index) {
             return Container(
               margin: EdgeInsets.only(right: 3.sp),
@@ -375,16 +375,19 @@ class ShimmerClass {
     );
   }
 
-  static Shimmer shimmerContainer({double height = 100}) {
+  static Widget shimmerContainer({double height = 100}) {
     return Shimmer.fromColors(
-      baseColor: ColorPalette.lightGrey.withValues(alpha: 0.3),
-      highlightColor: ColorPalette.lightGrey,
+      // استفاده از رنگ‌های استاندارد و دارای تضاد مناسب
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
       direction: ShimmerDirection.rtl,
       child: Container(
-        height: height.h,
+        height: height.h, // اعمال .h فقط در همین‌جا
+        // width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: ColorPalette.lightGrey,
+          color: Colors.white, // رنگ ماسک باید کاملاً کدر (مثل سفید) باشد
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );

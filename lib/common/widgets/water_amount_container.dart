@@ -50,13 +50,8 @@ class WaterAmountContainer extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              // سپس واحد (ساعت یا m³)
-              if (meter)
-                Text(
-                  'm³',
-                  style: TextStyleP.f16Bold.copyWith(color: ColorPalette.black),
-                )
-              else if (unit.isNotEmpty)
+
+               if (unit.isNotEmpty)
                 Text(
                   unit,
                   style: TextStyleP.f16Bold,

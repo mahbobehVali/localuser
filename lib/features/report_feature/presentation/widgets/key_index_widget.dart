@@ -20,7 +20,7 @@ class KeyIndexWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           BlocBuilder<ReportBloc, ReportState>(
-// تنها در صورتی ری‌بیلد انجام می‌شود که وضعیت قبلی Success نبوده باشد
+          //              تنها در صورتی ری‌بیلد انجام می‌شود که وضعیت قبلی Success نبوده باشد
             buildWhen: (previous, current) {
               return previous.reportFlowMeterStatus is! ReportFlowMeterSuccess;
             },
@@ -31,7 +31,7 @@ class KeyIndexWidget extends StatelessWidget {
                     amount: "${reportFlowMeterSuccess.reportFlowMeter.list.total.toString()} m³");
 
               }else  if(state.reportFlowMeterStatus is ReportFlowMeterLoading){
-                return ShimmerClass.shimmerContainer(height: 100.h);
+                return SizedBox(width: 120.w,child: ShimmerClass.shimmerContainer(height: 70));
               }else {
                 return  WaterAmountContainer(title: "حجم کل آب مصرف شده",amount: "-",meter: false,);
               }
@@ -48,7 +48,7 @@ class KeyIndexWidget extends StatelessWidget {
                   amount: "${reportCommandSuccess.reportFlowMeter.list.totalOn}",unit: "ساعت",meter: false,);
 
               }else  if(state.reportCommandStatus is ReportCommandLoading){
-                return ShimmerClass.shimmerContainer(height: 100.h);
+                return SizedBox(width: 120.w,child: ShimmerClass.shimmerContainer(height: 70));
               }else {
                 return  WaterAmountContainer(title: "مجموع ساعات کارکرد پمپ ها",amount: "-",meter: false,);
 
@@ -64,7 +64,7 @@ class KeyIndexWidget extends StatelessWidget {
                 return  WaterAmountContainer(title: "تعداد هشدارهای صادر شده",amount: reportCountSuccess.alertCountEntity.totalCount.toString(),meter: false,);
 
               }else  if(state.reportCountStatus is ReportCountLoading){
-                return ShimmerClass.shimmerContainer(height: 100.h);
+                return SizedBox(width: 120.w,child: ShimmerClass.shimmerContainer(height: 70));
               }else {
                 return  WaterAmountContainer(title: "تعداد هشدارهای صادر شده",amount: "-",meter: false,);
 
