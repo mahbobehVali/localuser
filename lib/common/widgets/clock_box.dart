@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mahaliii/config/color_palette.dart';
 
 class ClockBox extends StatelessWidget {
   const ClockBox({super.key, required this.clock,required this.time});

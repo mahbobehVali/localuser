@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../common/utils/constants.dart';
 import '../../../../common/widgets/last_activity_widget.dart';
 import '../../../../common/widgets/pagination_widget.dart';
-import '../../../../config/color_palette.dart';
-import '../../../../config/texts_style.dart';
 import '../bloc/report_bloc.dart';
 import '../bloc/user_activity_report_status.dart';
 

@@ -47,7 +47,6 @@ class SupportAnswerScreen extends StatelessWidget {
             locator<SupportCloseUseCase>(),
 
 
-
           );
           supportBloc.add(GetSupportAnswers(supportDataEntity.id!));
           return supportBloc;

@@ -97,7 +97,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     });
 
     on<ReportFlowMeter>((event, emit) async {
-      print("state.selectedReportIndex${state.selectedReportIndex}");
+
       final bool ignoreAllWell = state.selectedReportIndex == 0;
       emit(state.copyWith(newReportFlowMeterStatus: ReportFlowMeterLoading(),
                           newFlowMeterParams: event.flowMeterParams));

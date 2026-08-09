@@ -74,9 +74,10 @@ class ReportScreen extends StatelessWidget {
                       children: [
                         Text("انتخاب چاه"),
                         Container(
-                          height: 50,
+                          height: 40.h,
                           decoration:
-                          BoxDecoration(border: Border.all(color: Colors.grey)),
+                          BoxDecoration(border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(5)),
                           child: BlocConsumer<ReportBloc, ReportState>(
                             listener: (context, state) {
                               if(state.wellReportStatus is WellReportExit){
@@ -109,7 +110,7 @@ class ReportScreen extends StatelessWidget {
                                   buttonText: Text(
                                     initialSelectedObjects.isEmpty
                                         ? "انتخاب چاه"
-                                        : "${initialSelectedObjects.length} چاه",
+                                        : "${initialSelectedObjects.length.toString().toPersianDigit()} چاه",
                                   ),
                                   title: const SizedBox(), // مخفی کردن تایتل بالای دیالوگ
                                   chipDisplay: MultiSelectChipDisplay.none(), // مخفی کردن چیپ‌های زیر باکس
@@ -147,7 +148,7 @@ class ReportScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(width: 10),
+                  SizedBox(width: 10.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -181,8 +182,9 @@ class ReportScreen extends StatelessWidget {
                           },
                           child: Container(
                             width: double.infinity,
-                            height: 50,
-                            decoration:  BoxDecoration(border: Border.all(color: Colors.grey)),
+                            height: 40.h,
+                            decoration:  BoxDecoration(border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(5)),
 
                             child: Center(child: Text(
                                 displayText.toString().toPersianDigit())),
@@ -322,9 +324,8 @@ class ReportScreen extends StatelessWidget {
               BlocBuilder<ReportBloc, ReportState>(
                 buildWhen: (prev, curr) =>
                 prev.selectedReportIndex != curr.selectedReportIndex ||
-                prev.reportFlowMeterStatus!=curr.reportFlowMeterStatus,
+                    prev.reportFlowMeterStatus != curr.reportFlowMeterStatus,
                 builder: (context, state) {
-                  // ۱. پیدا کردن امن آیتم انتخاب شده با لایه دفاعی برای جلوگیری از خطای نال
                   final selectedIndex = state.selectedReportIndex ?? 0;
                   final selectedItem = state.reportIndexList.isNotEmpty
                       ? state.reportIndexList[selectedIndex]
@@ -337,8 +338,7 @@ class ReportScreen extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
-                        // border: Border.all(color: ColorPalette.lightGrey),
-                        color: ColorPalette.lightGrey
+                        color: ColorPalette.lightGrey,
                       ),
                       child: DropdownButton<AlertTypeEntity>(
                         underline: const SizedBox(),
@@ -346,28 +346,35 @@ class ReportScreen extends StatelessWidget {
                         padding: EdgeInsets.only(right: 15.w, left: 5.w),
                         value: selectedItem,
                         items: state.reportIndexList.map((alert) {
-                          // ۱. شرط غیرفعال بودن این آیتم خاص را بررسی می‌کنیم
-                          final bool isItemDisabled =
+                          // ۱. تعریف دقیق و یکپارچه شرط غیرفعال بودن (هم منطقی هم آیتم انتخابی)
+                          final bool isSpecificDisabled =
                               ((state.flowMeterParams?.ids?.length ?? 1) == 1) && (alert.id == 1);
+                          final bool isAlreadySelected = alert.id == selectedItem?.id;
+
+                          final bool isDisabled = isSpecificDisabled || isAlreadySelected;
 
                           return DropdownMenuItem<AlertTypeEntity>(
-                          value: alert,
-                          //وظیفه اصلی: اجرای یک اکشن خاص و محلی برای همان آیتم (مثلاً باز کردن یک دیالوگ، پخش صدا، یا غیرفعال کردن کلیک).
-                          onTap: isItemDisabled ? null : () {},
-                          child: Text(alert.name,
-                            style: TextStyle(
-                              // ۳. تغییر رنگ متن به خاکستری برای نشان دادن وضعیت غیرفعال
-                              color: isItemDisabled ? Colors.grey : Colors.black,
-                            ),),
-                        );
+                            value: alert,
+                            enabled: !isDisabled, //  روش استاندارد فلاتر برای غیرفعال کردن واقعی آیتم
+                            child: Text(
+                              alert.name,
+                              style: TextStyle(
+                                //  تغییر رنگ متن برای تمام حالت‌های غیرفعال
+                                color: isDisabled ? Colors.grey : Colors.black,
+                              ),
+                            ),
+                          );
                         }).toList(),
-                        onChanged: (value) {
+                        onChanged: state.reportFlowMeterStatus is ReportFlowMeterLoading
+                            ? null
+                            : (value) {
                           if (value != null) {
-                            final bool isItemDisabled =
+                            final bool isSpecificDisabled =
                                 ((state.flowMeterParams?.ids?.length ?? 1) == 1) && (value.id == 1);
+                            final bool isAlreadySelected = value.id == selectedItem?.id;
 
-                            // اگر غیرفعال نبود، ایونت را ارسال کن
-                            if (!isItemDisabled) {
+                            //  جلوگیری از ارسال ایونت در صورت انتخاب مجدد یا غیرفعال بودن
+                            if (!isSpecificDisabled && !isAlreadySelected) {
                               context.read<ReportBloc>().add(OneReportIndexClicked(value));
                             }
                           }

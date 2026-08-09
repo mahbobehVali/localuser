@@ -798,10 +798,10 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                 ),
                                                 child: const Row(
                                                   children: [
-                                                    Expanded(flex: 2, child: Text("تاریخ")),
-                                                    Expanded(flex: 2, child: Text("ساعات کارکرد پمپ")),
-                                                    Expanded(child: Text("حجم مصرفی")),
-                                                    Expanded(child: Text("تعداد هشدار")),
+                                                    Expanded(child: Text("تاریخ", textAlign: TextAlign.center)),
+                                                    Expanded(child: Text("ساعات کارکرد پمپ", textAlign: TextAlign.center)),
+                                                    Expanded(child: Text("حجم مصرفی", textAlign: TextAlign.center)),
+                                                    Expanded(child: Text("تعداد هشدار", textAlign: TextAlign.center)),
                                                   ],
                                                 ),
                                               );
@@ -835,10 +835,29 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                               ),
                                               child: Row(
                                                 children: [
-                                                  Expanded(flex: 2, child: Text(currentDate.toString().toPersianDigit())),
-                                                  Expanded(flex: 2, child: Text(workHours)),
-                                                  Expanded(child: Directionality(textDirection: TextDirection.ltr,child: Text(flowVolume,textAlign: TextAlign.right,))),
-                                                  Expanded(child: Text(alertCount)),
+                                                  Expanded(
+                                                    child: Text(currentDate.toString().toPersianDigit(),
+                                                      textAlign: TextAlign.center,
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Text(workHours,
+                                                      textAlign: TextAlign.center,
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Directionality(
+                                                      textDirection: TextDirection.ltr,
+                                                      child: Text(flowVolume,
+                                                        textAlign: TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Text(alertCount,
+                                                      textAlign: TextAlign.center,
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             );
@@ -856,7 +875,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                   }
                                 },),
                                 SizedBox(
-                                  height: 250,
+                                  height: 250.h,
                                   child: BlocBuilder<WellDetailBloc, WellDetailState>(
                                     buildWhen: (previous, current) {
 

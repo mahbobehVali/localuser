@@ -219,7 +219,9 @@ class Constants {
     if (maxAbs > 40000) {
       step = 20000.0;
     } else if (maxAbs > 10000) {
-      step = 5000.0;
+      step = 10000.0;
+    } else if (maxAbs > 5000) {
+      step = 1000.0;
     } else if (maxAbs > 1000) {
       step = 500.0;
     } else if (maxAbs > 500) {
@@ -232,10 +234,8 @@ class Constants {
       step = 10.0;
     } else if (maxAbs > 10) {
       step = 5.0;
-    } else if (maxAbs > 5) {
-      step = 2.0;
     } else {
-      step = 1.0;
+      step = 2.0;
     }
 
     // ۲. محاسبه سقف
@@ -280,8 +280,11 @@ class Constants {
     double step;
     if (maxAbs > 40000) {
       step = 20000.0;
-    } else if (maxAbs > 10000) {
-      step = 5000.0;
+    }
+    else if (maxAbs > 10000) {
+      step = 10000.0;
+    } else if (maxAbs > 5000) {
+      step = 1000.0;
     } else if (maxAbs > 1000) {
       step = 500.0;
     } else if (maxAbs > 500) {
@@ -332,7 +335,6 @@ class Constants {
       List<dynamic> customTitles,
       String day,
       ) {
-    print("sdfsfsffdff$day");
     final int index = value.toInt();
 
     // ۱. کنترل محدوده اندیس

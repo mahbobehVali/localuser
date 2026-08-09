@@ -79,8 +79,8 @@ class AlertsReportChartWidget extends StatelessWidget {
                               handleBuiltInTouches: true,
                               touchTooltipData: BarTouchTooltipData(
                                 getTooltipColor: (group) => ColorPalette.lightGrey,
-                                fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
-                                fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                fitInsideHorizontally: true,
+                                fitInsideVertically: true,
                               )
                           ),
                           borderData: FlBorderData(border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey))),
@@ -128,8 +128,8 @@ class AlertsReportChartWidget extends StatelessWidget {
                         color: ColorPalette.lightGrey,
                         child: Row(
                           children: [
-                            Expanded(flex: 3, child: Text("نوع هشدار", style: TextStyleP.f10Regular)),
-                            Expanded(flex: 2, child: Text("تعداد هشدارها", style: TextStyleP.f10Regular)),
+                            Expanded(child: Text("نوع هشدار", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
+                            Expanded( child: Text("تعداد هشدارها", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
                           ],
                         ),
                       );
@@ -143,8 +143,8 @@ class AlertsReportChartWidget extends StatelessWidget {
                         decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
                         child: Row(
                           children: [
-                            Expanded(flex: 3,child: Text(typeName[index - 1])),
-                            Expanded(flex: 2,child: Text(countByType[index - 1].count.toString().toPersianDigit())),
+                            Expanded(child: Text(typeName[index - 1],textAlign: TextAlign.center)),
+                            Expanded(child: Text(countByType[index - 1].count.toString().toPersianDigit(),textAlign: TextAlign.center)),
                           ],
                         ),
                       );

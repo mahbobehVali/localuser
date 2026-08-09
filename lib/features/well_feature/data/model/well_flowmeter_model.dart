@@ -21,9 +21,9 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
 }
 
  dynamic findFlowMeterElement(List<dynamic> list,{bool ignoreAllWell = false}) {
-  print("!ignoreAllWell${!ignoreAllWell}");
+  print("ignoreAllWell------${ignoreAllWell}");
    // ۱. بررسی شرط all-well فقط در صورتی که نادیده گرفته نشده باشد
-   if (!ignoreAllWell) {
+   if (ignoreAllWell==false) {
      final allElement = list.firstWhere(
            (element) =>
        element["type"] == "all-well" &&
@@ -31,19 +31,20 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
            element["xAxis"].length > 1,
        orElse: () => null,
      );
+     print("totalElementall-well${allElement}");
 
      if (allElement != null) return allElement;
    }
+  print("tttttttttttttttttttttttttttt");
 
     // اول تلاش می‌کنه total رو پیدا کنه
     final totalElement = list.firstWhere(
       (element) => element["type"] == "total",
       orElse: () => null,
     );
-   print("totalElement${totalElement}");
+   print("totalElementtotal${totalElement}");
 
     if (totalElement != null) return totalElement;
-
 
 
 
@@ -51,7 +52,7 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
       (element) => element["type"] == "one-well",
       orElse: () => null,
     );
-   print("oneElement${oneElement}");
+   print("oneElementone-well${oneElement}");
 
     if (oneElement != null) return oneElement;
 

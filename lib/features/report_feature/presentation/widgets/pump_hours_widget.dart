@@ -158,8 +158,8 @@ class PumpHoursChartWidget extends StatelessWidget {
                         color: ColorPalette.lightGrey,
                         child: Row(
                           children: [
-                            Expanded(flex: 3, child: Text( state.oneWell.length==1? "تاریخ":"چاه", style: TextStyleP.f10Regular)),
-                            Expanded(flex: 2, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular)),
+                            Expanded(flex: 3, child: Text( state.oneWell.length==1? "تاریخ":"چاه", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
+                            Expanded(flex: 2, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
                           ],
                         ),
                       );
@@ -172,8 +172,8 @@ class PumpHoursChartWidget extends StatelessWidget {
                         decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
                         child: Row(
                           children: [
-                            Expanded(flex: 3, child: Text(item.name.toString().toPersianDigit())),
-                            Expanded(flex: 2, child: Text('\u200E${item.amount}')),
+                            Expanded(flex: 3, child: Text(item.name.toString().toPersianDigit(),textAlign: TextAlign.center)),
+                            Expanded(flex: 2, child: Text('\u200E${item.amount}',textAlign: TextAlign.center)),
                           ],
                         ),
                       );

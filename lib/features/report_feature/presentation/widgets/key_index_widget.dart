@@ -28,7 +28,7 @@ class KeyIndexWidget extends StatelessWidget {
               if(state.reportFlowMeterStatus is ReportFlowMeterSuccess){
                 ReportFlowMeterSuccess reportFlowMeterSuccess=state.reportFlowMeterStatus as ReportFlowMeterSuccess;
                 return  WaterAmountContainer(title: "حجم کل آب مصرف شده",
-                    amount: "${reportFlowMeterSuccess.reportFlowMeter.list.total.toString()} m³");
+                    amount: "${reportFlowMeterSuccess.wellReportFlowMeter.list.total.toString()} m³");
 
               }else  if(state.reportFlowMeterStatus is ReportFlowMeterLoading){
                 return SizedBox(width: 120.w,child: ShimmerClass.shimmerContainer(height: 70));

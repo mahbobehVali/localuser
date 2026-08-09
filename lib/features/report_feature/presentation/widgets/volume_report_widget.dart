@@ -4,11 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
-import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/constants.dart';
-import '../../../../common/widgets/indicator_widget.dart';
 import '../../../../config/color_palette.dart';
 import '../../../../config/texts_style.dart';
 import '../bloc/report_bloc.dart';
@@ -25,8 +23,9 @@ class VolumeReportChartWidget extends StatelessWidget {
       builder: (context, state) {
         final status = state.reportFlowMeterStatus;
         if (status is ReportFlowMeterSuccess) {
+          print("status.wellReportFlowMeter.list${status.wellReportFlowMeter.list.xAxis}");
 
-          final flowMeter = status.reportFlowMeter.list;
+          final flowMeter = status.wellReportFlowMeter.list;
           final xLabels = flowMeter.xAxis;
           final yValues = flowMeter.yAxis;
 
@@ -53,6 +52,7 @@ class VolumeReportChartWidget extends StatelessWidget {
 
           for (int i = 0; i < yValues.length; i++) {
             final val = yValues[i];
+            print("xLabels[i]${xLabels[i]}");
              final parts = xLabels[i].split('/');
              final monthNum = int.tryParse(parts[1]) ?? 0;
 
@@ -168,49 +168,44 @@ class VolumeReportChartWidget extends StatelessWidget {
               ),
               SizedBox(height: 8.h,),
 
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: 500,
-                  child: ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: flatList.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return Container(
-                          padding: const EdgeInsets.all(10),
-                          color: ColorPalette.lightGrey,
-                          child: Row(
-                            children: [
-                              Expanded(flex: 4, child: Text(state.selectedReportIndex == 1 ? "چاه" : "تاریخ", style: TextStyleP.f10Regular)),
-                              Expanded(flex: 3, child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular)),
-                              Expanded(flex: 2, child: Text("وضعیت", style: TextStyleP.f10Regular)),
-                            ],
-                          ),
-                        );
-                      }
+              ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: flatList.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return Container(
+                      padding: const EdgeInsets.all(10),
+                      color: ColorPalette.lightGrey,
+                      child: Row(
+                        children: [
+                          Expanded( child: Text(state.selectedReportIndex == 1 ? "چاه" : "تاریخ",
+                              style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                          Expanded( child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                          Expanded( child: Text("وضعیت", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                        ],
+                      ),
+                    );
+                  }
 
-                      // دسترسی آسان به دیتای آماده از flatList
-                      final item = flatList[index - 1];
+                  // دسترسی آسان به دیتای آماده از flatList
+                  final item = flatList[index - 1];
 
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                        decoration: BoxDecoration(
-                          border: Border(bottom: BorderSide(color: ColorPalette.grey, width: 1)),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(flex: 4, child: Text(item.name??"")),
-                            Expanded(flex: 3, child: Text('\u200E${item.amount}', textAlign: TextAlign.start)),
-                            Expanded(flex: 2, child: Text(item.status??"", textAlign: TextAlign.start)),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                    decoration: BoxDecoration(
+                      border: Border(bottom: BorderSide(color: ColorPalette.grey, width: 1)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded( child: Text(item.name??"", textAlign: TextAlign.center)),
+                        Expanded(child: Text('\u200E${item.amount}', textAlign: TextAlign.center)),
+                        Expanded( child: Text(item.status??"", textAlign: TextAlign.center)),
+                      ],
+                    ),
+                  );
+                },
               )
 
             ],

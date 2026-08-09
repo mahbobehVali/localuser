@@ -455,6 +455,87 @@ class ShimmerClass {
     );
   }
 
+
+  static Widget shimmerBarChartAndListVertical({double height = 50}) {
+    // درصد ارتفاع میله‌ها برای طبیعی‌تر شدن ظاهر نمودار شیمر
+    final List<double> barHeights = [0.4, 0.7, 0.5, 0.85, 0.6, 0.75];
+
+    return Shimmer.fromColors(
+      baseColor: ColorPalette.lightGrey.withValues(alpha: 0.3),
+      highlightColor: ColorPalette.lightGrey,
+      direction: ShimmerDirection.rtl,
+      child: Column(
+        children: [
+          // بخش نمودار میله‌ای (BarChart)
+          Container(
+            height: 300,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Column(
+              children: [
+                // میله‌های نمودار
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: barHeights.map((factor) {
+                      return FractionallySizedBox(
+                        heightFactor: factor, // تنظیم ارتفاع نسبی هر میله
+                        child: Container(
+                          width: 22,
+                          decoration:  BoxDecoration(
+                            color: ColorPalette.lightGrey,
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(6), // گرد کردن بالای میله‌ها
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // محور پایین (X-Axis Labels)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: List.generate(
+                    barHeights.length,
+                        (index) => Container(
+                      width: 24,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: ColorPalette.lightGrey,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+
+          // بخش لیست زیر نمودار
+          ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(10),
+            itemCount: 4,
+            itemBuilder: (context, index) {
+              return Container(
+                height: height.h,
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: ColorPalette.lightGrey,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              );
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+
 }
 
 // نقاش اختصاصی برای کشیدن شکل خط نمودار

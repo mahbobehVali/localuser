@@ -26,11 +26,11 @@ class ReportFlowMeterError extends ReportFlowMeterStatus {
 }
 
 class ReportFlowMeterSuccess extends ReportFlowMeterStatus {
-  final WellFlowMeterEntity reportFlowMeter;
+  final WellFlowMeterEntity wellReportFlowMeter;
   final CapacityEntity capacityEntity;
 
-  const ReportFlowMeterSuccess(this.reportFlowMeter,this.capacityEntity);
+  const ReportFlowMeterSuccess(this.wellReportFlowMeter,this.capacityEntity);
 
   @override
-  List<Object> get props => [reportFlowMeter,capacityEntity];
+  List<Object> get props => [wellReportFlowMeter,capacityEntity];
 }

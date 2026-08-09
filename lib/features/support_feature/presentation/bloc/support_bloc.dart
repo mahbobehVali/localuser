@@ -121,18 +121,18 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
         File file=File(xFile.path);
         int fileSizeInBytes=await file.length();
 
-        CroppedFile? croppedFile=await ImageCropper().cropImage(sourcePath:
-        xFile.path,
-            maxHeight: 200,
-            maxWidth: 200,
-            aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-            uiSettings: [
-              AndroidUiSettings(cropStyle:CropStyle.circle,
-                  toolbarTitle: "crop image"),
-              IOSUiSettings(cropStyle:CropStyle.circle,
-                  title: "crop image")
-            ]
-        );
+        // CroppedFile? croppedFile=await ImageCropper().cropImage(sourcePath:
+        // xFile.path,
+        //     maxHeight: 200,
+        //     maxWidth: 200,
+        //     aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        //     uiSettings: [
+        //       AndroidUiSettings(cropStyle:CropStyle.circle,
+        //           toolbarTitle: "crop image"),
+        //       IOSUiSettings(cropStyle:CropStyle.circle,
+        //           title: "crop image")
+        //     ]
+        // );
         emit(state.copyWith(newSupportFile: (fileSizeInBytes > Constants.MAX_FILE_SIZE_BYTES)?null:file.path,
             newOverImage: (fileSizeInBytes > Constants.MAX_FILE_SIZE_BYTES)?true:false));
 

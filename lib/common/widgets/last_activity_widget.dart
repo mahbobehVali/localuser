@@ -75,12 +75,12 @@ class LastActivityWidget extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Expanded(flex: 2,child: Text("نام چاه",style: TextStyleP.f12Regular)),
+                        Expanded(flex: 2,child: Text("نام چاه",style: TextStyleP.f12Regular, textAlign: TextAlign.center)),
+                        Expanded(flex: 1,child: Text("تاریخ",style: TextStyleP.f12Regular, textAlign: TextAlign.center)),
+                        Expanded(flex: 1,child: Text("ساعت",style: TextStyleP.f12Regular, textAlign: TextAlign.center)),
+                        Expanded(flex: 1,child: Text("وضعیت",style: TextStyleP.f12Regular, textAlign: TextAlign.center)),
+                        Expanded(flex: 2,child: Text("توسط",style: TextStyleP.f12Regular, textAlign: TextAlign.center)),
 
-                        Expanded(flex: 1,child: Text("وضعیت",style: TextStyleP.f12Regular)),
-                        Expanded(flex: 3,child: Text("توسط",style: TextStyleP.f12Regular)),
-                        Expanded(flex: 2,child: Text("تاریخ",style: TextStyleP.f12Regular)),
-                        Expanded(flex: 1,child: Text("ساعت",style: TextStyleP.f12Regular)),
                       ],
                     ),
                   ):
@@ -92,11 +92,12 @@ class LastActivityWidget extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Expanded(flex: 2,child: Text(flatList[index-1].wellName,style: TextStyleP.f10Regular)),
-                        Expanded(flex: 1,child: Text(flatList[index-1].status,style: TextStyleP.f10Regular)),
-                        Expanded(flex: 3,child: Text(flatList[index-1].name,style: TextStyleP.f10Regular)),
-                        Expanded(flex: 2,child: Text(flatList[index-1].date.toPersianDigit(),style: TextStyleP.f10Regular)),
-                        Expanded(flex: 1,child: Text(flatList[index-1].time.toPersianDigit(),style: TextStyleP.f10Regular)),
+                        Expanded(flex: 2,child: Text(flatList[index-1].wellName,style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                        Expanded(flex: 1,child: Text(flatList[index-1].date.toPersianDigit(),style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                        Expanded(flex: 1,child: Text(flatList[index-1].time.toPersianDigit(),style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                        Expanded(flex: 1,child: Text(flatList[index-1].status,style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                        Expanded(flex: 2,child: Text(flatList[index-1].name,style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+
 
                       ],
                     ),

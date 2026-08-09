@@ -6,6 +6,7 @@ import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
+
 import '../../../../common/utils/constants.dart';
 import '../../../../common/widgets/indicator_widget.dart';
 import '../../../../config/color_palette.dart';
@@ -38,7 +39,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
         if (status is ReportFlowMeterSuccess) {
 
 
-          final flowMeter = status.reportFlowMeter.list;
+          final flowMeter = status.wellReportFlowMeter.list;
 
           final xLabels = flowMeter.xAxis;
           final yValues = flowMeter.yAxis;
@@ -262,10 +263,10 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                           color: ColorPalette.lightGrey,
                           child: Row(
                             children: [
-                              Expanded(flex: 4, child: Text(state.selectedReportIndex == 1 ? "چاه" : "تاریخ", style: TextStyleP.f10Regular)),
-                              Expanded(flex: 3, child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular)),
-                                Expanded(flex: 4, child: Text("حجم مصرف بیش از حد مجاز", style: TextStyleP.f10Regular)),
-                              Expanded(flex: 2, child: Text("وضعیت", style: TextStyleP.f10Regular)),
+                              Expanded(flex: 4, child: Text(state.selectedReportIndex == 1 ? "چاه" : "تاریخ", style: TextStyleP.f10Regular,textAlign: TextAlign.center,)),
+                              Expanded(flex: 3, child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular,textAlign: TextAlign.center,)),
+                                Expanded(flex: 4, child: Text("حجم مصرف بیش از حد مجاز", style: TextStyleP.f10Regular,textAlign: TextAlign.center,)),
+                              Expanded(flex: 2, child: Text("وضعیت", style: TextStyleP.f10Regular,textAlign: TextAlign.center,)),
                             ],
                           ),
                         );
@@ -281,10 +282,10 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                         ),
                         child: Row(
                           children: [
-                            Expanded(flex: 4, child: Text(item.name??"")),
-                            Expanded(flex: 3, child: Text('\u200E${item.amount}', textAlign: TextAlign.start)),
-                              Expanded(flex: 4, child: Text(item.capacity ?? "۰.۰")),
-                            Expanded(flex: 2, child: Text(item.status??"", textAlign: TextAlign.start)),
+                            Expanded(flex: 4, child: Text(item.name??"",textAlign: TextAlign.center,)),
+                            Expanded(flex: 3, child: Text('\u200E${item.amount}', textAlign: TextAlign.center)),
+                              Expanded(flex: 4, child: Text(item.capacity ?? "۰.۰",textAlign: TextAlign.center,)),
+                            Expanded(flex: 2, child: Text(item.status??"", textAlign: TextAlign.center)),
                           ],
                         ),
                       );
@@ -296,7 +297,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
             ],
           );
         }
-        if (status is ReportFlowMeterLoading) return ShimmerClass.shimmerChartAndListVertical();
+        if (status is ReportFlowMeterLoading) return ShimmerClass.shimmerBarChartAndListVertical();
         if (status is ReportFlowMeterError) return Center(child: Text(status.error));
         if (status is ReportFlowMeterInitial) {
           return Center(child: Padding(

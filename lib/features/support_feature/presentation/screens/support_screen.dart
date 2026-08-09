@@ -29,7 +29,6 @@ class SupportScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: BlocProvider(
         create: (context) {
           SupportBloc supportBloc = SupportBloc(
@@ -43,14 +42,35 @@ class SupportScreen extends StatelessWidget {
           return supportBloc;
         },
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsets.only(left: 16.w,right: 16.w,top: 50.h),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text("پشتیبانی", style: TextStyleP.f16Medium),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("پشتیبانی", style: TextStyleP.f16Medium),
+                  IconButton(
+                    style: ButtonStyle(
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)
+                        ),
+                      ),
+                      side: WidgetStatePropertyAll(
+                        BorderSide(),
+                      ),
+                    ),
+                    icon: const Icon(Icons.navigate_next),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
               SizedBox(height: 16.h),
-              const Text("ثبت درخواست جدید"),
-              SizedBox(height: 24.h),
+               Text("ثبت درخواست جدید",style: TextStyleP.f16Bold),
+              SizedBox(height: 16.h),
               Row(
                 children: List.generate(
                   2,
@@ -102,7 +122,7 @@ class SupportScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(12),
                           child: Text("پیام‌های ارسال شده در پشتیبانی", style: TextStyleP.f12Regular),
                         ),
                         Padding(
@@ -179,11 +199,12 @@ class SupportScreen extends StatelessWidget {
                                                     decoration: Constants().boxDecoration,
                                                     child: const Row(
                                                       children: [
-                                                        Expanded(flex: 4, child: Text("نوع پشتیبانی")),
-                                                        Expanded(flex: 4, child: Text("موضوع")),
-                                                        Expanded(flex: 2, child: Text("تاریخ")),
-                                                        Expanded(flex: 3, child: Text("ساعت")),
-                                                        Expanded(flex: 4, child: Text("وضعیت")),
+                                                        Expanded(flex: 4, child: Text("نوع پشتیبانی", textAlign: TextAlign.center)),
+                                                        Expanded(flex: 2, child: Text("تاریخ", textAlign: TextAlign.center)),
+                                                        Expanded(flex: 3, child: Text("ساعت", textAlign: TextAlign.center)),
+                                                        Expanded(flex: 4, child: Text("موضوع", textAlign: TextAlign.center)),
+
+                                                        Expanded(flex: 4, child: Text("وضعیت", textAlign: TextAlign.center)),
                                                       ],
                                                     ),
                                                   )
@@ -209,11 +230,12 @@ class SupportScreen extends StatelessWidget {
                                                         children: [
                                                           Expanded(
                                                             flex: 4,
-                                                            child: Text(data[index - 1].part == 1 ? "درخواست به مدیر" : "پشتیبانی دستگاه"),
+                                                            child: Text(data[index - 1].part == 1 ? "درخواست به مدیر" : "پشتیبانی دستگاه", textAlign: TextAlign.center),
                                                           ),
-                                                          Expanded(flex: 4, child: Text(data[index - 1].subject.toString().toPersianDigit())),
-                                                          Expanded(flex: 2, child: Text(data[index - 1].clock?.toPersianDigit() ?? "")),
-                                                          Expanded(flex: 3, child: Text(data[index - 1].date?.toPersianDigit() ?? "")),
+                                                          Expanded(flex: 2, child: Text(data[index - 1].clock?.toPersianDigit() ?? "", textAlign: TextAlign.center)),
+                                                          Expanded(flex: 3, child: Text(data[index - 1].date?.toPersianDigit() ?? "", textAlign: TextAlign.center)),
+                                                          Expanded(flex: 4, child: Text(data[index - 1].subject.toString().toPersianDigit(), textAlign: TextAlign.center)),
+
                                                           Expanded(
                                                             flex: 4,
                                                             child: Container(

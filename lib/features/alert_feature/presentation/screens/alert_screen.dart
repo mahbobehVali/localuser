@@ -128,11 +128,11 @@ class AlertScreen extends StatelessWidget {
                                                 decoration:  Constants().boxDecoration,
                                                 child: Row(
                                                   children: [
-                                                    Expanded(flex: 5,child: Text("نام چاه")),
-                                                    Expanded(flex: 5,child: Text("نوع هشدار")),
-                                                    Expanded(flex: 2,child: Text("ساعت")),
-                                                    Expanded(flex: 3,child: Text("تاریخ")),
-                                                    Expanded(flex: 4,child: Text("وضعیت")),
+                                                    Expanded(flex: 5,child: Text("نام چاه", textAlign: TextAlign.center)),
+                                                    Expanded(flex: 5,child: Text("نوع هشدار", textAlign: TextAlign.center)),
+                                                    Expanded(flex: 2,child: Text("ساعت", textAlign: TextAlign.center)),
+                                                    Expanded(flex: 3,child: Text("تاریخ", textAlign: TextAlign.center)),
+                                                    Expanded(flex: 4,child: Text("وضعیت", textAlign: TextAlign.center)),
                                                   ],
                                                 ),
                                               ):GestureDetector(
@@ -149,12 +149,12 @@ class AlertScreen extends StatelessWidget {
 
                                                   ),child: Row(
                                                   children: [
-                                                    Expanded(flex: 5,child: Text(data[index-1].wellName!)),
+                                                    Expanded(flex: 5,child: Text(data[index-1].wellName!, textAlign: TextAlign.center)),
 
-                                                    Expanded(flex: 5,child: Text(data[index-1].message!)),
-                                                    Expanded(flex: 2,child: Text(data[index-1].clock!.toPersianDigit())),
+                                                    Expanded(flex: 5,child: Text(data[index-1].message!, textAlign: TextAlign.center)),
+                                                    Expanded(flex: 2,child: Text(data[index-1].clock!.toPersianDigit(), textAlign: TextAlign.center)),
 
-                                                    Expanded(flex: 3,child: Text(data[index-1].date!.toPersianDigit())),
+                                                    Expanded(flex: 3,child: Text(data[index-1].date!.toPersianDigit(), textAlign: TextAlign.center)),
                                                     Expanded(flex: 4,child: Container(
                                                       padding: EdgeInsets.all(5),
                                                       decoration: BoxDecoration(
@@ -165,7 +165,7 @@ class AlertScreen extends StatelessWidget {
                                                       ),
                                                       child: Text(data[index-1].status==0 ?"جدید":
                                                       data[index-1].status==1?"در حال بررسی":
-                                                      "رفع شده",textAlign: TextAlign.center,),
+                                                      "رفع شده",textAlign: TextAlign.center),
                                                     )),
 
                                                   ],
