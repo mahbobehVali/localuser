@@ -251,7 +251,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       }
     });
 
-
     on<WellPerformance>((event, emit) async {
       emit(state.copyWith(newWellPerformanceStatus: WellPerformanceLoading()));
 
@@ -277,7 +276,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
         emit(state.copyWith(newWellPerformanceStatus: WellPerformanceError("خطایی رخ داده")));
       }
     });
-
 
     on<FlowMeterEvent>((event, emit) async {
       emit(state.copyWith(newFlowMeterStatus: FlowMeterLoading(),newSelectedChartVolumeTab: event.flowMeterParams.type));
@@ -333,12 +331,10 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
     });
 
-
     on<GetProgram>((event, emit) async {
       emit(state.copyWith(newGetProgramStatus: GetProgramLoading()));
 
       DataState getProgram = await getProgramUseCase(event.id);
-
 
       if (getProgram is DataSuccess ) {
 
@@ -371,11 +367,11 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     });
 
     on<CreateNewTime>((event, emit) async {
+
       emit(state.copyWith(
         newCreateTimeStatus: CreateTimeLoading(),
       ));
 
-      // ارسال درخواست مخصوص این صفحه
       socketRepository.requestCreateTimeData(event.createTimeParams);
 
       // ۲. مدیریت استریم با emit.forEach
@@ -383,13 +379,12 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
         socketRepository.createTimeStream.timeout(
           const Duration(seconds: 60),
           onTimeout: (sink) {
-            // زمانی که ۶۰ ثانیه بگذرد و هیچ دیتایی نیاید، این بخش اجرا می‌شود
             sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
           },
         ).take(1),
         onData: (status) {
-          add(GetProgram(event.createTimeParams.deviceID!));
-          // دیتای دریافتی را به وضعیت موفقیت می‌بریم
+
+          add(GetProgram(event.createTimeParams.id!));
           return state.copyWith(
             newCreateTimeStatus: CreateTimeSuccess(status),
           );
@@ -407,7 +402,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     on<DeleteTime>((event, emit) async {
       emit(state.copyWith(newDeleteTimeStatus: DeleteTimeLoading()));
 
-      // ارسال درخواست مخصوص این صفحه
      await socketRepository.requestDeleteTimeData(event.createTimeParams);
 
       // ۲. مدیریت استریم با emit.forEach
@@ -415,14 +409,12 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
         socketRepository.deleteTimeStream.timeout(
           const Duration(seconds: 60),
           onTimeout: (sink) {
-            // زمانی که ۶۰ ثانیه بگذرد و هیچ دیتایی نیاید، این بخش اجرا می‌شود
             sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
           },
         ).take(1),
         onData: (status) {
-          add(GetProgram(event.createTimeParams.deviceID!));
+          add(GetProgram(event.createTimeParams.id??1));
           print(status);
-          // دیتای دریافتی را به وضعیت موفقیت می‌بریم
           return state.copyWith(
             newDeleteTimeStatus: DeleteTimeSuccess(status),
           );

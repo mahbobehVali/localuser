@@ -42,15 +42,34 @@ class AlertDetailScreen extends StatelessWidget {
         return alertBloc;
       },
   child: Scaffold(
-      appBar: AppBar(),
       body: SizedBox(
         width: double.infinity,
         child: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 16.w,vertical: 32.h),
+          padding:  EdgeInsets.symmetric(horizontal: 16.w,vertical: 50.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text( "اطلاعات کامل هشدار ارسال شده",style: TextStyleP.f16Medium,),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text( "اطلاعات کامل هشدار ارسال شده",style: TextStyleP.f16Medium,),
+                  IconButton(
+                    style: ButtonStyle(
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)
+                        ),
+                      ),
+
+                    ),
+                    icon:  Icon(Icons.cancel_presentation_outlined,size: 30.sp),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
               SizedBox(height: 16.h),
               Column(
                 mainAxisAlignment: MainAxisAlignment.start,

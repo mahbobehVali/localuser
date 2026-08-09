@@ -8,6 +8,7 @@ import 'package:mahaliii/features/panel_feature/presentation/cubit/logout_cubit.
 import 'package:mahaliii/features/panel_feature/presentation/screens/account_screen.dart';
 import 'package:mahaliii/features/support_feature/presentation/screens/support_screen.dart';
 
+import '../../../../common/widgets/global_snackbar.dart';
 import '../../../../common/widgets/icon_container.dart';
 
 
@@ -39,17 +40,24 @@ class _PanelScreenState extends State<PanelScreen> {
                     return AccountScreen();
                   },));
                 },
-                    image: "assets/icons/user-square.png",
+                    image: Image.asset("assets/icons/user.png"),
                     title: "اطلاعات حساب کاربری"),
-                SizedBox(height: 32.h),
+                SizedBox(height: 15.h),
                 RowBox(onTap: () {
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                     return SupportScreen();
                   },));
                 },
-                image: "assets/icons/user-square.png",
+                image: Image.asset("assets/icons/vector.png"),
                 title: "پشتیبانی"),
-                SizedBox(height: 32.h),
+                SizedBox(height: 15.h),
+                RowBox(onTap: () {
+                  GlobalSnackBar.show(context, message: "این بخش به زودی فعال خواهد شد");
+
+                },
+                    image: Icon(Icons.contact_support_outlined),
+                    title: "سوالات متداول"),
+                SizedBox(height: 15.h),
 
                 BlocProvider<LogoutCubit>(
                   create: (context) => LogoutCubit(),
@@ -74,7 +82,6 @@ class _PanelScreenState extends State<PanelScreen> {
                             children: [
                               IconContainer(
                                 icon: Icon(Icons.logout_rounded),
-                                // icon: Image.asset("assets/icons/Logout.png"),
                                 color: Colors.transparent,
                                 width: 24,
                                 height: 24,
@@ -106,7 +113,7 @@ class RowBox extends StatelessWidget {
   });
 
   final GestureTapCallback onTap;
-  final String image;
+  final dynamic image;
   final String title;
 
   @override
@@ -129,7 +136,7 @@ class RowBox extends StatelessWidget {
               children: [
                 IconContainer(
 
-                  icon: Image.asset(image),
+                  icon: image,
                   color: Colors.transparent,
                   width: 24,
                   height: 24,

@@ -7,6 +7,7 @@ import 'package:mahaliii/features/sign_up_feature/domain/usecase/region_usecase.
 import 'package:mahaliii/features/sign_up_feature/presentation/screens/sign_up/register_screen.dart';
 
 import '../../../../../common/utils/constants.dart';
+import '../../../../../config/texts_style.dart';
 import '../../../../../locator.dart';
 import '../../../domain/usecase/first_sign_up.dart';
 import '../../../domain/usecase/register_usecase.dart';
@@ -49,8 +50,8 @@ class SignUpScreen extends StatelessWidget {
                     width: 14.w,
                   ),
                   Text(
-                    "پنل مدیریت هوشمند آب شهرداری تهران",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                      "پنل مدیریت هوشمند آب شهرداری تهران",
+                      style: TextStyleP.f14Bold.copyWith(color: ColorPalette.primaryTextGreen)
                   ),
                 ],
               ),

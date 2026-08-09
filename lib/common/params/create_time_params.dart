@@ -10,6 +10,7 @@ class CreateTimeParams {
   String? endTime;
   int? status;
   int? day;
+  int? id;
 
   CreateTimeParams({
      this.code,
@@ -21,6 +22,7 @@ class CreateTimeParams {
      this.endTime,
      this.status,
      this.day,
+     this.id,
   });
 
   // CreateTimeParams copyWith(

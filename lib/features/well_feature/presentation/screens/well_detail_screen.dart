@@ -86,6 +86,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
   @override
   void initState() {
     super.initState();
+    print("widget.wellsDataEntity.id!${widget.wellsDataEntity.id!}");
 
     final socketRepository = locator<SocketRepository>();
 
@@ -215,31 +216,51 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       //   return wellDetailBloc;
       // },
       child: Scaffold(
-          appBar: AppBar(),
           body:  Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding:  EdgeInsets.only(left: 16.w,right: 16.w,top:50.h),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  BlocBuilder<WellDetailBloc, WellDetailState>(
-                    builder: (context, state) {
-                      return SegmentedButton(
-                          style: SegmentedButton.styleFrom(
-                              backgroundColor: ColorPalette.lightGrey,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      BlocBuilder<WellDetailBloc, WellDetailState>(
+                        builder: (context, state) {
+                          return SegmentedButton(
+                              style: SegmentedButton.styleFrom(
+                                  backgroundColor: ColorPalette.lightGrey,
+                              ),
+
+
+                              onSelectionChanged: (Set<int> newSelected) {
+                                BlocProvider.of<WellDetailBloc>(context).add(ChangeWellTab(newSelected.first));
+
+                              },
+                              segments: [
+                                ButtonSegment(value: 0,label: Text("وضعیت کلی")),
+                                ButtonSegment(value: 1,label: Text("کنترل چاه")),
+
+                              ], selected:{state.selectedWellTab});
+                        },
+                      ),
+                      IconButton(
+                        style: ButtonStyle(
+                          shape: WidgetStatePropertyAll(
+                            RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5)
+                            ),
                           ),
-
-
-                          onSelectionChanged: (Set<int> newSelected) {
-                            BlocProvider.of<WellDetailBloc>(context).add(ChangeWellTab(newSelected.first));
-
-                          },
-                          segments: [
-                            ButtonSegment(value: 0,label: Text("وضعیت کلی")),
-                            ButtonSegment(value: 1,label: Text("کنترل چاه")),
-
-                          ], selected:{state.selectedWellTab});
-                    },
+                          side: WidgetStatePropertyAll(
+                            BorderSide(),
+                          ),
+                        ),
+                        icon: const Icon(Icons.navigate_next),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
                   ),
                   SizedBox(height: 26.h),
                   BlocSelector<WellDetailBloc, WellDetailState, int>(
@@ -1095,6 +1116,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                   ],
                                 ),
                                 BlocListener<WellDetailBloc, WellDetailState>(
+                                  listenWhen: (previous, current) => previous.isSwitched!=current.isSwitched,
                                   listener: (context, state) {
                                     if (state.onOffStatus is OnOffSuccess) {
                                       // ۱. ابتدا دیالوگ باز شده را می‌بندیم (چون روی صفحه اصلی باز شده بود با کانتکست اصلی pop می‌شود)

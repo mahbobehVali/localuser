@@ -105,6 +105,7 @@ class Program extends StatelessWidget {
                       }).toList(),
                     ),
                     ListView.builder(
+                      padding: EdgeInsets.zero,
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: maxRows,
@@ -177,9 +178,7 @@ class Program extends StatelessWidget {
       height: 70,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        border: Border.symmetric(
-          horizontal: BorderSide( color: ColorPalette.lightGrey)
-           ),
+        border: BoxBorder.fromLTRB(bottom: BorderSide( color: ColorPalette.lightGrey))
         // color: Colors.red
       ),
       child: Container(

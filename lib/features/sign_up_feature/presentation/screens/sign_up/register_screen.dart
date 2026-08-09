@@ -6,6 +6,7 @@ import 'package:mahaliii/common/widgets/refuse_button.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/entity/area_entity.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/bloc/region_status.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/bloc/register_status.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../../common/widgets/global_elevated_button.dart';
 import '../../../../../common/widgets/show_snack_bar.dart';
@@ -27,7 +28,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   GlobalKey<FormState> signUpFormKey = GlobalKey();
 
-  TextEditingController passController = TextEditingController(text: "Mm123456");
+  TextEditingController passController = TextEditingController();
   TextEditingController codeController = TextEditingController();
 
   @override
@@ -213,7 +214,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                               serverId: state.signUpParams.serverId,
                                               nationalCode: state.signUpParams.nationalCode,
                                               name: state.signUpParams.name,
-                                              code: int.parse(codeController.text),
+                                              code: int.parse(codeController.text.toString().toEnglishDigit()),
                                             )
                                           ),
                                         );

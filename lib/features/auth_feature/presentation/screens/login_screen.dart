@@ -6,6 +6,8 @@ import 'package:mahaliii/features/auth_feature/domain/usecase/forget_pass_usecas
 import 'package:mahaliii/features/auth_feature/domain/usecase/get_code_usecase.dart';
 import 'package:mahaliii/features/auth_feature/presentation/screens/forget_password/enter_mobile_screen.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/screens/sign_up/sign_up_screen.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../common/params/login_params.dart';
 import '../../../../common/utils/constant_texts.dart';
@@ -19,15 +21,59 @@ import '../../domain/usecase/login_usecase.dart';
 import '../bloc/login_bloc/login_bloc.dart';
 import '../bloc/login_bloc/login_status.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
+class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> loginKey = GlobalKey();
-  // final GlobalKey<FormState> passwordFormKey = GlobalKey();
-  final TextEditingController mobileController = TextEditingController(text: "09032732153");
-  final TextEditingController passwordController = TextEditingController(text: "Kk@123456#");
 
+  // final GlobalKey<FormState> passwordFormKey = GlobalKey();
+  // final TextEditingController mobileController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController(text: "09032732153");
+
+  // final TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController(text: "Kk@123456#");
+  bool _rememberMe = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadSavedCredentials();
+  }
+    // ۱. خواندن اطلاعات ذخیره‌شده هنگام ورود به صفحه
+  Future<void> _loadSavedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberMe = prefs.getBool('remember_me') ?? false;
+      if (_rememberMe) {
+        mobileController.text = prefs.getString('saved_mobile') ?? '';
+        passwordController.text = prefs.getString('saved_password') ?? '';
+      }
+    });
+  }
+
+  // ۲. ذخیره یا پاک‌سازی اطلاعات هنگام کلیک روی دکمه ورود
+  Future<void> _handleLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (_rememberMe) {
+      await prefs.setBool('remember_me', true);
+      await prefs.setString('saved_mobile', mobileController.text);
+      await prefs.setString('saved_password', passwordController.text);
+    } else {
+      // اگر تیک زده نشده باشد، داده‌های قبلی پاک می‌شوند
+      await prefs.remove('remember_me');
+      await prefs.remove('saved_mobile');
+      await prefs.remove('saved_password');
+    }
+
+    // ادامه فرآیند احراز هویت (API Call)...
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -55,7 +101,17 @@ class LoginScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     // mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("پنل مدیریت هوشمند آب تهران",style: TextStyleP.f14Bold.copyWith(color: ColorPalette.primaryTextGreen),),
+                      Row(
+                        children: [
+                          Image.asset("assets/images/logo.png",width: 28,),
+                          SizedBox(
+                            width: 14.w,
+                          ),
+                          Text(
+                            "پنل مدیریت هوشمند آب شهرداری تهران",
+                              style: TextStyleP.f14Bold.copyWith(color: ColorPalette.primaryTextGreen)                          ),
+                        ],
+                      ),
                       SizedBox(height: 64.h),
 
                       Text("ورود به پلتفرم هوشمند مدیریت مصرف آب",style: TextStyleP.f16Medium,),
@@ -122,7 +178,8 @@ class LoginScreen extends StatelessWidget {
                       },child: SizedBox(
                           width: MediaQuery.sizeOf(context).width,
                           child: Text("فراموشی رمز عبور؟",textAlign: TextAlign.end,style: TextStyle(color: ColorPalette.darkBlue),)),),
-                      SizedBox(height: 15.h),
+
+                      SizedBox(height: 32.h),
 
                       BlocConsumer<LoginBloc, LoginState>(
                         listenWhen: (previous, current) => current.loginStatus != previous.loginStatus,
@@ -132,11 +189,12 @@ class LoginScreen extends StatelessWidget {
                             width: double.infinity,
                             onTap: () {
                               if (loginKey.currentState!.validate()) {
+                                _handleLogin();
                                 BlocProvider.of<LoginBloc>(context).add(
                                   ButtonLoginClicked(
                                     LoginParams(
-                                      mobile: mobileController.text,
-                                      password: passwordController.text,
+                                      mobile: mobileController.text.toString().toEnglishDigit(),
+                                      password: passwordController.text.toString().toEnglishDigit(),
                                     ),
                                   ),
                                 );
@@ -161,7 +219,23 @@ class LoginScreen extends StatelessWidget {
                           }
                         },
                       ),
-                      SizedBox(height: 32.h),
+
+                      Row(
+                        children: [
+                          Checkbox(
+                            activeColor: ColorPalette.darkGreen,
+
+                            value: _rememberMe,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _rememberMe = value ?? false;
+                              });
+                            },
+                          ),
+                          const Text('مرا به خاطر بسپار'),
+                        ],
+                      ),
+                      SizedBox(height: 20.h),
 
                       Row(
                         children: [

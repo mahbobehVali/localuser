@@ -440,7 +440,10 @@ class ShowDialogs {
                                     widget: state.createTimeStatus is CreateTimeLoading?
                                   CircularProgressIndicator(): Text("ثبت زمان",style: TextStyle(color: ColorPalette.black),),
                                     onTap:(state.daySelected.id==-1) ||
-                                        state.startHour!.isEmpty || state.endHour!.isEmpty || isLoading? null:() {
+                                        state.startHour!.isEmpty || state.endHour!.isEmpty ? (){
+                                      GlobalSnackBar.show(scaffoldContext, message: "روز هفته و ساعت شروع و پایان را مشخص کنید");
+
+                                    }:isLoading? null:() {
                                       bool hasConflict = checkConflictForDay(programDayEntity: programDayEntity,
                                           targetDayName: state.daySelected.name, newStart: state.startHour!, newEnd: state.endHour!);
                                       if (hasConflict) {
@@ -454,7 +457,9 @@ class ShowDialogs {
                                             userLocalID: wellsDataEntity.userLocalId,
                                             startTime: state.startHour,
                                             endTime: state.endHour,
-                                            weekDay: state.daySelected.id
+                                            weekDay: state.daySelected.id,
+                                          id: wellsDataEntity.id
+
                                         )));
                                       }
                                     },))
@@ -660,7 +665,6 @@ class ShowDialogs {
               textDirection: TextDirection.rtl,
               child: AlertDialog(
                 content: SizedBox(
-                  width: 300.w,
                   height: 60.h,
                   child: const Center(child: Text("برای تایید خروج از سیستم دکمه تایید را فشار دهید.")),
                 ),
@@ -673,6 +677,8 @@ class ShowDialogs {
                           borderRadius: BorderRadius.circular(2.5),
                           backColor: Color(0xff5F8CC5),
                             onTap: () {
+                              // Helper.saveUserLoggedInSharedPreference(false);
+
                               logoutCubit.logout();
                               Navigator.of(context).pop();
                               Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
@@ -758,10 +764,7 @@ class ShowDialogs {
                   final isLoading = state.onOffStatus is OnOffLoading;
 
                   return AlertDialog(
-                    content: SizedBox(
-                      height: 50.h,
-                      child: Text("آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟"),
-                    ),
+                    content: Text("آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟"),
                     actions: [
                       // اگر در حال دریافت پاسخ هستیم، تایمر ۶۰ ثانیه‌ای را نشان بده
                       if (isLoading) ...[

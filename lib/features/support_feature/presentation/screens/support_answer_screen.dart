@@ -37,7 +37,6 @@ class SupportAnswerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: BlocProvider<SupportBloc>(
         create: (context) {
           SupportBloc supportBloc = SupportBloc(
@@ -54,11 +53,32 @@ class SupportAnswerScreen extends StatelessWidget {
           return supportBloc;
         },
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
+          padding: EdgeInsets.symmetric(horizontal: 16.w,vertical: 50.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(supportDataEntity.subject??"", style: TextStyleP.f16Medium),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(supportDataEntity.subject??"", style: TextStyleP.f16Medium),
+                  IconButton(
+                    style: ButtonStyle(
+                      shape: WidgetStatePropertyAll(
+                        RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)
+                        ),
+                      ),
+                      side: WidgetStatePropertyAll(
+                        BorderSide(),
+                      ),
+                    ),
+                    icon: const Icon(Icons.navigate_next),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
               SizedBox(height: 24.h),
              Expanded(
                child: Container(

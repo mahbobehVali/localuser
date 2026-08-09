@@ -10,6 +10,7 @@ import 'package:mahaliii/features/panel_feature/domain/usecase/send_sms_usecase.
 import 'package:mahaliii/features/panel_feature/presentation/bloc/account_bloc.dart';
 import 'package:mahaliii/features/panel_feature/presentation/bloc/send_sms_status.dart';
 import 'package:mahaliii/features/panel_feature/presentation/screens/widgets/radio_row.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/sharedpreference.dart';
 import '../../../../common/widgets/account_box.dart';
@@ -127,10 +128,10 @@ class _AccountScreenState extends State<AccountScreen>{
 
                       SizedBox(height: 16.h,),
 
-                      AccountBox(title: "کد ملی",name: info.isNotEmpty ? (info[2] ?? "") : "در حال بارگذاری..."),
+                      AccountBox(title: "کد ملی",name: info.isNotEmpty ? (info[2].toString().toPersianDigit() ) : "در حال بارگذاری..."),
                       SizedBox(height: 16.h,),
 
-                      AccountBox(title: "شماره تماس",name: info.isNotEmpty ? (info[1] ?? "") : "در حال بارگذاری..."),
+                      AccountBox(title: "شماره تماس",name: info.isNotEmpty ? (info[1].toString().toPersianDigit()) : "در حال بارگذاری..."),
                     ],
                   ),
                 ),
@@ -277,9 +278,9 @@ class _AccountScreenState extends State<AccountScreen>{
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(child: AccountBox(title: "منطقه",name: info.isNotEmpty ? (info[8] ?? "") : "در حال بارگذاری...",)),
+                          Expanded(child: AccountBox(title: "منطقه",name: info.isNotEmpty ? (info[8].toString().toPersianDigit() ) : "در حال بارگذاری...",)),
                           SizedBox(width: 5,),
-                          Expanded(child: AccountBox(title: "ناحیه",name: info.isNotEmpty ? (info[7] ?? "") : "در حال بارگذاری...",)),
+                          Expanded(child: AccountBox(title: "ناحیه",name: info.isNotEmpty ? (info[7].toString().toPersianDigit() ) : "در حال بارگذاری...",)),
                         ],
                       ),
                     ],

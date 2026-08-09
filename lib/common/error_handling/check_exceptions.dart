@@ -80,7 +80,8 @@ class CheckExceptions {
         return DataFailed(
             error:
             // password==true?
-            appException.response!.data["errors"][0]
+            appException.response!.data["errors"].length==1? appException.response!.data["errors"][0]:
+                "${appException.response!.data["errors"][0]}\n${appException.response!.data["errors"][1]}"
             // appException.response!.data["errors"]["mobile"][0]
             // "خطایی رخ داده"
 

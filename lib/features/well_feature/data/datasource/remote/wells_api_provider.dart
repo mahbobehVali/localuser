@@ -48,7 +48,6 @@ class WellsApiProvider {
     };
     try {
       final response = await dio.get("alert/count",queryParameters:data);
-      print("response=============${response.data}");
       return response;
     } on DioException catch (e) {
 
@@ -75,7 +74,6 @@ class WellsApiProvider {
 
     try {
       final response = await dio.post("report/flowmeter",data: data);
-      print("response.data---------------${response.data}");
 
       return response;
     } on DioException catch (e) {
