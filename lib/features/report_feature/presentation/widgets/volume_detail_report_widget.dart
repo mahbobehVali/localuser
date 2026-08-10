@@ -202,6 +202,16 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                   getTooltipColor: (group) => ColorPalette.lightGrey,
                                   fitInsideHorizontally: true,
                                   fitInsideVertically: true,
+                                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                    return BarTooltipItem(
+                                      rod.toY.toString().toPersianDigit(),
+                                       TextStyle(
+                                        color: ColorPalette.darkBlue,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    );
+                                  },
                                 )
                             ),
                             titlesData: FlTitlesData(

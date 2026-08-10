@@ -42,8 +42,8 @@ class Constants {
 
 
   static Widget noData(){
-    return Padding(
-      padding: EdgeInsets.all(32),
+    return SizedBox(
+      height: 250.h,
       child: Center(child: Text("داده ای وجود ندارد")),
     );
   }

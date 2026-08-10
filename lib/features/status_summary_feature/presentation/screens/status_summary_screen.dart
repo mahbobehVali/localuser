@@ -85,12 +85,12 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
             return statusSummaryBloc;
           },
           child: Padding(
-            padding:  EdgeInsets.symmetric(horizontal: 12.w,vertical: 30.h),
+            padding:  EdgeInsets.only(left: 12.w,right:  12.w,top: 30.h),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children:[
-                  Text("خلاصه عملکرد چاه‌ها",style: TextStyleP.f16Medium),
+                  Text("خلاصه عملکرد چاه‌ها",style: TextStyleP.f16Bold),
                   SizedBox(height: 16.h),
                   ///socket water
 
@@ -148,7 +148,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("آخرین فعالیت های انجام شده",style: TextStyleP.f12Regular),
+                      Text("آخرین فعالیت های انجام شده",style: TextStyleP.f14Medium),
                       SizedBox(height: 10.h),
 
                       BlocBuilder<StatusSummaryBloc, StatusSummaryState>(

@@ -108,7 +108,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       ..add(
         WellWorkHourStart(
           FlowMeterParams(
-            type: 2,
+            type: 0,
             ids: [widget.wellsDataEntity.deviceId!],
           ),
         ),
@@ -330,7 +330,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
                                       if (status is FlowMeterError) {
                                         return Container(
-                                          height: 250,
+                                          height: 250.h,
                                           alignment: Alignment.center,
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
@@ -527,13 +527,13 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         handleBuiltInTouches: true,
                                                         touchTooltipData: BarTouchTooltipData(
                                                           getTooltipColor: (group) => ColorPalette.lightGrey,
-                                                          fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
-                                                          fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                                          fitInsideHorizontally: true,
+                                                          fitInsideVertically: true,
                                                       )
                                                     ),
 
                                                     borderData: FlBorderData(
-                                                      border: const Border(bottom: BorderSide(), left: BorderSide()),
+                                                      border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                                                     ),
                                                     titlesData: FlTitlesData(
                                                       show: true,
@@ -626,7 +626,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         if ((currentYValues==null || currentYValues.isEmpty) ||
                                             (currentXValues==null || currentXValues.isEmpty)
                                         ) {
-                                          return  Center(child: Constants.noData());
+                                          return  Constants.noData();
                                         }
                                         final scale = successState.previousWellWorkEntity==null?Constants().getScale(currentYValues):
                                         Constants().getChartScale(currentYValues,previousYValues);

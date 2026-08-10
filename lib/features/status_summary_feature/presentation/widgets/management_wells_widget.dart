@@ -30,7 +30,7 @@ class ManagementWellsWidget extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Text("لیست چاه‌های تحت مدیریت",style: TextStyleP.f14Bold),
+              child: Text("لیست چاه‌های تحت مدیریت",style: TextStyleP.f14Medium),
             ),
             SizedBox(height: 10.h),
             BlocConsumer<StatusSummaryBloc, StatusSummaryState>(

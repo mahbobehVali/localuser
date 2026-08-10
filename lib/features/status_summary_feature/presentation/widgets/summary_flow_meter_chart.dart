@@ -33,8 +33,9 @@ class SummaryFlowMeterChart extends StatelessWidget {
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                 children: [
-                  Text("روند مصرف آب چاه‌ها",style: TextStyleP.f12Regular),
+                  Text("روند مصرف آب چاه‌ها",style: TextStyleP.f14Medium),
                   BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
                     buildWhen: (previous, current) =>
                     current.selectedChartTab!=previous.selectedChartTab,

@@ -59,7 +59,7 @@ class ReportScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text( "گزارش عملکرد دستگاه",style: TextStyleP.f16Medium,),
+              Text( "گزارش عملکرد دستگاه",style: TextStyleP.f16Bold,),
               SizedBox(height: 16.h),
               Text("برای دسترسی به اطلاعات مورد نظر خود، در کادرهای پایین فیلتر مورد نیاز خود را اعمال کنید.",style: TextStyleP.f12Regular),
               SizedBox(height: 24.h),
