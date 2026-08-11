@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
+import 'package:mahaliii/features/report_feature/presentation/bloc/report_detail_flow_meter_status.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
@@ -35,11 +36,11 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
           // محاسبه اختلاف به روز
           return date2.difference(date1).inDays;
         }
-        final status = state.reportFlowMeterStatus;
-        if (status is ReportFlowMeterSuccess) {
+        final status = state.reportDetailFlowMeterStatus;
+        if (status is ReportDetailFlowMeterSuccess) {
 
 
-          final flowMeter = status.wellReportFlowMeter.list;
+          final flowMeter = status.wellReportDetailFlowMeter.list;
 
           final xLabels = flowMeter.xAxis;
           final yValues = flowMeter.yAxis;
@@ -75,6 +76,8 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
 
               if (val > cap) {
                 overCapacity = (val - cap).toString().toPersianDigit();
+              }else if (val > disconnectCap) {
+                overCapacity = (val - disconnectCap).toString().toPersianDigit();
               }
 
               flatList.add(VolumeSlot(
@@ -91,7 +94,18 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
 
           List<BarChartGroupData> chartGroups = List.generate(xLabels.length, (index) {
             final double yVal = index < yValues.length ? yValues[index].toDouble() : 0.0;
-
+            if (yVal == 0) {
+              return BarChartGroupData(
+                x: index,
+                barRods: [
+                  BarChartRodData(
+                    toY: 0,
+                    color: Colors.transparent,
+                    width: 12,
+                  ),
+                ],
+              );
+            }
             final capacityList = status.capacityEntity.capacityListEntity;
             final bool hasMultipleCapacity = capacityList != null ;
 
@@ -114,37 +128,55 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
             }
 
             // حالت دوم: مقایسه با capacity و دو رنگه کردن میله
-            final double capacityVal = index < capacityList.length
-                ? double.tryParse(capacityList[index].capacity?.toString() ?? '0') ?? 0.0
-                : 0.0;
+             double capacityVal = 0.0;
 
-            if (yVal == 0) {
-              return BarChartGroupData(
-                x: index,
-                barRods: [
-                  BarChartRodData(
-                    toY: 0,
-                    color: Colors.transparent,
-                    width: 12,
-                  ),
-                ],
-              );
-            }
-
+            //
+            // index < capacityList.length
+            //     ? double.tryParse(capacityList[index].capacity?.toString() ?? '0') ?? 0.0
+            //     : 0.0;
+            final capacityItem = status.capacityEntity.capacityListEntity?[index];
+            final disconnectCap = (capacityItem?.disconnectCapacity ?? 0) *
+                getDaysBetweenShamsiDates(state.startDate, state.endDate);
+            final cap = (capacityItem?.capacity ?? 0) *
+                getDaysBetweenShamsiDates(state.startDate, state.endDate);
             List<BarChartRodStackItem> stackItems = [];
 
-            if (yVal > capacityVal*getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
-              // لایه اول: از 0 تا capacityVal -> رنگ آبی
-              stackItems.add(BarChartRodStackItem(0, capacityVal, normalColor));
+            final double currentVal = yValues[index].toDouble();
+            final double capVal = cap.toDouble();
+            final double disconnectCapVal = disconnectCap.toDouble();
 
-              // لایه دوم: از capacityVal تا yVal -> رنگ قرمز
-              stackItems.add(BarChartRodStackItem(capacityVal, yVal, exceedColor));
+            if (currentVal > capVal) {
+              // لایه اول: از 0 تا ظرفیت (مثلاً 0 تا 18000) -> رنگ آبی
+              stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
+
+              // لایه دوم: از ظرفیت تا کل مقدار (مثلاً 18000 تا 30000) -> رنگ خاکستری/قرمز
+              stackItems.add(BarChartRodStackItem(capVal, currentVal, exceedColor));
             }
-            // سناریو ب: y کمتر یا برابر capacity است (مثلاً y=700 و capacity=900)
+            else if (currentVal > disconnectCapVal) {
+              // لایه اول: از 0 تا ظرفیت قطعی -> رنگ آبی
+              stackItems.add(BarChartRodStackItem(0, disconnectCapVal, normalColor));
+
+              // لایه دوم: از ظرفیت قطعی تا کل مقدار -> رنگ خاکستری/قرمز
+              stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, exceedColor));
+            }
             else {
-              // فقط یک لایه: از 0 تا 700 -> رنگ آبی
-              stackItems.add(BarChartRodStackItem(0, yVal, normalColor));
+              // اگر مصرف کم‌تر از حد مجاز باشد: کل میله از 0 تا yVal -> رنگ آبی
+              stackItems.add(BarChartRodStackItem(0, currentVal, normalColor));
             }
+
+
+            // if (yVal > capacityVal*getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
+            //   // لایه اول: از 0 تا capacityVal -> رنگ آبی
+            //   stackItems.add(BarChartRodStackItem(0, capacityVal, normalColor));
+            //
+            //   // لایه دوم: از capacityVal تا yVal -> رنگ قرمز
+            //   stackItems.add(BarChartRodStackItem(capacityVal, yVal, exceedColor));
+            // }
+            // // سناریو ب: y کمتر یا برابر capacity است (مثلاً y=700 و capacity=900)
+            // else {
+            //   // فقط یک لایه: از 0 تا 700 -> رنگ آبی
+            //   stackItems.add(BarChartRodStackItem(0, yVal, normalColor));
+            // }
 
             return BarChartGroupData(
               x: index,
@@ -168,55 +200,69 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                     textDirection: TextDirection.ltr,
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: Container(
+                      child: SizedBox(
                         width: calculatedChartWidth,
 
                         height: 300,
-                        padding: const EdgeInsets.only(top: 40, right: 18.0,bottom: 10),
-                        child: BarChart(
-                          BarChartData(
-                            extraLinesData: ExtraLinesData(
-                              horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
-                            ),
-                            maxY: scale['maxY'],
-                            //  تنظیم هوشمند مبدأ روی صفر (در صورت نداشتن مقدار منفی)
-                            minY: (scale['minY'] != null && scale['minY']! < 0) ? scale['minY'] : 0.0,
-
-                            alignment: BarChartAlignment.spaceAround,
-                            gridData: FlGridData(
-                              show: false,
-                              verticalInterval: scale['step'],
-                              getDrawingHorizontalLine: (value) {
-                                return const FlLine(
-                                  strokeWidth: 1,
-                                  color: Colors.grey,
-                                );
-                              },
-                            ),
-                            borderData: FlBorderData(
-                              border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
-                            ),
-                            barTouchData: BarTouchData(
-                                handleBuiltInTouches: true,
-                                touchTooltipData: BarTouchTooltipData(
-                                  getTooltipColor: (group) => ColorPalette.lightGrey,
-                                  fitInsideHorizontally: true,
-                                  fitInsideVertically: true,
-                                )
-                            ),
-                            titlesData: FlTitlesData(
-                              show: true,
-                              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                              bottomTitles: Constants().axisBottomTitles(xLabels,
-                                flowMeter.type=="all-well" ? "nothing" :
-                              state.startDate==state.endDate ? "day" :  "date",),
-                              leftTitles: Constants().leftTitles(
-                                interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
-                                scale: scale['step'] == 0 ? 10 : scale['step']!,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 40, right: 18.0,bottom: 10),
+                          child: BarChart(
+                            BarChartData(
+                              extraLinesData: ExtraLinesData(
+                                horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
                               ),
+                              maxY: scale['maxY'],
+                              //  تنظیم هوشمند مبدأ روی صفر (در صورت نداشتن مقدار منفی)
+                              minY: (scale['minY'] != null && scale['minY']! < 0) ? scale['minY'] : 0.0,
+
+                              alignment: BarChartAlignment.spaceAround,
+                              gridData: FlGridData(
+                                show: false,
+                                verticalInterval: scale['step'],
+                                getDrawingHorizontalLine: (value) {
+                                  return const FlLine(
+                                    strokeWidth: 1,
+                                    color: Colors.grey,
+                                  );
+                                },
+                              ),
+                              borderData: FlBorderData(
+                                border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
+                              ),
+                              barTouchData: BarTouchData(
+                                  handleBuiltInTouches: true,
+                                  touchTooltipData: BarTouchTooltipData(
+                                    getTooltipColor: (group) => ColorPalette.lightGrey,
+                                    fitInsideHorizontally: true,
+                                    fitInsideVertically: true,
+                                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                      final item = flatList[groupIndex];
+
+                                      return BarTooltipItem(
+                                        'حجم مصرف: \u200E${rod.toY.toString().toPersianDigit()}\nبیش از حد مجاز: ${item.capacity}',
+                                        TextStyle(
+                                          color: ColorPalette.darkBlue,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      );
+                                    },
+                                  ),
+
+                              ),
+                              titlesData: FlTitlesData(
+                                show: true,
+                                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                bottomTitles: Constants().axisBottomTitles(xLabels,
+                                  flowMeter.type=="all-well" ? "nothing" :
+                                state.startDate==state.endDate ? "day" :  "date",),
+                                leftTitles: Constants().leftTitles(
+                                  interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
+                                  scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                ),
+                              ),
+                              barGroups: chartGroups,
                             ),
-                            barGroups: chartGroups,
                           ),
                         )
                       ),
@@ -297,14 +343,8 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
             ],
           );
         }
-        if (status is ReportFlowMeterLoading) return ShimmerClass.shimmerBarChartAndListVertical();
-        if (status is ReportFlowMeterError) return Center(child: Text(status.error));
-        if (status is ReportFlowMeterInitial) {
-          return Center(child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Text("لطفاً فیلتر مورد نیاز خود را اعمال کنید"),
-        ));
-        }
+        if (status is ReportDetailFlowMeterLoading) return ShimmerClass.shimmerBarChartAndListVertical();
+        if (status is ReportDetailFlowMeterError) return Center(child: Text(status.error));
         return const SizedBox.shrink();
       },
     );

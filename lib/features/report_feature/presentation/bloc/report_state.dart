@@ -12,6 +12,7 @@ class ReportState {
   final String endHour;
   final ReportCountStatus? reportCountStatus;
   final ReportFlowMeterStatus? reportFlowMeterStatus;
+  final ReportDetailFlowMeterStatus? reportDetailFlowMeterStatus;
   final ReportCommandStatus? reportCommandStatus;
   final List<AlertTypeEntity> reportIndexList;
   final int? selectedReportIndex;
@@ -31,6 +32,7 @@ class ReportState {
     required this.endHour,
     required this.reportCountStatus,
     required this.reportFlowMeterStatus,
+    required this.reportDetailFlowMeterStatus,
     required this.reportCommandStatus,
     required this.reportIndexList,
     required this.selectedReportIndex,
@@ -51,6 +53,7 @@ class ReportState {
         String? newEndHour,
         ReportCountStatus? newReportCountStatus,
         ReportFlowMeterStatus? newReportFlowMeterStatus,
+        ReportDetailFlowMeterStatus? newReportDetailFlowMeterStatus,
         ReportCommandStatus? newReportCommandStatus,
          List<AlertTypeEntity>? newReportIndexList,
          int? newSelectedReportIndex,
@@ -70,6 +73,7 @@ class ReportState {
       endDate: newEndDate??endDate,
       reportCountStatus: newReportCountStatus??reportCountStatus,
       reportFlowMeterStatus: newReportFlowMeterStatus??reportFlowMeterStatus,
+      reportDetailFlowMeterStatus: newReportDetailFlowMeterStatus??reportDetailFlowMeterStatus,
       reportCommandStatus: newReportCommandStatus??reportCommandStatus,
       reportIndexList: newReportIndexList??reportIndexList,
       selectedReportIndex: newSelectedReportIndex??selectedReportIndex,

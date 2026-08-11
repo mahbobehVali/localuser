@@ -42,10 +42,9 @@ class Constants {
 
 
   static Widget noData(){
-    return Padding(
-      padding: EdgeInsets.all(32),
-      child: Center(child: Text("داده ای وجود ندارد")),
-    );
+    return SizedBox(
+        height: 250.h,
+        child: Center(child: Text("داده ای وجود ندارد")));
   }
 
 
@@ -280,8 +279,7 @@ class Constants {
     double step;
     if (maxAbs > 40000) {
       step = 20000.0;
-    }
-    else if (maxAbs > 10000) {
+    } else if (maxAbs > 10000) {
       step = 10000.0;
     } else if (maxAbs > 5000) {
       step = 1000.0;

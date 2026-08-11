@@ -66,37 +66,6 @@ class _AccountScreenState extends State<AccountScreen>{
     }
 
     return Scaffold(
-       appBar:  PreferredSize(
-         preferredSize: const Size.fromHeight(70),
-         child: Padding(
-           padding: const EdgeInsets.all(6),
-           child: AppBar(
-             automaticallyImplyLeading: false,
-              title: Text("حساب کاربری",
-                style: TextStyleP.f16Medium,
-              ),
-              centerTitle: false,
-              actions: [
-                IconButton(
-                  style: ButtonStyle(
-                    shape: WidgetStatePropertyAll(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5)
-                      ),
-                    ),
-                    side: WidgetStatePropertyAll(
-                      BorderSide(),
-                    ),
-                  ),
-                  icon: const Icon(Icons.navigate_next),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-         ),
-       ),
         body: BlocProvider<AccountBloc>(
         create: (context) {
 
@@ -109,12 +78,37 @@ class _AccountScreenState extends State<AccountScreen>{
       return accountBloc;
       },
       child: Padding(
-          padding: const EdgeInsets.only(left: 8,right:8,bottom: 8,top: 20),
+          padding:  EdgeInsets.only(left: 8.w,right:8.w,top: 50.h),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("حساب کاربری",
+                      style: TextStyleP.f16Medium,
+                    ),
+                    IconButton(
+                      style: ButtonStyle(
+                        shape: WidgetStatePropertyAll(
+                          RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5)
+                          ),
+                        ),
+                        side: WidgetStatePropertyAll(
+                          BorderSide(),
+                        ),
+                      ),
+                      icon: const Icon(Icons.navigate_next),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 21.h,),
 
 
                 Container(

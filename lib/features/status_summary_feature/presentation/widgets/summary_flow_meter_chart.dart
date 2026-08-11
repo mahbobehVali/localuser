@@ -34,7 +34,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("روند مصرف آب چاه‌ها",style: TextStyleP.f12Regular),
+                  Text("روند مصرف آب چاه‌ها",style: TextStyleP.f14Medium),
                   BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
                     buildWhen: (previous, current) =>
                     current.selectedChartTab!=previous.selectedChartTab,
@@ -74,7 +74,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                         ) ?? true;
 
                         if (isAllEmpty || seriesList == null || seriesList.isEmpty) {
-                          return const Center(child: Text("دیتایی وجود ندارد"));
+                          return Constants.noData();
                         }
 
                         // ترکیب تمام yAxisها در یک لیست واحد برای محاسبه اسکیل دقیق

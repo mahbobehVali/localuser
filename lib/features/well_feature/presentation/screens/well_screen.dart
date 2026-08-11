@@ -50,7 +50,7 @@ class _WellScreenState extends State<WellScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children:[
-              Text("لیست چاه‌های تحت مدیریت",style: TextStyleP.f16Medium,),
+              Text("لیست چاه‌های تحت مدیریت",style: TextStyleP.f16Bold,),
               SizedBox(height: 16.h),
 
               Text("برای دسترسی به اطلاعات چاه مورد نظر خود بر روی آن کلیک کنید.",style: TextStyleP.f12Regular,),

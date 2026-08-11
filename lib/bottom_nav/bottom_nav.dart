@@ -34,6 +34,28 @@ class BottomNavWidget extends StatelessWidget {
 
   ];
 
+  static const List activeBottomNavItems = [
+    {
+      "title": "وضعیت کلی",
+      "icon": "assets/icons/activeHome.png"
+    },
+    {
+      "title": "چاه ها",
+      "icon": "assets/icons/Category.png"
+    },{
+      "title": "گزارش ها",
+      "icon": "assets/icons/activeChart.png"
+    },
+    {
+      "title": "هشدارها",
+      "icon": "assets/icons/activeNotification.png"
+    },{
+      "title": "پنل کاربر",
+      "icon": "assets/icons/active_user-square.png"
+    },
+
+  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +82,7 @@ class BottomNavWidget extends StatelessWidget {
 
                       children: [
                         SizedBox(
-                            child: Image.asset(bottomNavItems[index]["icon"],
+                            child: Image.asset(state==index?activeBottomNavItems[index]["icon"]:bottomNavItems[index]["icon"],
                                 color: state==index?ColorPalette.darkBlue:Colors.black)),
                         SizedBox(height: 6.h,),
                         Text(bottomNavItems[index]["title"],

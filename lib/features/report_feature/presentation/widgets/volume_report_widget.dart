@@ -214,10 +214,13 @@ class VolumeReportChartWidget extends StatelessWidget {
         if (status is ReportFlowMeterLoading) return ShimmerClass.shimmerChartAndListVertical();
         if (status is ReportFlowMeterError) return Center(child: Text(status.error));
         if (status is ReportFlowMeterInitial) {
-          return Center(child: Padding(
-          padding: const EdgeInsets.all(15),
-          child: Text("لطفاً فیلتر مورد نیاز خود را اعمال کنید"),
-        ));
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
+              height: 250.h,
+              child: Center(child: Text("لطفاً فیلتر مورد نیاز خود را اعمال کنید")),
+            ),
+          );
         }
         return const SizedBox.shrink();
       },

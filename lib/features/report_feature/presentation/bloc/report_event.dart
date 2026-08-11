@@ -68,6 +68,15 @@ class ReportFlowMeter extends ReportEvent {
   List<Object?> get props => [];
 }
 
+class ReportDetailFlowMeter extends ReportEvent {
+  final FlowMeterParams flowMeterParams;
+  const ReportDetailFlowMeter(this.flowMeterParams);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
 class ReportCommand extends ReportEvent {
   final FlowMeterParams flowMeterParams;
   const ReportCommand(this.flowMeterParams);

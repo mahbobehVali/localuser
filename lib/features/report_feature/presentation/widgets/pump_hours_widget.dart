@@ -109,8 +109,8 @@ class PumpHoursChartWidget extends StatelessWidget {
                               handleBuiltInTouches: true,
                               touchTooltipData: BarTouchTooltipData(
                                 getTooltipColor: (group) => ColorPalette.lightGrey,
-                                fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
-                                fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                fitInsideHorizontally: true,
+                                fitInsideVertically: true,
                               )
                           ),
                           borderData: FlBorderData(border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey))),

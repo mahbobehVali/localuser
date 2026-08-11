@@ -52,7 +52,7 @@ class AlertScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text( "هشدارها و اعلان‌ها",style: TextStyleP.f16Medium,),
+              Text( "هشدارها و اعلان‌ها",style: TextStyleP.f16Bold,),
               SizedBox(height: 16.h),
               Text("در این بخش تمامی هشدارهای ارسال شده از دستگاه را مشاهده میکنید.",style: TextStyleP.f12Regular),
               SizedBox(height: 16.h),

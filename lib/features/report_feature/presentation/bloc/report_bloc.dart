@@ -5,6 +5,7 @@ import 'package:mahaliii/common/utils/use_case.dart';
 import 'package:mahaliii/features/report_feature/domain/usecase/get_capacity_usecase.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/report_command_status.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/report_count_status.dart';
+import 'package:mahaliii/features/report_feature/presentation/bloc/report_detail_flow_meter_status.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/report_flow_meter_status.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/user_activity_report_status.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/well_report_status.dart';
@@ -41,6 +42,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     endHour: "23:59",
     reportCountStatus: ReportCountInitial(),
     reportFlowMeterStatus:  ReportFlowMeterInitial(),
+    reportDetailFlowMeterStatus: ReportDetailFlowMeterInitial(),
     reportCommandStatus: ReportCommandInitial(),
     reportIndexList: Constants().reportIndex,
     selectedReportIndex: 0,
@@ -98,11 +100,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
 
     on<ReportFlowMeter>((event, emit) async {
 
-      final bool ignoreAllWell = state.selectedReportIndex == 0;
       emit(state.copyWith(newReportFlowMeterStatus: ReportFlowMeterLoading(),
                           newFlowMeterParams: event.flowMeterParams));
       DataState dataState = await wellFlowMeterUseCase(event.flowMeterParams,
-          ignoreAllWell: ignoreAllWell);
+          ignoreAllWell: true);
       DataState capacityDataState = await getCapacityUseCase(event.flowMeterParams);
 
       if (dataState is DataSuccess) {
@@ -114,6 +115,24 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         emit(state.copyWith(newReportFlowMeterStatus: ReportFlowMeterError(dataState.error??"حطایی رخ داده")));
       }
     });
+
+    on<ReportDetailFlowMeter>((event, emit) async {
+
+      emit(state.copyWith(newReportDetailFlowMeterStatus: ReportDetailFlowMeterLoading(),
+          newFlowMeterParams: event.flowMeterParams));
+      DataState dataState = await wellFlowMeterUseCase(event.flowMeterParams);
+      DataState capacityDataState = await getCapacityUseCase(event.flowMeterParams);
+
+      if (dataState is DataSuccess) {
+
+        emit(state.copyWith(newReportDetailFlowMeterStatus: ReportDetailFlowMeterSuccess(
+            dataState.data,capacityDataState.data)));
+      }
+      if (dataState is DataFailed) {
+        emit(state.copyWith(newReportDetailFlowMeterStatus: ReportDetailFlowMeterError(dataState.error??"حطایی رخ داده")));
+      }
+    });
+
 
     on<ReportCommand>((event, emit) async {
       emit(state.copyWith(newReportCommandStatus: ReportCommandLoading()));
@@ -153,9 +172,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
 
     on<OneReportIndexClicked>((event, emit) async {
       emit(state.copyWith(newSelectedReportIndex: event.alertTypeEntity.id));
-      if(event.alertTypeEntity.id==0 || event.alertTypeEntity.id==1) {
-        add(ReportFlowMeter(state.flowMeterParams!));
-      }
+
     //   switch (event.alertTypeEntity.id) {
     //     case 0:
     //       add(ReportFlowMeter(state.flowMeterParams!));
@@ -174,10 +191,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     // }
     });
 
-    on<SearchClicked>((event, emit) async {
-      // emit(state.copyWith(newFlowMeterParams: event.flowMeterParams));
-      add(OneReportIndexClicked(AlertTypeEntity("",0)));
-    });
+    // on<SearchClicked>((event, emit) async {
+    //   // emit(state.copyWith(newFlowMeterParams: event.flowMeterParams));
+    //   add(OneReportIndexClicked(AlertTypeEntity("",0)));
+    // });
 
   }
 }

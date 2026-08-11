@@ -108,7 +108,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       ..add(
         WellWorkHourStart(
           FlowMeterParams(
-            type: 2,
+            type: 0,
             ids: [widget.wellsDataEntity.deviceId!],
           ),
         ),
@@ -330,7 +330,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
                                       if (status is FlowMeterError) {
                                         return Container(
-                                          height: 250,
+                                          height: 250.h,
                                           alignment: Alignment.center,
                                           child: Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
@@ -439,7 +439,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                               scrollDirection: Axis.horizontal,
                                               child: Container(
                                                 width: calculatedChartWidth,
-                                                height: 300,
+                                                height: 250.h,
                                                 padding: const EdgeInsets.only(top: 40, right: 18.0, bottom: 10),
                                                 child: state.selectedChartVolumeTab == 0
                                                     ? LineChart(
@@ -533,7 +533,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                     ),
 
                                                     borderData: FlBorderData(
-                                                      border: const Border(bottom: BorderSide(), left: BorderSide()),
+                                                      border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                                                     ),
                                                     titlesData: FlTitlesData(
                                                       show: true,
