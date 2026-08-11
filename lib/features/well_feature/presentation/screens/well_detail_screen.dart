@@ -527,8 +527,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         handleBuiltInTouches: true,
                                                         touchTooltipData: BarTouchTooltipData(
                                                           getTooltipColor: (group) => ColorPalette.lightGrey,
-                                                          fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
-                                                          fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                                          fitInsideHorizontally: true,
+                                                          fitInsideVertically: true,
                                                       )
                                                     ),
 
@@ -626,7 +626,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         if ((currentYValues==null || currentYValues.isEmpty) ||
                                             (currentXValues==null || currentXValues.isEmpty)
                                         ) {
-                                          return  Center(child: Constants.noData());
+                                          return  Constants.noData();
                                         }
                                         final scale = successState.previousWellWorkEntity==null?Constants().getScale(currentYValues):
                                         Constants().getChartScale(currentYValues,previousYValues);
