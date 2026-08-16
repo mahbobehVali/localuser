@@ -88,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         },
         child: Padding(
-          padding:  EdgeInsets.only(left: 15,right: 15,top: 50.h),
+          padding:  EdgeInsets.only(left: 15,right: 15,top: 70.h),
           child: LayoutBuilder(builder: (context, constraints) {
             return SingleChildScrollView(
               child:  ConstrainedBox(
@@ -112,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyleP.f14Bold.copyWith(color: ColorPalette.primaryTextGreen)                          ),
                         ],
                       ),
-                      SizedBox(height: 64.h),
+                      SizedBox(height: 30.h),
 
                       Text("ورود به پلتفرم هوشمند مدیریت مصرف آب",style: TextStyleP.f16Medium,),
                       SizedBox(height: 40.h),
