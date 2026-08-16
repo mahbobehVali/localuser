@@ -70,7 +70,6 @@ class BottomNavWidget extends StatelessWidget {
           ]),
           child: BottomAppBar(
             padding: EdgeInsets.only(right: 10.w,bottom: 4.h,top: 4.h),
-            // height: 44.h,
             color: Colors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -84,14 +83,18 @@ class BottomNavWidget extends StatelessWidget {
                         SizedBox(
                             child: Image.asset(state==index?activeBottomNavItems[index]["icon"]:bottomNavItems[index]["icon"],
                                 color: state==index?ColorPalette.darkBlue:Colors.black)),
-                        SizedBox(height: 6.h,),
+                        SizedBox(height: 6.h),
                         Text(bottomNavItems[index]["title"],
                           textAlign: TextAlign.center,
                           style: TextStyle(
                           color: state==index?ColorPalette.darkBlue:Colors.black,
                           fontWeight: FontWeight.w500
-
-                        ),)
+                        ),),
+                      if(state==index)  Container(
+                          margin: EdgeInsets.all(5),
+                          height: 3.h,
+                          color: ColorPalette.darkBlue,
+                        )
                       ],
                     ),
                     onTap: () {

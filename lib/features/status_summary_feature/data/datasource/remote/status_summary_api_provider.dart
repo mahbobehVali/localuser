@@ -15,15 +15,17 @@ class StatusSummaryApiProvider {
       //0 today 6 currentWeek
       "type":flowMeterParams.type,
       //deviceId
-      "ids":flowMeterParams.ids,
-      "reportType":0,
+      "id":flowMeterParams.ids,
+      // "reportType":0,
       "level":"area"
     };
 
     try {
       final response = await dio.post("report/flowmeter",data: data);
+      print("response${response.data}");
       return response;
     } on DioException catch (e) {
+      print("response${e.response?.statusCode}");
       return CheckExceptions.response(e.response);
     }
   }

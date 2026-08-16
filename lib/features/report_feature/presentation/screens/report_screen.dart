@@ -346,9 +346,10 @@ class ReportScreen extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
-                        color: ColorPalette.lightGrey,
+                        color: ColorPalette.inverseGrey.withValues(alpha: 0.8),
                       ),
                       child: DropdownButton<AlertTypeEntity>(
+                        iconEnabledColor: ColorPalette.black,
                         underline: const SizedBox(),
                         isExpanded: true,
                         padding: EdgeInsets.only(right: 15.w, left: 5.w),
@@ -362,13 +363,14 @@ class ReportScreen extends StatelessWidget {
                           final bool isDisabled = isSpecificDisabled || isAlreadySelected;
 
                           return DropdownMenuItem<AlertTypeEntity>(
+
                             value: alert,
                             enabled: !isDisabled, //  روش استاندارد فلاتر برای غیرفعال کردن واقعی آیتم
                             child: Text(
                               alert.name,
                               style: TextStyle(
                                 //  تغییر رنگ متن برای تمام حالت‌های غیرفعال
-                                color: isDisabled ? Colors.grey : Colors.black,
+                                color: ColorPalette.black
                               ),
                             ),
                           );

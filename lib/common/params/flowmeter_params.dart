@@ -7,7 +7,7 @@ class FlowMeterParams {
   int? time;
   int? page;
   int? reportType;
-  List? ids;
+  dynamic ids;
   String? level;
   String? startDate;
   String? endDate;
@@ -36,7 +36,7 @@ class FlowMeterParams {
         int? newTime,
         int? newPage,
         int? newReportType,
-        List? newIds,
+        dynamic newIds,
         String? newLevel,
         String? newStartDate,
         String? newEndDate,

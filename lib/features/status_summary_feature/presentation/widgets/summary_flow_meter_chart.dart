@@ -45,7 +45,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                           onSelectionChanged: (Set<int> newSelected) {
                             BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                               type: newSelected.first,
-                              ids:[int.parse(info[6])],
+                              ids:int.parse(info[6]),
                             )));
 
                           },
