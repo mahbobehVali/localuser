@@ -34,32 +34,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   TextEditingController passController = TextEditingController();
   TextEditingController codeController = TextEditingController();
-  late Timer _timer;
-  int _remainingSeconds = 120;
-
-  @override
-  void initState() {
-    super.initState();
-    _startCountdown();
-  }
 
   @override
   void dispose() {
-    _timer.cancel();
     super.dispose();
-    // validationController.dispose();
     passController.dispose();
     codeController.dispose();
-  }
-
-  void _startCountdown() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
-      setState(() {
-        _remainingSeconds--;
-        if (_remainingSeconds == 0) timer.cancel();
-
-      });
-    });
   }
 
 
