@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../common/error_handling/check_exceptions.dart';
 import '../../../../common/error_handling/exceptions.dart';
+import '../../../../common/params/sign_up_params.dart';
 import '../../../../common/utils/data_state.dart';
 import '../../domain/entity/area_entity.dart';
 import '../../domain/entity/region_entity.dart';
@@ -22,6 +23,17 @@ class SignUpRepositoryImpl extends SignUpRepository {
       Response response = await apiProvider.firstSignUp(firstLevelSignInParams);
 
       return DataSuccess(response.data["smsID"]);
+    } on AppException catch (e) {
+      return CheckExceptions.getError(e);
+    }
+  }
+
+  @override
+  Future<DataState<dynamic>> getValidationCode(SignUpParams signUpParams) async {
+    try {
+      await apiProvider.getValidationCode(signUpParams);
+
+      return DataSuccess("");
     } on AppException catch (e) {
       return CheckExceptions.getError(e);
     }

@@ -157,6 +157,13 @@ class Constants {
 
   ];
 
+  List<AlertTypeEntity> responsibilityList = [
+    AlertTypeEntity("کاربر محلی", 0),
+    AlertTypeEntity("مدیر منطقه", 1),
+
+
+  ];
+
 
   List<AlertTypeEntity> alertStatus = [
     AlertTypeEntity("جدید", 0),

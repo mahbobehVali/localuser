@@ -36,6 +36,7 @@ import 'features/sign_up_feature/domain/repository/sign_up_repository.dart';
 import 'features/sign_up_feature/domain/usecase/first_sign_up.dart';
 import 'features/sign_up_feature/domain/usecase/region_usecase.dart';
 import 'features/sign_up_feature/domain/usecase/register_usecase.dart';
+import 'features/sign_up_feature/domain/usecase/send_validation_code_usecase.dart';
 import 'features/status_summary_feature/data/datasource/remote/status_summary_api_provider.dart';
 import 'features/status_summary_feature/data/repository/status_summary_repositoryimpl.dart';
 import 'features/status_summary_feature/domain/usecase/last_activity_usecase.dart';
@@ -90,6 +91,7 @@ Future<void> setup() async {
   locator.registerFactory<SignUpRepository>(() =>SignUpRepositoryImpl(apiProvider: locator()));
   locator.registerFactory<RegisterUseCase>(() =>RegisterUseCase(locator()));
   locator.registerFactory<FirstSignupUseCase>(() =>FirstSignupUseCase(locator()));
+  locator.registerFactory<SendValidationCodeUseCase>(() =>SendValidationCodeUseCase(locator()));
   locator.registerFactory<RegionUseCase>(() =>RegionUseCase(locator()));
   locator.registerFactory<AreaUseCase>(() =>AreaUseCase(locator()));
   locator.registerSingleton<SharedPrefOperator>(SharedPrefOperator(sharedPreferences));

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,8 +14,10 @@ import '../../../../../common/widgets/global_elevated_button.dart';
 import '../../../../../common/widgets/show_snack_bar.dart';
 import '../../../../../config/color_palette.dart';
 import '../../../../../config/texts_style.dart';
+import '../../../../alert_feature/domain/entity/alert_type_entity.dart';
 import '../../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../../domain/entity/region_entity.dart';
+import '../../bloc/again_validation_status.dart';
 import '../../bloc/area_status.dart';
 import '../../bloc/sign_up_bloc.dart';
 
@@ -30,14 +34,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   TextEditingController passController = TextEditingController();
   TextEditingController codeController = TextEditingController();
+  late Timer _timer;
+  int _remainingSeconds = 120;
+
+  @override
+  void initState() {
+    super.initState();
+    _startCountdown();
+  }
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    _timer.cancel();
     super.dispose();
+    // validationController.dispose();
     passController.dispose();
     codeController.dispose();
   }
+
+  void _startCountdown() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        _remainingSeconds--;
+        if (_remainingSeconds == 0) timer.cancel();
+
+      });
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +74,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     // تعیین حداقل ارتفاع محتوا به اندازه ارتفاع موجود در صفحه
                     minHeight: constraints.maxHeight,
                   ),
-                  child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 30.h),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
 
 
@@ -70,119 +94,171 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             children: [
                               Text("نوع مسئولیت"),
                               SizedBox(height: 8.h),
-                              Text("انتخاب منطقه"),
-                              SizedBox(height: 8.h),
-                              Container(
-                                height: 50.h,
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(color: Colors.grey),
-                                ),
-                                width: double.infinity,
-                                alignment: Alignment.center,
-                                child: BlocBuilder<SignUpBloc, SignUpState>(
-                                  builder: (context, state) {
-                                    if(state.regionStatus is RegionSuccess){
-                                      RegionSuccess regionSuccess=state.regionStatus as RegionSuccess;
-                                      var regionIndex = 0;
-                                      if (state.oneRegionEntity != null) {
-                                        regionIndex = regionSuccess.regionEntity.indexWhere(
-                                                (element) => element.id == state.oneRegionEntity!.id);
-                                      }
-                                      return DropdownButton<RegionEntity>(
-                                          underline: const SizedBox(),
-                                          isExpanded: true,
-                                          padding: EdgeInsets.only(right: 15.w),
-                                        value: regionSuccess.regionEntity[regionIndex],
+                              BlocBuilder<SignUpBloc, SignUpState>(
+                                // buildWhen: (previous, current) =>
+                                // current.selectedAlertType!=previous.selectedAlertType,
 
-                                          items: regionSuccess.regionEntity
-                                              .map((region) =>
-                                              DropdownMenuItem<RegionEntity>(
-                                                value: region,
-                                                child:
-                                                Text(region.name!.toString()),
-                                              ))
-                                              .toList(),
-                                          onChanged: (value) {
-                                            BlocProvider.of<SignUpBloc>(context)
-                                                .add(OneRegionClicked(value!));
-                                          });
+                                builder: (context, state) {
 
-                                    }else if (state.regionStatus is RegionLoading){
-                                      return Center(child: CircularProgressIndicator(),);
-                                    }else if (state.regionStatus is RegionError){
-                                      RegionError regionError=state.regionStatus as RegionError;
-                                      return Center(child: Text(regionError.error));
-                                    }else {
-                                      return SizedBox();
-                                    }
-                                  },
-                                ),
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(color: Colors.grey)),
+                                    width: double.infinity,
+                                    alignment: Alignment.center,
+                                    child:
+                                    DropdownButton<AlertTypeEntity>(
+                                        underline: const SizedBox(),
+                                        isExpanded: true,
+                                        padding: EdgeInsets.only(right: 15.w),
+                                        value: state.responsibilityList[state.selectedResponsibility!],
+                                        items: state.responsibilityList
+                                            .map((alertType) =>
+                                            DropdownMenuItem<AlertTypeEntity>(
+                                              value: alertType,
+                                              child: Text(alertType.name),
+                                            ))
+                                            .toList(),
+                                        onChanged: (value) {
+                                          BlocProvider.of<SignUpBloc>(context)
+                                              .add(ResponsibilityChanged(value!));
+                                        }),
+                                  );
+                                },
                               ),
-                              SizedBox(height: 10,),
-                              Text("انتخاب ناحیه"),
-                              SizedBox(height: 8.h),
-                              Container(
-                                height: 50.h,
-                                padding: const EdgeInsets.symmetric(horizontal: 5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(color: Colors.grey),
-                                ),
-                                width: double.infinity,
-                                alignment: Alignment.center,
-                                child: BlocBuilder<SignUpBloc, SignUpState>(
-                                  builder: (context, state) {
-                                    if(state.areaStatus is AreaSuccess){
-                                      AreaSuccess areaSuccess=state.areaStatus as AreaSuccess;
-                                      var areaIndex = 0;
-                                      if (state.oneAreaEntity != null) {
-                                        areaIndex = areaSuccess.areaEntity.indexWhere(
-                                                (element) => element.id == state.oneAreaEntity!.id);
-                                      }
-                                      return DropdownButton<AreaEntity>(
-                                          underline: const SizedBox(),
-                                          isExpanded: true,
-                                          padding: EdgeInsets.only(right: 15.w),
-                                          value: areaSuccess.areaEntity[areaIndex],
+                              SizedBox(height: 10.h),
 
-                                          items:  areaSuccess.areaEntity
-                                              .map((area) =>
-                                              DropdownMenuItem<AreaEntity>(
-                                                value: area,
-                                                child:
-                                                Text(area.name!.toString()),
-                                              ))
-                                              .toList(),
-                                          onChanged: (value) {
-                                            BlocProvider.of<SignUpBloc>(context)
-                                                .add(OneAreaClicked(value!));
-                                          });
-                                    }else if (state.areaStatus is AreaLoading){
-                                      return Center(child: CircularProgressIndicator(),);
-                                    }else if (state.areaStatus is AreaError){
-                                      AreaError areaError=state.areaStatus as AreaError;
-                                      return Center(child: Text(areaError.error));
-                                    }else {
-                                      return SizedBox();
-                                    }
-                                  },
-                                ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text("انتخاب منطقه"),
+                                        SizedBox(height: 8.h),
+                                        Container(
+                                          height: 50.h,
+                                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(5),
+                                            border: Border.all(color: Colors.grey),
+                                          ),
+                                          width: double.infinity,
+                                          alignment: Alignment.center,
+                                          child: BlocBuilder<SignUpBloc, SignUpState>(
+                                            builder: (context, state) {
+                                              if(state.regionStatus is RegionSuccess){
+                                                RegionSuccess regionSuccess=state.regionStatus as RegionSuccess;
+                                                var regionIndex = 0;
+                                                if (state.oneRegionEntity != null) {
+                                                  regionIndex = regionSuccess.regionEntity.indexWhere(
+                                                          (element) => element.id == state.oneRegionEntity!.id);
+                                                }
+                                                return DropdownButton<RegionEntity>(
+                                                    underline: const SizedBox(),
+                                                    isExpanded: true,
+                                                    padding: EdgeInsets.only(right: 15.w),
+                                                    value: regionSuccess.regionEntity[regionIndex],
+
+                                                    items: regionSuccess.regionEntity
+                                                        .map((region) =>
+                                                        DropdownMenuItem<RegionEntity>(
+                                                          value: region,
+                                                          child:
+                                                          Text(region.name!.toString()),
+                                                        ))
+                                                        .toList(),
+                                                    onChanged: (value) {
+                                                      BlocProvider.of<SignUpBloc>(context)
+                                                          .add(OneRegionClicked(value!));
+                                                    });
+
+                                              }else if (state.regionStatus is RegionLoading){
+                                                return Center(child: CircularProgressIndicator(),);
+                                              }else if (state.regionStatus is RegionError){
+                                                RegionError regionError=state.regionStatus as RegionError;
+                                                return Center(child: Text(regionError.error));
+                                              }else {
+                                                return SizedBox();
+                                              }
+                                            },
+                                          ),
+                                        ),
+
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w,),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                                      children: [
+
+                                        Text("انتخاب ناحیه"),
+                                        SizedBox(height: 8.h),
+                                        Container(
+                                          height: 50.h,
+                                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(5),
+                                            border: Border.all(color: Colors.grey),
+                                          ),
+                                          width: double.infinity,
+                                          alignment: Alignment.center,
+                                          child: BlocBuilder<SignUpBloc, SignUpState>(
+                                            builder: (context, state) {
+                                              if(state.areaStatus is AreaSuccess){
+                                                AreaSuccess areaSuccess=state.areaStatus as AreaSuccess;
+                                                var areaIndex = 0;
+                                                if (state.oneAreaEntity != null) {
+                                                  areaIndex = areaSuccess.areaEntity.indexWhere(
+                                                          (element) => element.id == state.oneAreaEntity!.id);
+                                                }
+                                                return DropdownButton<AreaEntity>(
+                                                    underline: const SizedBox(),
+                                                    isExpanded: true,
+                                                    padding: EdgeInsets.only(right: 15.w),
+                                                    value: areaSuccess.areaEntity[areaIndex],
+
+                                                    items:  areaSuccess.areaEntity
+                                                        .map((area) =>
+                                                        DropdownMenuItem<AreaEntity>(
+                                                          value: area,
+                                                          child:
+                                                          Text(area.name!.toString()),
+                                                        ))
+                                                        .toList(),
+                                                    onChanged: (value) {
+                                                      BlocProvider.of<SignUpBloc>(context)
+                                                          .add(OneAreaClicked(value!));
+                                                    });
+                                              }else if (state.areaStatus is AreaLoading){
+                                                return Center(child: CircularProgressIndicator(),);
+                                              }else if (state.areaStatus is AreaError){
+                                                AreaError areaError=state.areaStatus as AreaError;
+                                                return Center(child: Text(areaError.error));
+                                              }else {
+                                                return SizedBox();
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
 
-                              SizedBox(height: 8.h),
-                              Text("کد اعتبارسنجی"),
-                              SizedBox(height: 8.h),
-                              TextFormField(
-                                controller: codeController,
-                              ),
                               SizedBox(height: 8.h),
 
                               Text("رمز عبور"),
                               SizedBox(height: 8.h),
                               TextFormField(
                                 controller: passController,
+                              ),
+                              SizedBox(
+                                height: 30.h,
                               ),
                               BlocConsumer<SignUpBloc, SignUpState>(
                                 listener: (BuildContext context, SignUpState state) {
@@ -209,12 +285,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             SignUpParams(
                                               password: passController.text,
                                               areaId: state.oneAreaEntity!.id,
-                                              type: 0,
+                                              type: state.selectedResponsibility,
                                               mobile: state.signUpParams.mobile,
                                               serverId: state.signUpParams.serverId,
                                               nationalCode: state.signUpParams.nationalCode,
                                               name: state.signUpParams.name,
-                                              code: int.parse(codeController.text.toString().toEnglishDigit()),
+                                              code: state.signUpParams.code,
                                             )
                                           ),
                                         );
@@ -235,10 +311,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   curve: Curves.bounceIn,
                                 );
                               },)
-
-
-
-
 
                             ],
                           ),

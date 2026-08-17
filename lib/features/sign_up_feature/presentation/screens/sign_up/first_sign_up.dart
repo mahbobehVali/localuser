@@ -82,7 +82,7 @@ class _FirstSignUpState extends State<FirstSignUp> {
                               return null;
                             },
                           ),
-                          SizedBox(height: 24.h),
+                          SizedBox(height: 20.h),
                           Text("کد ملی"),
                           SizedBox(height: 8.h),
 
@@ -101,7 +101,7 @@ class _FirstSignUpState extends State<FirstSignUp> {
                               return null;
                             },
                           ),
-                          SizedBox(height: 24.h),
+                          SizedBox(height: 20.h),
 
                           Text("شماره تماس"),
                           SizedBox(height: 8.h),
@@ -118,51 +118,15 @@ class _FirstSignUpState extends State<FirstSignUp> {
                               return null;
                             },
                           ),
-                          SizedBox(height: 24.h),
-                          // Text("نوع ثبت نام"),
-                          // SizedBox(height: 8.h),
-                          // Container(
-                          //   height: 55.h,
-                          //   decoration: BoxDecoration(
-                          //     borderRadius: BorderRadius.circular(5),
-                          //     border: Border.all(color: Colors.grey),
-                          //   ),
-                          //   width: double.infinity,
-                          //   alignment: Alignment.center,
-                          //   child: BlocBuilder<ConsultantSignUpBloc, ConsultantSignUpState>(
-                          //     buildWhen: (previous, current) =>
-                          //     previous.teacherModel != current.teacherModel,
-                          //     builder: (context, state) {
-                          //       return DropdownButton<TeacherModel>(
-                          //         underline: const SizedBox(),
-                          //         isExpanded: true,
-                          //         padding: EdgeInsets.only(right: 15.w),
-                          //         value: state.teacherModel[state.selectedTeacher],
-                          //         items: state.teacherModel.map(
-                          //               (u) => DropdownMenuItem<TeacherModel>(
-                          //             value: u,
-                          //             child: Text(u.title),
-                          //           ),
-                          //         ).toList(),
-                          //         onChanged: (value) {
-                          //           BlocProvider.of<ConsultantSignUpBloc>(
-                          //             context,
-                          //           ).add(IsTeacherClicked(value!));
-                          //         },
-                          //       );
-                          //     },
-                          //   ),
-                          // ),
 
                         ],
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 40.h),
                     BlocConsumer<SignUpBloc, SignUpState>(
                       listener: (BuildContext context, SignUpState state) {
                         if (state.firstLevelSendStatus is FirstLevelSuccess) {
                           FirstLevelSuccess firstLevelSuccess=state.firstLevelSendStatus as FirstLevelSuccess;
-                         print("firstLevelSuccess.serverId${firstLevelSuccess.serverId}");
                           BlocProvider.of<SignUpBloc>(context).add(
                             SaveServerId(
                               state.signUpParams.copyWith(

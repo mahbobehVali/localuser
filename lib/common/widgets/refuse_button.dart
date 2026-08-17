@@ -7,10 +7,12 @@ class RefuseButton extends StatelessWidget {
    const RefuseButton({
     super.key,
      this.onTap,
-     this.width
+     this.width,
+     this.text,
   });
    final VoidCallback? onTap;
    final double? width;
+   final String? text;
 
 
   @override
@@ -19,7 +21,7 @@ class RefuseButton extends StatelessWidget {
         onTap: onTap??() {
           Navigator.of(context).pop();
         },
-        widget: const Text("انصراف",
+        widget: Text(text??"انصراف",
             style: TextStyle(
                 color: Colors.white,fontSize: 18)),
         backColor: Colors.grey,

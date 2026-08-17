@@ -14,6 +14,7 @@ abstract class SignUpRepository {
   Future<DataState<dynamic>> register(SignUpParams signUpParams);
   Future<DataState<dynamic>> getRegions();
   Future<DataState<dynamic>> getArea(int id);
+  Future<DataState<dynamic>> getValidationCode(SignUpParams signUpParams);
 
 
 }

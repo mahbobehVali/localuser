@@ -4,7 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/area_usecase.dart';
 import 'package:mahaliii/features/sign_up_feature/domain/usecase/region_usecase.dart';
+import 'package:mahaliii/features/sign_up_feature/domain/usecase/send_validation_code_usecase.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/screens/sign_up/register_screen.dart';
+import 'package:mahaliii/features/sign_up_feature/presentation/screens/sign_up/validation_screen.dart';
 
 import '../../../../../common/utils/constants.dart';
 import '../../../../../config/texts_style.dart';
@@ -25,11 +27,10 @@ class SignUpScreen extends StatelessWidget {
       create: (context) {
         SignUpBloc signUpBloc = SignUpBloc(
           locator<RegisterUseCase>(),
-          // locator<AgainSendValidationCodeUseCase>(),
           locator<FirstSignupUseCase>(),
-          // locator<ValidationUseCase>(),
           locator<AreaUseCase>(),
           locator<RegionUseCase>(),
+          locator<SendValidationCodeUseCase>(),
 
         );
 
@@ -37,7 +38,6 @@ class SignUpScreen extends StatelessWidget {
         return signUpBloc;
       },
       child: Scaffold(
-        appBar: AppBar(),
         body: Padding(
           padding:  EdgeInsets.symmetric(horizontal: 30.w),
           child: Column(
@@ -65,19 +65,19 @@ class SignUpScreen extends StatelessWidget {
               BlocBuilder<SignUpBloc, SignUpState>(
                 builder: (context, state) {
                   return Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: List.generate(2, (index) {
-                      return Padding(
-                        padding:  EdgeInsets.only(left:10.w),
-                        child: Row(
-                          children: [
-                            Text(Constants().signUpConstant[index],style: TextStyle(
-                              color: state.step==index?ColorPalette.darkBlue:Colors.black
-                            ),),
-                            state.step==1?SizedBox():Icon(Icons.arrow_forward_ios)
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(Constants().signUpConstant.length, (index) {
+                      return Row(
+                        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                          ],
-                        ),
+                        children: [
+                          Text(Constants().signUpConstant[index],style: TextStyleP.f10Regular.copyWith(
+                              color: state.step==index?ColorPalette.darkBlue:ColorPalette.black
+                          ),),
+                          SizedBox(width: 4.w,),
+                          index==2?SizedBox():Icon(Icons.arrow_forward_ios)
+
+                        ],
                       );
                     },),
                   );
@@ -89,8 +89,8 @@ class SignUpScreen extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     FirstSignUp(pageController: pageController),
-                    // ValidationCodeScreen(pageController: pageController),
 
+                    ValidationScreen(pageController: pageController),
                     RegisterScreen(pageController: pageController),
                   ],
                 ),

@@ -1,18 +1,23 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mahaliii/common/params/sign_up_params.dart';
+import 'package:mahaliii/common/utils/constants.dart';
+import 'package:mahaliii/features/sign_up_feature/domain/usecase/send_validation_code_usecase.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/bloc/region_status.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/bloc/register_status.dart';
+import 'package:mahaliii/features/sign_up_feature/presentation/bloc/validation_status.dart';
 
 import '../../../../common/params/validation_params.dart';
 import '../../../../common/utils/data_state.dart';
 import '../../../../common/utils/use_case.dart';
+import '../../../alert_feature/domain/entity/alert_type_entity.dart';
 import '../../domain/entity/area_entity.dart';
 import '../../domain/entity/region_entity.dart';
 import '../../domain/usecase/area_usecase.dart';
 import '../../domain/usecase/first_sign_up.dart';
 import '../../domain/usecase/region_usecase.dart';
 import '../../domain/usecase/register_usecase.dart';
+import 'again_validation_status.dart';
 import 'area_status.dart';
 import 'first_level_status.dart';
 
@@ -26,11 +31,13 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   // ValidationUseCase validationUseCase;
   AreaUseCase areaUseCase;
   RegionUseCase regionUseCase;
+  SendValidationCodeUseCase sendValidationCodeUseCase;
   SignUpBloc(
       this.registerUseCase,
       this.firstSignupUseCase,
       this.areaUseCase,
       this.regionUseCase,
+      this.sendValidationCodeUseCase,
 
       ) : super(SignUpState(
       firstLevelSendStatus: FirstLevelInitial(),
@@ -43,7 +50,12 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     oneAreaEntity: null,
     ignoreArea: true,
     step: 0,
-    serverId: 0
+    serverId: 0,
+      responsibilityList: Constants().responsibilityList,
+    selectedResponsibility: 0,
+    againSendValidationStatus: AgainSendValidationInitial(),
+    userValidationId: 0,
+    sendValidationStatus: SendValidationInitial()
 
   )) {
 
@@ -92,6 +104,41 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
             state.copyWith(newRegisterStatus: RegisterError(dataState.error!)));
       }
     });
+
+    on<SendValidation>((event, emit) async {
+      emit(state.copyWith(newSendValidationStatus: SendValidationLoading(),
+        newStep: event.signUpParams.step,
+      ));
+      DataState dataState = await sendValidationCodeUseCase(event.signUpParams);
+
+      if (dataState is DataSuccess) {
+
+        emit(state.copyWith(
+            newSignUpParams: event.signUpParams,
+            newSendValidationStatus: SendValidationSuccess()));
+      }
+      if (dataState is DataFailed) {
+        emit(
+            state.copyWith(newSendValidationStatus: SendValidationError(dataState.error!)));
+      }
+    });
+
+    on<AgainSendValidationButtonClicked>((event, emit) async {
+      emit(state.copyWith(newAgainSendValidationStatus: AgainSendValidationLoading()));
+      DataState dataState = await firstSignupUseCase(state.signUpParams);
+
+      if (dataState is DataSuccess) {
+
+        emit(state.copyWith(
+            newAgainSendValidationStatus: AgainSendValidationSuccess(dataState.data),
+        newServerId: dataState.data));
+      }
+      if (dataState is DataFailed) {
+        emit(
+            state.copyWith(newAgainSendValidationStatus: AgainSendValidationError(dataState.error!)));
+      }
+    });
+
     on<SaveServerId>((event, emit) async {
       emit(state.copyWith(newSignUpParams: event.signUpParams));
 
@@ -140,6 +187,14 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     on<OneAreaClicked>((event, emit) async {
       emit(state.copyWith(newOneAreaEntity: event.areaEntity));
 
+    });
+
+    on<ResponsibilityChanged>((event, emit) async {
+      emit(state.copyWith(newSelectedResponsibility: event.responsibilityEntity.id));
+    });
+
+    on<FillUserValidationId>((event, emit) async {
+      emit(state.copyWith(newUserValidationId: event.id));
     });
   }
 }

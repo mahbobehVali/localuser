@@ -24,13 +24,12 @@ class ValidationButtonClicked extends SignUpEvent {
   List<Object?> get props => [validationParams];
 }
 class AgainSendValidationButtonClicked extends SignUpEvent {
-  final String mobile;
 
-  const AgainSendValidationButtonClicked(this.mobile);
+  const AgainSendValidationButtonClicked();
 
   @override
   // TODO: implement props
-  List<Object?> get props => [mobile];
+  List<Object?> get props => [];
 }
 class RegisterClicked extends SignUpEvent {
   final SignUpParams signUpParams;
@@ -92,6 +91,8 @@ class OneAreaClicked extends SignUpEvent{
   List<Object?> get props => [areaEntity];
 
 }
+
+
 class OneRegionClicked extends SignUpEvent{
   final RegionEntity regionEntity;
 
@@ -103,6 +104,38 @@ class OneRegionClicked extends SignUpEvent{
 
 }
 
+class ResponsibilityChanged extends SignUpEvent{
+  final AlertTypeEntity responsibilityEntity;
+
+  const ResponsibilityChanged(this.responsibilityEntity);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [responsibilityEntity];
+
+}
+
+class FillUserValidationId extends SignUpEvent {
+
+  int id;
+
+  FillUserValidationId(this.id);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [id];
+}
+
+class SendValidation extends SignUpEvent {
+
+  SignUpParams signUpParams;
+
+  SendValidation(this.signUpParams);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [signUpParams];
+}
 
 
 

@@ -25,6 +25,13 @@ class SignUpState {
   final bool ignoreArea;
   final int? step;
   final int? serverId;
+  final List<AlertTypeEntity> responsibilityList;
+  final int? selectedResponsibility;
+  final AgainSendValidationStatus? againSendValidationStatus;
+  final int userValidationId;
+  final SendValidationStatus sendValidationStatus;
+
+
 
 
   SignUpState({
@@ -39,6 +46,11 @@ class SignUpState {
     required this.ignoreArea,
     required this.step,
     required this.serverId,
+    required this.responsibilityList,
+    required this.selectedResponsibility,
+    required this.againSendValidationStatus,
+    required this.userValidationId,
+    required this.sendValidationStatus,
   });
 
   SignUpState copyWith(
@@ -58,6 +70,12 @@ class SignUpState {
          bool? newIgnoreArea,
         int? newStep,
         int? newServerId,
+         List<AlertTypeEntity>? newResponsibilityList,
+        int? newSelectedResponsibility,
+        AgainSendValidationStatus? newAgainSendValidationStatus,
+        int? newUserValidationId,
+        SendValidationStatus? newSendValidationStatus
+
 
 
 
@@ -78,7 +96,12 @@ class SignUpState {
       oneAreaEntity: newOneAreaEntity??oneAreaEntity,
       oneRegionEntity: newOneRegionEntity??oneRegionEntity,
       ignoreArea: newIgnoreArea??ignoreArea,
-      step: newStep??step, serverId: newServerId??serverId
+      step: newStep??step, serverId: newServerId??serverId,
+      responsibilityList: newResponsibilityList??responsibilityList,
+      selectedResponsibility: newSelectedResponsibility??selectedResponsibility,
+      againSendValidationStatus: newAgainSendValidationStatus??againSendValidationStatus,
+      userValidationId: newUserValidationId??userValidationId,
+      sendValidationStatus: newSendValidationStatus??sendValidationStatus
 
     );
   }

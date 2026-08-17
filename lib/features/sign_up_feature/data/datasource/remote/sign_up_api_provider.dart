@@ -20,7 +20,25 @@ class SignUpApiProvider {
 
         "mobile": signUpParams.mobile,
         "nationalCode": signUpParams.nationalCode,
-        "login":1
+      }
+      );
+      return response;
+    } on DioException catch (e) {
+      return CheckExceptions.response(e.response);
+    }
+  }
+
+
+  Future<dynamic> getValidationCode(
+      SignUpParams signUpParams,
+      ) async {
+
+
+    try {
+      var response = await dio.post("user/sms/validate", data: {
+
+        "code": signUpParams.code,
+        "smsID": signUpParams.serverId,
       }
       );
       return response;
