@@ -274,7 +274,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                       children: [
 
                         Text(
-                          "خلاصه وضعیت چاه ${widget.wellsDataEntity.wellName}",
+                          "خلاصه وضعیت ${widget.wellsDataEntity.wellName}",
                           style: TextStyleP.f16Medium,
                         ),
                         Padding(
