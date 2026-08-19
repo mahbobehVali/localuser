@@ -556,8 +556,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         ],
                                       );
 
-
-
                                     },
                                   ),
                                 ],
