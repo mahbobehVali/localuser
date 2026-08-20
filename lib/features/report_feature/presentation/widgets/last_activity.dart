@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../../common/utils/constants.dart';
 import '../../../../common/widgets/last_activity_widget.dart';
 import '../../../../common/widgets/pagination_widget.dart';

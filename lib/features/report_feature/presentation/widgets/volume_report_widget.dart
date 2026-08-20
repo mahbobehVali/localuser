@@ -180,7 +180,7 @@ class VolumeReportChartWidget extends StatelessWidget {
                       color: ColorPalette.lightGrey,
                       child: Row(
                         children: [
-                          Expanded( child: Text(state.selectedReportIndex == 1 ? "چاه" : "تاریخ",
+                          Expanded( child: Text( "تاریخ",
                               style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
                           Expanded( child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
                           Expanded( child: Text("وضعیت", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
