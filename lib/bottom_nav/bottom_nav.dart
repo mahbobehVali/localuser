@@ -15,43 +15,26 @@ class BottomNavWidget extends StatelessWidget {
   static const List bottomNavItems = [
     {
       "title": "وضعیت کلی",
-      "icon": "assets/icons/home.png"
+      "icon": "assets/icons/home.png",
+      "activeIcon": "assets/icons/activeHome.png"
     },
     {
       "title": "چاه ها",
-      "icon": "assets/icons/menu.png"
+      "icon": "assets/icons/category.png",
+      "activeIcon": "assets/icons/activeCategory.png"
     },{
       "title": "گزارش ها",
-      "icon": "assets/icons/Chart.png"
+      "icon": "assets/icons/chart.png",
+      "activeIcon": "assets/icons/activeChart.png"
     },
     {
       "title": "هشدارها",
-      "icon": "assets/icons/Notification.png"
+      "icon": "assets/icons/Notification.png",
+      "activeIcon": "assets/icons/activeNotification.png"
     },{
       "title": "پنل کاربر",
-      "icon": "assets/icons/user-square.png"
-    },
-
-  ];
-
-  static const List activeBottomNavItems = [
-    {
-      "title": "وضعیت کلی",
-      "icon": "assets/icons/activeHome.png"
-    },
-    {
-      "title": "چاه ها",
-      "icon": "assets/icons/Category.png"
-    },{
-      "title": "گزارش ها",
-      "icon": "assets/icons/activeChart.png"
-    },
-    {
-      "title": "هشدارها",
-      "icon": "assets/icons/activeNotification.png"
-    },{
-      "title": "پنل کاربر",
-      "icon": "assets/icons/active_user-square.png"
+      "icon": "assets/icons/user.png",
+      "activeIcon": "assets/icons/activeUser.png"
     },
 
   ];
@@ -81,7 +64,7 @@ class BottomNavWidget extends StatelessWidget {
 
                       children: [
                         SizedBox(
-                            child: Image.asset(state==index?activeBottomNavItems[index]["icon"]:bottomNavItems[index]["icon"],
+                            child: Image.asset(state==index?bottomNavItems[index]["activeIcon"]:bottomNavItems[index]["icon"],
                                 color: state==index?ColorPalette.darkBlue:Colors.black)),
                         SizedBox(height: 6.h),
                         Text(bottomNavItems[index]["title"],

@@ -139,45 +139,46 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
             final double capVal = cap.toDouble();
             final double disconnectCapVal = disconnectCap.toDouble();
 
-            if (currentVal > disconnectCapVal) {
-              // اگر از حد قطع بیشتر است، باید لایه‌ها به ترتیب زیر روی هم چیده شوند:
+            // if (currentVal > disconnectCapVal) {
+            //   // اگر از حد قطع بیشتر است، باید لایه‌ها به ترتیب زیر روی هم چیده شوند:
+            //
+            //   // ۱. لایه اول: از صفر تا ظرفیت عادی
+            //   if (capVal > 0) {
+            //     stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
+            //     // ۲. لایه دوم: از ظرفیت عادی تا ظرفیت قطعی
+            //     stackItems.add(BarChartRodStackItem(capVal, disconnectCapVal, capColor));
+            //     // ۳. لایه سوم: از ظرفیت قطعی تا مقدار کل مصرف
+            //     stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, disCapColor));
+            //   } else {
+            //     stackItems.add(BarChartRodStackItem(0, disconnectCapVal, normalColor));
+            //     stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, disCapColor));
+            //   }
+            //
+            // }
+            // else if (currentVal > capVal) {
+            //   // اگر فقط از ظرفیت عادی رد کرده ولی به حد قطع نرسیده است
+            //   stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
+            //   stackItems.add(BarChartRodStackItem(capVal, currentVal, capColor));
+            // }
+            // else {
+            //   // اگر کمتر از هر دو حد مجاز باشد
+            //   stackItems.add(BarChartRodStackItem(0, currentVal, normalColor));
+            // }
 
-              // ۱. لایه اول: از صفر تا ظرفیت عادی
-              if (capVal > 0) {
-                stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
-                // ۲. لایه دوم: از ظرفیت عادی تا ظرفیت قطعی
-                stackItems.add(BarChartRodStackItem(capVal, disconnectCapVal, capColor));
-                // ۳. لایه سوم: از ظرفیت قطعی تا مقدار کل مصرف
-                stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, disCapColor));
-              } else {
-                stackItems.add(BarChartRodStackItem(0, disconnectCapVal, normalColor));
-                stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, disCapColor));
-              }
 
-            }
-            else if (currentVal > capVal) {
-              // اگر فقط از ظرفیت عادی رد کرده ولی به حد قطع نرسیده است
+            if (currentVal > capVal) {
+              // اگر مصرف از ظرفیت عادی بیشتر است، میله به دو لایه تقسیم می‌شود:
+
+              // ۱. لایه اول: از صفر تا ظرفیت عادی (رنگ نرمال)
               stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
+
+              // ۲. لایه دوم: از ظرفیت عادی تا مقدار کل مصرف (رنگ اخطار / بیش از حد مجاز)
               stackItems.add(BarChartRodStackItem(capVal, currentVal, capColor));
             }
             else {
-              // اگر کمتر از هر دو حد مجاز باشد
+              // اگر مصرف کمتر یا مساوی ظرفیت مجاز باشد (فقط یک لایه)
               stackItems.add(BarChartRodStackItem(0, currentVal, normalColor));
             }
-
-
-            // if (yVal > capacityVal*getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
-            //   // لایه اول: از 0 تا capacityVal -> رنگ آبی
-            //   stackItems.add(BarChartRodStackItem(0, capacityVal, normalColor));
-            //
-            //   // لایه دوم: از capacityVal تا yVal -> رنگ قرمز
-            //   stackItems.add(BarChartRodStackItem(capacityVal, yVal, exceedColor));
-            // }
-            // // سناریو ب: y کمتر یا برابر capacity است (مثلاً y=700 و capacity=900)
-            // else {
-            //   // فقط یک لایه: از 0 تا 700 -> رنگ آبی
-            //   stackItems.add(BarChartRodStackItem(0, yVal, normalColor));
-            // }
 
             return BarChartGroupData(
               x: index,

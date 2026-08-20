@@ -286,13 +286,13 @@ class ReportScreen extends StatelessWidget {
                         startDate: state.startDate,
                         ids: state.oneWell
                       )))
-                        ..add(ReportDetailFlowMeter(FlowMeterParams(
-                            page: 1,
-                            type: 5,
-                            endDate: state.endDate,
-                            startDate: state.startDate,
-                            ids: state.oneWell
-                        )))
+                        // ..add(ReportDetailFlowMeter(FlowMeterParams(
+                        //     page: 1,
+                        //     type: 5,
+                        //     endDate: state.endDate,
+                        //     startDate: state.startDate,
+                        //     ids: state.oneWell
+                        // )))
                         ..add(GetAlertCount(FlowMeterParams(
                           page: 1,
                           time: -1,

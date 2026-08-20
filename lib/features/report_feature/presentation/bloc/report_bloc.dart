@@ -110,6 +110,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
 
         emit(state.copyWith(newReportFlowMeterStatus: ReportFlowMeterSuccess(
             dataState.data,capacityDataState.data)));
+        add(ReportDetailFlowMeter(event.flowMeterParams));
       }
       if (dataState is DataFailed) {
         emit(state.copyWith(newReportFlowMeterStatus: ReportFlowMeterError(dataState.error??"حطایی رخ داده")));
