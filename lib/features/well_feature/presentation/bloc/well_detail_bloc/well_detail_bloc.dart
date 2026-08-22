@@ -10,6 +10,7 @@ import 'package:mahaliii/features/well_feature/domain/usecase/get_program_usecas
 import 'package:mahaliii/features/well_feature/domain/usecase/well_work_usecase.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/delete_time_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/pump_performance_status.dart';
+import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/section_well_work_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/week_well_work_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_screen_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_status.dart';
@@ -47,7 +48,8 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       wellStatus: WellLoading(),
       isSwitched: false,
     daySelected: AlertTypeEntity("", -1),
-    wellWorkStatus: WeekWellWorkInitial(),
+    weekWellWorkStatus: WeekWellWorkInitial(),
+    sectionWellWorkStatus: SectionWellWorkInitial(),
     wellPerformanceStatus: WellPerformanceLoading(),
     alertCountStatus: AlertCountLoading(),
     getProgramStatus: GetProgramLoading(),
@@ -297,7 +299,12 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
       }
       if (flowMeterDataState is DataFailed) {
-        emit(state.copyWith(newFlowMeterStatus: FlowMeterError("خطایی رخ داده")));
+        if (flowMeterDataState.isTokenExpired) {
+          emit(state.copyWith(newFlowMeterStatus: FlowMeterExit()));
+        }else {
+          emit(state.copyWith(
+              newFlowMeterStatus: FlowMeterError("خطایی رخ داده")));
+        }
       }
     });
 

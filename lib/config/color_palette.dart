@@ -18,5 +18,11 @@ class ColorPalette{
   static Color orange=Color(0xffF39C12);
   static Color backColor=Color(0xffEDEDED);
   static Color iconContainerColor=Color(0xffECF1F9);
+  static Color analysingColor=Color(0xffFCDEB1);
+  static Color analysingTextColor=Color(0xffBD780D);
+  static Color solvedColor=Color(0xffC0E2C7);
+  static Color solvedTextColor=Color(0xff3C9A4F);
+  static Color newTextColor=Color(0xff182D49);
+
 
 }

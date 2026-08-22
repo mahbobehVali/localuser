@@ -96,7 +96,8 @@ class _WellScreenState extends State<WellScreen> {
                                 );
                               },
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12.w,vertical: 12.h),
+                              height: 40.h,
+                              padding: EdgeInsets.symmetric(horizontal: 12.w),
                               margin: EdgeInsets.symmetric(vertical: 5.h),
                               decoration: BoxDecoration(
                                 color: ColorPalette.tGrey,

@@ -90,11 +90,9 @@ class AlertDetailScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: alertDataEntity.status == 0
-                              ? ColorPalette.lightBlue
-                              : alertDataEntity.status == 1
-                              ? Colors.yellow
-                              : ColorPalette.lightGreen,
+                          color: alertDataEntity.status==0 ?ColorPalette.lightBlue:
+                          alertDataEntity.status==1?ColorPalette.analysingColor:
+                          ColorPalette.solvedColor,
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Text(
@@ -103,7 +101,9 @@ class AlertDetailScreen extends StatelessWidget {
                               : alertDataEntity.status == 1
                               ? "در حال بررسی"
                               : "رفع شده",
-                        ),
+                        style: TextStyle(color: alertDataEntity.status==0 ?ColorPalette.newTextColor:
+                        alertDataEntity.status==1?ColorPalette.analysingTextColor:
+                            ColorPalette.solvedTextColor)),
                       ),
                     ],
                   ),
@@ -251,80 +251,85 @@ class AlertDetailScreen extends StatelessWidget {
                       AlertDetailSuccess alertDetailSuccess =state.alertDetailStatus as AlertDetailSuccess;
 
                       return ListView.builder(
+                        padding: EdgeInsets.zero,
                         itemCount: alertDetailSuccess.alertDetailEntity.length,
                         itemBuilder: (context, index) {
                           final item = alertDetailSuccess.alertDetailEntity[index];
 
                           return IntrinsicHeight( // ۱. این ویجت باعث هم‌ارتفاع شدن ستون‌های چپ و راست می‌شود
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                            child: Padding(
+                              padding:  EdgeInsets.only(bottom: 8.h),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
 
-                              children: [
-                                Row(
-                                  children: [
-                                    IconContainer(
-                                      width: 25.sp,
-                                      icon: Image.asset("assets/icons/user-square.png"),
-                                      color: ColorPalette.lightGrey,
-                                    ),
-                                    SizedBox(width: 8.h),
-
-                                    Text(item.userName ?? ''),
-
-                                  ],
-                                ),
-
-
-                                SizedBox(height: 12.w),
-
-                                Expanded( // ۴. جلوگیری از خطای Overflow در محتوای متنی
-                                  child: Padding(padding: EdgeInsets.only(right:12.w),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Row(
                                     children: [
-                                      VerticalDivider(
-                                        color: ColorPalette.grey,
-                                        width: 2,
-                                        thickness: 1,
+                                      IconContainer(
+                                        width: 25.sp,
+                                        icon: Image.asset("assets/icons/user.png"),
+                                        color: ColorPalette.lightGrey,
                                       ),
                                       SizedBox(width: 8.h),
 
-                                      Expanded(child: Container(
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: ColorPalette.lightGrey.withValues(alpha: 0.3),
-                                          borderRadius: BorderRadius.circular(5),
-                                          border: BoxBorder.all(color: ColorPalette.lightGrey.withValues(alpha: 0.5))
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text(item.clock!.toString().toPersianDigit()),
-                                                Row(
-                                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                                  children: [
-                                                    Text(item.date!.toString().toPersianDigit()),
-                                                    SizedBox(width: 4.w),
-                                                    Icon(
-                                                      Icons.calendar_month_outlined,
-                                                      color: ColorPalette.mediumGrey,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 17.h),
-                                            Text(item.message ?? ''),
-                                          ],
-                                        ),
-                                      )),
+                                      Text(item.userName ?? ''),
+
                                     ],
-                                  ),),
-                                ),
-                              ],
+                                  ),
+
+
+                                  SizedBox(height: 12.w),
+
+                                  Expanded( // ۴. جلوگیری از خطای Overflow در محتوای متنی
+                                    child: Padding(padding: EdgeInsets.only(right:12.w),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        VerticalDivider(
+                                          color: ColorPalette.grey,
+                                          width: 2,
+                                          thickness: 1,
+                                        ),
+                                        SizedBox(width: 8.h),
+
+                                        Expanded(child: Container(
+                                          padding: const EdgeInsets.all(12),
+
+                                          decoration: BoxDecoration(
+                                            color: ColorPalette.lightGrey.withValues(alpha: 0.3),
+                                            borderRadius: BorderRadius.circular(5),
+                                            border: BoxBorder.all(color: ColorPalette.lightGrey.withValues(alpha: 0.5))
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(item.clock!.toString().toPersianDigit()),
+                                                  Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                                    children: [
+                                                      Text(item.date!.toString().toPersianDigit()),
+                                                      SizedBox(width: 4.w),
+                                                      Icon(
+                                                        Icons.calendar_month_outlined,
+                                                        color: ColorPalette.mediumGrey,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 17.h),
+                                              Text(item.message ?? ''),
+                                            ],
+                                          ),
+                                        )),
+                                      ],
+                                    ),),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         },

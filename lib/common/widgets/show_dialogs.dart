@@ -254,8 +254,10 @@ class ShowDialogs {
                                 direction:Axis.horizontal,
                                 children: List.generate(Constants().weekDayNames.length, (index) {
 
-                                  final isSelected =state.daySelected.id==-1?index==0:
-                                  state.daySelected.id == Constants().weekDayNames[index].id;
+                                  // اصلاح این قسمت: اگر id برابر با -1 بود، هیچ‌کدام را انتخاب نکن (false برگردان)
+                                  final bool isSelected = state.daySelected.id == -1
+                                      ? false
+                                      : state.daySelected.id == Constants().weekDayNames[index].id;
 
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 5,left: 5),

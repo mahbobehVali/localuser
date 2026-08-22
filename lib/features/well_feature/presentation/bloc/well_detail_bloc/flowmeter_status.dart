@@ -39,6 +39,11 @@ class FlowMeterEmpty extends FlowMeterStatus {
   List<Object> get props => [];
 }
 
+class FlowMeterExit extends FlowMeterStatus {
+  @override
+  List<Object> get props => [];
+}
+
 class FlowMeterError extends FlowMeterStatus {
   final String error;
 

@@ -27,6 +27,9 @@ dynamic findFlowMeterElement(List<dynamic> list) {
         element["xAxis"].length > 1,
     orElse: () => null,
   );
+  // print("sdfsdfsd");
+  // print(allElement["totalOn"]);
+  // print(allElement["totalOff"]);
 
   if (allElement != null) return allElement;
 

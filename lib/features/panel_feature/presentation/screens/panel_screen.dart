@@ -122,7 +122,7 @@ class RowBox extends StatelessWidget {
       onTap:onTap,
       child: Container(
         height: 40.h,
-        padding: EdgeInsets.symmetric(horizontal: 18),
+        padding: EdgeInsets.symmetric(horizontal: 18.w),
         decoration: BoxDecoration(
           color: ColorPalette.tGrey,
           borderRadius: BorderRadius.circular(8),

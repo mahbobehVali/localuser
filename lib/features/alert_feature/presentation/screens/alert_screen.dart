@@ -159,13 +159,16 @@ class AlertScreen extends StatelessWidget {
                                                       padding: EdgeInsets.all(5),
                                                       decoration: BoxDecoration(
                                                         color: data[index-1].status==0 ?ColorPalette.lightBlue:
-                                                        data[index-1].status==1?Colors.yellow:
-                                                        ColorPalette.lightGreen,
+                                                        data[index-1].status==1?ColorPalette.analysingColor:
+                                                        ColorPalette.solvedColor,
                                                         borderRadius: BorderRadius.circular(5)
                                                       ),
                                                       child: Text(data[index-1].status==0 ?"جدید":
                                                       data[index-1].status==1?"در حال بررسی":
-                                                      "رفع شده",textAlign: TextAlign.center),
+                                                      "رفع شده",textAlign: TextAlign.center,
+                                                      style: TextStyle(color: data[index-1].status==0 ?ColorPalette.newTextColor:
+                                                      data[index-1].status==1?ColorPalette.analysingTextColor:
+                                                      ColorPalette.solvedTextColor),),
                                                     )),
 
                                                   ],

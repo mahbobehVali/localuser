@@ -10,8 +10,6 @@ class BottomNavWidget extends StatelessWidget {
   const BottomNavWidget({super.key,required this.pageController});
   final PageController pageController;
 
-
-
   static const List bottomNavItems = [
     {
       "title": "وضعیت کلی",
@@ -38,7 +36,6 @@ class BottomNavWidget extends StatelessWidget {
     },
 
   ];
-
 
   @override
   Widget build(BuildContext context) {

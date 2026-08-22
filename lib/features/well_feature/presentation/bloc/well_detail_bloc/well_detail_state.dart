@@ -6,7 +6,8 @@ class WellDetailState {
   final int? status;
   final bool? isSwitched;
   final AlertTypeEntity daySelected;
-  final WeekWellWorkStatus? wellWorkStatus;
+  final WeekWellWorkStatus? weekWellWorkStatus;
+  final SectionWellWorkStatus? sectionWellWorkStatus;
   final WellPerformanceStatus? wellPerformanceStatus;
   final AlertCountStatus? alertCountStatus;
   final WellStatus? wellStatus;
@@ -30,7 +31,8 @@ class WellDetailState {
     required this.status,
     required this.isSwitched,
     required this.daySelected,
-    required this.wellWorkStatus,
+    required this.weekWellWorkStatus,
+    required this.sectionWellWorkStatus,
     required this.wellPerformanceStatus,
     required this.alertCountStatus,
     required this.wellStatus,
@@ -57,6 +59,7 @@ class WellDetailState {
         bool? newIsSwitched,
         AlertTypeEntity? newDaySelected,
         WeekWellWorkStatus? newWeekWellWorkStatus,
+        SectionWellWorkStatus? newSectionWellWorkStatus,
         WellPerformanceStatus? newWellPerformanceStatus,
         AlertCountStatus? newAlertCountStatus,
         WellStatus? newWellStatus,
@@ -81,7 +84,8 @@ class WellDetailState {
       status: newStatus??status,
         isSwitched: newIsSwitched??isSwitched,
       daySelected: newDaySelected??daySelected,
-      wellWorkStatus: newWeekWellWorkStatus??wellWorkStatus,
+      weekWellWorkStatus: newWeekWellWorkStatus??weekWellWorkStatus,
+      sectionWellWorkStatus: newSectionWellWorkStatus??sectionWellWorkStatus,
       wellPerformanceStatus: newWellPerformanceStatus??wellPerformanceStatus,
       alertCountStatus: newAlertCountStatus??alertCountStatus,
       wellStatus: newWellStatus??wellStatus,
