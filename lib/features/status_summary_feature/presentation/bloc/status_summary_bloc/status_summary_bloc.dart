@@ -55,6 +55,7 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
         }
       }
     });
+
     on<ReportFlowMeter>((event, emit) async {
       emit(state.copyWith(newReportFlowMeterStatus: SummaryFlowMeterLoading(),
           newSelectedChartTab: event.flowMeterParams.type));
@@ -66,7 +67,7 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
       if (dataState is DataFailed) {
         emit(state.copyWith(
             newReportFlowMeterStatus: SummaryFlowMeterError(dataState.error!)));
-      }    });
+      }});
 
     on<LastActivityStart>((event, emit) async {
       emit(state.copyWith(newLastActivityStatus: LastActivityLoading(),

@@ -68,6 +68,7 @@ dependencies:
   path: ^1.9.1
   collection: ^1.19.1
   bloc_concurrency: ^0.3.0
+  dotted_line: ^3.3.0
 
 dev_dependencies:
   flutter_test:

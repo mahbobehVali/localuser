@@ -1,7 +1,9 @@
+import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
+import 'package:mahaliii/features/well_feature/presentation/screens/well_detail_screen.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/widgets/icon_container.dart';
@@ -59,60 +61,85 @@ class ManagementWellsWidget extends StatelessWidget {
                       final isWellOn = wellData?.statusWell == 1;
                       final alertCount = wellData?.alert ?? 0;
 
-                      return Container(
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: ColorPalette.inverseGrey),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            IconContainer(
-                              icon: Icon(Icons.location_on_outlined),
-                              color: ColorPalette.iconContainerColor,
-                              width: 24,
-                              height: 24,
-                            ),
-                            SizedBox(width: 8.w),
-                            Expanded(
-                              child: Column(
+                      return GestureDetector(
+                        onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                              return WellDetailScreen(wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!);
+                            },));
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: ColorPalette.inverseGrey),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SizedBox(height:4.h),
-                                  Text(statusSummarySuccess.wellsEntity[index].data!.wellName!),
+                                  IconContainer(
+                                    icon: Icon(Icons.location_on_outlined),
+                                    color: ColorPalette.iconContainerColor,
+                                    width: 24,
+                                    height: 24,
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        SizedBox(height:4.h),
+                                        Text(statusSummarySuccess.wellsEntity[index].data!.wellName!),
 
-                                  SizedBox(height: 8.h),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text.rich(
-                                        TextSpan(
-                                          text: 'وضعیت: ',
-                                          style: const TextStyle(color: Colors.black),
+                                        SizedBox(height: 8.h),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            TextSpan(
-                                              text: isWellOn ? 'روشن' : 'خاموش',
-                                              style: TextStyle(
-                                                color: isWellOn ? ColorPalette.darkGreen : ColorPalette.darkRed,
+                                            Text.rich(
+                                              TextSpan(
+                                                text: 'وضعیت: ',
+                                                style: const TextStyle(color: Colors.black),
+                                                children: [
+                                                  TextSpan(
+                                                    text: isWellOn ? 'روشن' : 'خاموش',
+                                                    style: TextStyle(
+                                                      color: isWellOn ? ColorPalette.darkGreen : ColorPalette.darkRed,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
+                                            Text(
+                                              alertCount == 0 ? 'هشدار فعال: ندارد' : 'هشدار فعال: ${alertCount.toString().toPersianDigit()} عدد',
+                                            ),
                                           ],
-                                        ),
-                                      ),
-                                      Text(
-                                        alertCount == 0 ? 'هشدار فعال: ندارد' : 'هشدار فعال: ${alertCount.toString().toPersianDigit()} عدد',
-                                      ),
-                                    ],
+                                        )
+                                      ],
+                                    ),
                                   )
+
                                 ],
                               ),
-                            )
+                              Padding(
+                                padding:  EdgeInsets.symmetric(vertical: 8.h),
+                                child: DottedLine(
+                                  dashColor: ColorPalette.inverseGrey,
 
-                          ],
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("مشاهده چاه"),
+                                  Icon(Icons.navigate_next)
+                                ],
+                              )
+                            ],
+                          ),
+
                         ),
-
                       );
                     },);
                 }

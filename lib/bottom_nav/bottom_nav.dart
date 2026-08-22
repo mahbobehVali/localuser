@@ -48,9 +48,11 @@ class BottomNavWidget extends StatelessWidget {
       builder: (context, state) {
 
         return Container(
-          decoration: BoxDecoration(boxShadow: [
-            BoxShadow(offset: Offset(0, 1),blurRadius: 5,color: Color(0xffDDDDDD))
-          ]),
+          decoration: BoxDecoration(
+              boxShadow: [
+            BoxShadow(offset: Offset(0,1),blurRadius: 20,color: Color(0xffffffff))
+          ],
+          ),
           child: BottomAppBar(
             padding: EdgeInsets.only(right: 10.w,bottom: 4.h,top: 4.h),
             color: Colors.white,

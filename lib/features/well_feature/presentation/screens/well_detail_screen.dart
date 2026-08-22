@@ -78,6 +78,50 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       };
     });
   }
+
+  List<PieChartSectionData> sec({dynamic on, dynamic off}) {
+    final double onVal = (on ?? 0).toDouble();
+    final double offVal = (off ?? 0).toDouble();
+
+    // اگر هر دو صفر بودند، کل چارت را خاکستری نشان بده
+    if (onVal == 0 && offVal == 0) {
+      return [
+        PieChartSectionData(
+          color: Colors.grey.shade300,
+          value: 100,
+          title: '',
+          radius: 50.0,
+        ),
+      ];
+    }
+
+    return List.generate(2, (i) {
+      const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+      return switch (i) {
+        0 => PieChartSectionData(
+          color: ColorPalette.darkBlue,
+          value: onVal,
+          title: '',
+          titleStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            shadows: shadows,
+          ),
+        ),
+        1 => PieChartSectionData(
+          color: Colors.grey.shade400,
+          value: offVal,
+          title: '',
+          titleStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            shadows: shadows,
+          ),
+        ),
+        _ => throw StateError('Invalid index'),
+      };
+    });
+  }
   bool builtOnce = false;
 
   late WellDetailBloc _bloc;
@@ -86,7 +130,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
   @override
   void initState() {
     super.initState();
-    print("widget.wellsDataEntity.id!${widget.wellsDataEntity.id!}");
 
     final socketRepository = locator<SocketRepository>();
 
@@ -183,38 +226,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
     return BlocProvider.value(
       value: _bloc,
-      // create: (context) {
-      //   WellDetailBloc wellDetailBloc = WellDetailBloc(
-      //     locator<WellsRepository>(),
-      //     locator<WellWorkHourUseCase>(),
-      //     locator<WellFlowMeterUseCase>(),
-      //     locator<WellsListUseCase>(),
-      //     locator<GetProgramUseCase>(),
-      //     locator<SocketRepository>(),
-      //     locator<AlertCountUseCase>(),
-      //   );
-      //   wellDetailBloc..
-      //   add(WellWorkHourStart(FlowMeterParams(
-      //       type: 2,
-      //       ids: [widget.wellsDataEntity.deviceId!]
-      //   )))
-      //     ..add(WellPerformance(FlowMeterParams(
-      //         type: 2,
-      //         time: 2,
-      //         ids: [widget.wellsDataEntity.deviceId!]
-      //   )))..add(GetProgram(widget.wellsDataEntity.id!))..
-      //   add(FirstSwitch(widget.wellsDataEntity.statusWell==1?true:false))..
-      //   add(ChangeUserLocalId(widget.wellsDataEntity.userLocalId));
-      //   // ..add(AlertCountStart(
-      //   //   FlowMeterParams(
-      //   //     time: 2,
-      //   //     ids: [12]
-      //   //   )
-      //   // )
-      //   // )
-      //       ;
-      //   return wellDetailBloc;
-      // },
       child: Scaffold(
           body:  Padding(
             padding:  EdgeInsets.only(left: 16.w,right: 16.w,top:50.h),
@@ -741,7 +752,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(5),
                             ),
-                            padding: EdgeInsets.all(10),
+                            padding: EdgeInsets.only(right: 10.w,top: 10.h,bottom: 10.h),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -892,12 +903,18 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         WeekWellWorkSuccess wellWorkSuccess = state.wellWorkStatus as WeekWellWorkSuccess;
                                         final dynamic on = wellWorkSuccess.currentWellWorkEntity.list.totalOn;
                                         final dynamic off = wellWorkSuccess.currentWellWorkEntity.list.totalOff;
-
+                                        final double onVal = (on ?? 0).toDouble();
+                                        final double offVal = (off ?? 0).toDouble();
+                                        final bool isEmpty = onVal == 0 && offVal == 0;
                                         return Center(
-                                            child: Stack(
+                                            child:
+                                            // isEmpty
+                                            //     ? Center(child: Text('0%')):
+                                            Stack(
                                               alignment: Alignment.center,
                                               children: [
-                                                PieChart(
+
+                                               PieChart(
                                                   PieChartData(
                                                     sectionsSpace: 0,
                                                     centerSpaceRadius: 80,
@@ -943,10 +960,11 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                     Indicator(color: Colors.grey.shade400, text: 'مجموع ساعات خاموش بودن', isSquare: false),
                                   ],
                                 ),
+                                SizedBox(height: 10.h),
 
                               ],
                             )),
-                        SizedBox(height: 10),
+                        SizedBox(height: 10.h),
 
                       ],
                     ):

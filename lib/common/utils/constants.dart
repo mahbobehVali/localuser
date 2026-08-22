@@ -75,10 +75,11 @@ class Constants {
     ColorPalette.darkBlue,
     ColorPalette.darkGreen,
     ColorPalette.lightGreen,
-    Colors.orange,
+    ColorPalette.orange,
     Colors.purple,
-    Colors.yellow,
+    Colors.amber.withValues(alpha: 0.5),
     Colors.pinkAccent,
+    Colors.brown,
   ];
 
   List<dynamic> alert = [
@@ -474,7 +475,7 @@ class Constants {
         HorizontalLine(
           y: yValue,
           strokeWidth: 1,
-          color: Colors.grey.withValues(alpha: 0.2),
+          color: ColorPalette.inverseGrey.withValues(alpha: 0.1),
         ),
       );
     }

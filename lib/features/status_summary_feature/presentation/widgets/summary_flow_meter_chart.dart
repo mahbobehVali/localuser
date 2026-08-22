@@ -50,7 +50,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
 
                           },
                           segments: [
-                            ButtonSegment(value: 0,label: Text("امروز")),
+                            ButtonSegment(value: 1,label: Text("امروز")),
                             ButtonSegment(value: 6,label: Text("هفته")),
 
                           ], selected:{state.selectedChartTab});
@@ -161,7 +161,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                             handleBuiltInTouches: true,
                                           ),
                                           titlesData: FlTitlesData(
-                                            bottomTitles: Constants().axisBottomTitles(xLabels,state.selectedChartTab==0? "day":"week"),
+                                            bottomTitles: Constants().axisBottomTitles(xLabels,state.selectedChartTab==1? "day":"week"),
                                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
 

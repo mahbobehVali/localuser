@@ -75,7 +75,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
               ..add(WellsListStart())
               ..add(SocketEvent("area",int.parse(info[6])))
               ..add(ReportFlowMeter(FlowMeterParams(
-                  type: 0,
+                  type: 1,
                   ids:int.parse(info[6]),
               )))
               ..add(LastActivityStart(FlowMeterParams(

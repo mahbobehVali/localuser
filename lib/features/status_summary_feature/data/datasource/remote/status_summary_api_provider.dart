@@ -10,6 +10,7 @@ class StatusSummaryApiProvider {
 
   //گزارش وصعیت آب
   Future<dynamic> flowMeter(FlowMeterParams flowMeterParams) async {
+    print("flowMeterParams.ids${flowMeterParams.ids}");
 
     var data = {
       //0 today 6 currentWeek
