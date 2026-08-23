@@ -704,7 +704,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                 BarChartRodData(
                                                   // چک کردن لیست اول
                                                   toY: index < currentYValues.length ? currentYValues[index].toDouble() : 0.0,
-                                                  color: Colors.orange,
+                                                  color: ColorPalette.orange,
                                                   width: 12,
                                                   borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
                                                 ),
@@ -763,13 +763,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                             },
                                                           ),
                                                           lineTouchData: LineTouchData(
-                                                            handleBuiltInTouches: true,
-                                                            touchTooltipData: LineTouchTooltipData(
-                                                              maxContentWidth: 250.w,
-                                                              getTooltipColor: (group) => ColorPalette.lightGrey,
-                                                              fitInsideHorizontally: true,
-                                                              fitInsideVertically: true,
-                                                            ),
+                                                            handleBuiltInTouches: false,
+
                                                           ),
 
                                                           borderData: FlBorderData(
@@ -780,10 +775,33 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                                             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                                             bottomTitles: Constants().axisBottomTitles(currentXValues, "clock"),
-                                                            leftTitles: Constants().leftTitles(
-                                                              interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
-                                                              scale: scale['step'] == 0 ? 10 : scale['step']!,
-                                                              title: "ساعت"
+                                                            leftTitles: AxisTitles(
+                                                              sideTitles: SideTitles(
+                                                                showTitles: true,
+                                                                interval: 1, // فاصله ۱ برای نمایش دقیق ۰ و ۱
+                                                                reservedSize: 55.w, // فضای کافی برای کلمات
+                                                                getTitlesWidget: (value, meta) {
+                                                                  String text = "";
+                                                                  if (value == 0) {
+                                                                    text = "خاموش";
+                                                                  } else if (value == 1) {
+                                                                    text = "روشن";
+                                                                  } else {
+                                                                    return const SizedBox.shrink();
+                                                                  }
+
+                                                                  return Padding(
+                                                                    padding: const EdgeInsets.only(left: 4),
+                                                                    child: Text(
+                                                                      text,
+                                                                      style: const TextStyle(
+                                                                        fontSize: 10,
+                                                                        fontWeight: FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -831,18 +849,48 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                     final int xIndex = group.x.toInt();
                                                                     if (xIndex < 0 || xIndex >= currentYValues.length) return null;
 
-                                                                    final double currentV = currentYValues[xIndex];
-                                                                    final double previousV = previousYValues[xIndex];
+                                                                    // استخراج روز هفته یا برچسب محور X
+                                                                    // final String dayStr = (xIndex < currentXValues.length)
+                                                                    //     ? currentXValues[xIndex].toString().toPersianDigit()
+                                                                    //     : "";
 
                                                                     List<TextSpan> spans = [];
-
-                                                                    // ۲. استخراج ساعت یا تاریخ اصلی (جدا کردن ساعت اگر شامل فاصله باشد)
-                                                                    final String currentLabel = currentV.toString().toPersianDigit();
-                                                                    final String previousLabel = previousV.toString().toPersianDigit();
-
+                                                                    final String weekDayName = Constants().weekDayNames[xIndex].name;
+                                                                    // ۱. نمایش روز هفته در خط اول
                                                                     spans.add(
                                                                       TextSpan(
-                                                                        text: "هفته جاری: $currentLabel",
+                                                                        text: "$weekDayName\n",
+                                                                        style: const TextStyle(
+                                                                          color: Colors.black,
+                                                                          fontWeight: FontWeight.w600,
+                                                                          fontSize: 11,
+                                                                        ),
+                                                                      ),
+                                                                    );
+
+                                                                    // خط جداکننده زیر روز هفته
+                                                                    spans.add(
+                                                                      const TextSpan(
+                                                                        text: "_________________\n",
+                                                                        style: TextStyle(
+                                                                          color: Colors.black54,
+                                                                          fontWeight: FontWeight.w600,
+                                                                          fontSize: 10,
+                                                                        ),
+                                                                      ),
+                                                                    );
+
+                                                                    // بررسی اینکه آیا داده‌های هفته گذشته وجود دارند یا خیر
+                                                                    final bool hasPrevious = successState.previousWellWorkEntity != null &&
+                                                                        xIndex < previousYValues.length;
+
+                                                                    final double currentV = currentYValues[xIndex].toDouble();
+                                                                    final String currentLabel = currentV.toStringAsFixed(1).toString().toPersianDigit();
+
+                                                                    // ۲. هفته جاری (عدد در سمت چپ، متن در وسط، دایره نارنجی در سمت راست)
+                                                                    spans.add(
+                                                                      TextSpan(
+                                                                        text: "\u2066$currentLabel\u2069 :هفته جاری ",
                                                                         style: const TextStyle(
                                                                           color: Colors.black87,
                                                                           fontWeight: FontWeight.bold,
@@ -852,19 +900,53 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                     );
                                                                     spans.add(
                                                                       TextSpan(
-                                                                        text: "هفته گذشته: $previousLabel",
-                                                                        style: const TextStyle(
-                                                                          color: Colors.black87,
+                                                                        text: "●",
+                                                                        style: TextStyle(
+                                                                          color: ColorPalette.orange,
                                                                           fontWeight: FontWeight.bold,
-                                                                          fontSize: 12,
+                                                                          fontSize: 11,
                                                                         ),
                                                                       ),
                                                                     );
+
+                                                                    // ۳. هفته گذشته (فقط اگر وجود داشته باشد)
+                                                                    if (hasPrevious) {
+                                                                      spans.add(
+                                                                        const TextSpan(
+                                                                          text: "\n",
+                                                                          style: TextStyle(fontSize: 4),
+                                                                        ),
+                                                                      );
+
+                                                                      final double previousV = previousYValues[xIndex].toDouble();
+                                                                      final String previousLabel = previousV.toStringAsFixed(1).toString().toPersianDigit();
+
+                                                                      spans.add(
+                                                                        TextSpan(
+                                                                          text: "\u2066$previousLabel\u2069 :هفته گذشته ",
+                                                                          style: const TextStyle(
+                                                                            color: Colors.black87,
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 12,
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                      spans.add(
+                                                                        const TextSpan(
+                                                                          text: "●",
+                                                                          style: TextStyle(
+                                                                            color: Colors.grey,
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 11,
+                                                                          ),
+                                                                        ),
+                                                                      );
+                                                                    }
 
                                                                     return BarTooltipItem(
-                                                                      textAlign: TextAlign.right,
-                                                                      "",
+                                                                      '',
                                                                       const TextStyle(),
+                                                                      textAlign: TextAlign.right,
                                                                       children: spans,
                                                                     );
                                                                   },
@@ -897,7 +979,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                         children:  [
                                                           Indicator(color: ColorPalette.orange, text: 'هفته جاری', isSquare: true),
-                                                          Indicator(color: Colors.grey, text: 'هفته گذشته', isSquare: true),
+                                                          Indicator(color: ColorPalette.grey, text: 'هفته گذشته', isSquare: true),
                                                         ],
                                                       ),
                                                     ],

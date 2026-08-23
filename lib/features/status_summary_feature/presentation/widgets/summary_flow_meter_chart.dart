@@ -143,14 +143,15 @@ class SummaryFlowMeterChart extends StatelessWidget {
 
                           if (spots.isNotEmpty) {
                             chartBars.add(
-                              LineChartBarData(
-                                isCurved: true,
-                                color: Constants().lineColors[i % Constants().lineColors.length],
-                                barWidth: 2.5,
-                                isStrokeCapRound: true,
-                                dotData: const FlDotData(show: false),
-                                spots: spots,
-                              ),
+                                LineChartBarData(
+                                  isCurved: true,
+                                  preventCurveOverShooting: true, // جلوگیری از افتادن انحنا به زیر خط صفر (بسیار مهم)
+                                  color: Constants().lineColors[i % Constants().lineColors.length],
+                                  barWidth: 2.5,
+                                  isStrokeCapRound: true,
+                                  dotData: const FlDotData(show: false),
+                                  spots: spots,
+                                )
                             );
                           }
                         }
@@ -251,6 +252,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                       padding: const EdgeInsets.all(12),
                                       child: state.selectedChartTab == 1
                                           ? LineChart(
+
                                         LineChartData(
                                           extraLinesData: ExtraLinesData(
                                             horizontalLines: Constants().generateHorizontalLines(
