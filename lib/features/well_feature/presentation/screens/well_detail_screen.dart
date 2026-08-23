@@ -353,37 +353,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         }
 
                                         if (status is FlowMeterError) {
-                                          // return Container(
-                                          //   height: 250.h,
-                                          //   alignment: Alignment.center,
-                                          //   child: Column(
-                                          //     mainAxisAlignment: MainAxisAlignment.center,
-                                          //     children: [
-                                          //       const Icon(Icons.error_outline, color: Colors.red, size: 40),
-                                          //       const SizedBox(height: 8),
-                                          //       Text(
-                                          //         status.error,
-                                          //         style: TextStyleP.f12Regular.copyWith(color: Colors.red),
-                                          //         textAlign: TextAlign.center,
-                                          //       ),
-                                          //       const SizedBox(height: 12),
-                                          //       ElevatedButton.icon(
-                                          //         onPressed: () {
-                                          //           context.read<WellDetailBloc>().add(
-                                          //             FlowMeterEvent(
-                                          //               FlowMeterParams(
-                                          //                 type: state.selectedChartVolumeTab,
-                                          //                 ids: [widget.wellsDataEntity.deviceId!],
-                                          //               ),
-                                          //             ),
-                                          //           );
-                                          //         },
-                                          //         icon: const Icon(Icons.refresh, size: 18),
-                                          //         label: const Text("تلاش مجدد"),
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // );
+
                                           return Text("خطایی رخ داده");
                                         }
 
@@ -494,10 +464,50 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         touchTooltipData: LineTouchTooltipData(
                                                           maxContentWidth: 250.w,
                                                           getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
-                                                          fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
-                                                          fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
+                                                          fitInsideHorizontally: true,
+                                                          fitInsideVertically: true,
+                                                          getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                                                            if (touchedSpots.isEmpty) return [];
+
+                                                            // فقط اولین نقطه را مبنا قرار می‌دهیم تا کل لیست یک بار ساخته شود و تکرار نشود
+                                                            final spot = touchedSpots.first;
+                                                            final int xIndex = spot.x.toInt();
+                                                            if (xIndex < 0 || xIndex >= xLabels.length) return [];
+
+
+                                                            List<TextSpan> spans = [];
+
+                                                            // جدا کردن تاریخ و ساعت با فاصله و برداشتن بخش دوم (ساعت)
+                                                            final String values = yValues[xIndex].toString().toPersianDigit();
+
+                                                            spans.add(
+                                                              TextSpan(
+                                                                text: "حجم آب عبوری دبی سنج: $values\n",
+                                                                style: const TextStyle(
+                                                                  color: Colors.black87,
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            );
+
+
+                                                            // برگرداندن لیست با طول مساوی تعداد نقاط، اما با این ترفند که فقط یک تول‌تیپ واحد و تمیز رندر شود
+                                                            return touchedSpots.map((s) {
+                                                              if (s == spot) {
+                                                                return LineTooltipItem(
+                                                                  textAlign: TextAlign.right,
+                                                                  "",
+                                                                  const TextStyle(),
+                                                                  children: spans,
+                                                                );
+                                                              }
+                                                              return null; // بقیه نقاط خالی برگردانده شوند تا تکرار نشوند
+                                                            }).toList();
+                                                          },
                                                         ),
                                                         handleBuiltInTouches: true,
+
                                                       ),
                                                       lineBarsData: [
                                                         LineChartBarData(
@@ -549,15 +559,45 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                           );
                                                         },
                                                       ),
-                                                      barTouchData: BarTouchData(
+                                                        barTouchData: BarTouchData(
                                                           handleBuiltInTouches: true,
                                                           touchTooltipData: BarTouchTooltipData(
                                                             maxContentWidth: 250.w,
-                                                            getTooltipColor: (group) => ColorPalette.lightGrey,
+                                                            getTooltipColor: (group) => const Color(0xFFF7F9FA), // پس‌زمینه ملایم
                                                             fitInsideHorizontally: true,
                                                             fitInsideVertically: true,
-                                                        )
-                                                      ),
+                                                            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                                              final int xIndex = group.x.toInt();
+                                                              if (xIndex < 0 || xIndex >= xLabels.length) return null;
+
+                                                              final double currentDate = yValues[xIndex];
+
+                                                              List<TextSpan> spans = [];
+
+                                                              // ۲. استخراج ساعت یا تاریخ اصلی (جدا کردن ساعت اگر شامل فاصله باشد)
+                                                              final String timeLabel = currentDate.toString().toPersianDigit();
+
+                                                              spans.add(
+                                                                TextSpan(
+                                                                  text: "حجم آب عبوری دبی سنج: $timeLabel",
+                                                                  style: const TextStyle(
+                                                                    color: Colors.black87,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    fontSize: 12,
+                                                                  ),
+                                                                ),
+                                                              );
+
+
+                                                              return BarTooltipItem(
+                                                                textAlign: TextAlign.right,
+                                                                "",
+                                                                const TextStyle(),
+                                                                children: spans,
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
 
                                                       borderData: FlBorderData(
                                                         border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
@@ -787,6 +827,48 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                   getTooltipColor: (group) => ColorPalette.lightGrey,
                                                                   fitInsideHorizontally: true,
                                                                   fitInsideVertically: true,
+                                                                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                                                    final int xIndex = group.x.toInt();
+                                                                    if (xIndex < 0 || xIndex >= currentYValues.length) return null;
+
+                                                                    final double currentV = currentYValues[xIndex];
+                                                                    final double previousV = previousYValues[xIndex];
+
+                                                                    List<TextSpan> spans = [];
+
+                                                                    // ۲. استخراج ساعت یا تاریخ اصلی (جدا کردن ساعت اگر شامل فاصله باشد)
+                                                                    final String currentLabel = currentV.toString().toPersianDigit();
+                                                                    final String previousLabel = previousV.toString().toPersianDigit();
+
+                                                                    spans.add(
+                                                                      TextSpan(
+                                                                        text: "هفته جاری: $currentLabel",
+                                                                        style: const TextStyle(
+                                                                          color: Colors.black87,
+                                                                          fontWeight: FontWeight.bold,
+                                                                          fontSize: 12,
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                    spans.add(
+                                                                      TextSpan(
+                                                                        text: "هفته گذشته: $previousLabel",
+                                                                        style: const TextStyle(
+                                                                          color: Colors.black87,
+                                                                          fontWeight: FontWeight.bold,
+                                                                          fontSize: 12,
+                                                                        ),
+                                                                      ),
+                                                                    );
+
+                                                                    return BarTooltipItem(
+                                                                      textAlign: TextAlign.right,
+                                                                      "",
+                                                                      const TextStyle(),
+                                                                      children: spans,
+                                                                    );
+                                                                  },
+
                                                                 ),
                                                               ),
                                                               borderData: FlBorderData(
@@ -802,6 +884,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                 leftTitles: Constants().leftTitles(
                                                                   interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
                                                                   scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                                                  title: "ساعت"
                                                                 ),
                                                               ),
                                                               barGroups: chartGroups,

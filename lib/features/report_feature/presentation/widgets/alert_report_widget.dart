@@ -60,42 +60,104 @@ class AlertsReportChartWidget extends StatelessWidget {
             children: [
               SizedBox(
                 height: 300,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: chartWidth,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: BarChart(
-                        BarChartData(
-                          extraLinesData: ExtraLinesData(
-                            horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
-                          ),
-                          maxY: scale['maxY'],
-                          minY: scale['minY'],
-                          alignment: BarChartAlignment.spaceAround,
-                          gridData: const FlGridData(show: false),
-                          barTouchData: BarTouchData(
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: chartWidth,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: BarChart(
+                          BarChartData(
+                            extraLinesData: ExtraLinesData(
+                              horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
+                            ),
+                            maxY: scale['maxY'],
+                            minY: scale['minY'],
+                            alignment: BarChartAlignment.spaceAround,
+                            gridData: const FlGridData(show: false),
+                            barTouchData: BarTouchData(
                               handleBuiltInTouches: true,
                               touchTooltipData: BarTouchTooltipData(
                                 getTooltipColor: (group) => ColorPalette.lightGrey,
                                 fitInsideHorizontally: true,
                                 fitInsideVertically: true,
-                              )
-                          ),
-                          borderData: FlBorderData(border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey))),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            bottomTitles: Constants().axisBottomTitles(typeName, "alertType"),
-                            leftTitles: Constants().leftTitles(
-                              interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
-                              scale: scale['step'] == 0 ? 10 : scale['step']!,
-                              title: "تعداد هشدارها"
+                                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                  final int xIndex = group.x.toInt();
+                                  // استفاده از نوع هشدار (typeName) به جای xLabels
+                                  final String titleStr = (xIndex >= 0 && xIndex < typeName.length)
+                                      ? typeName[xIndex].toString().toPersianDigit()
+                                      : "";
+
+                                  final double val = rod.toY;
+                                  final String formattedVal = val < 0
+                                      ? "-${(-val).toStringAsFixed(1).toString().toPersianDigit()}"
+                                      : val.toStringAsFixed(1).toString().toPersianDigit();
+
+                                  return BarTooltipItem(
+                                    '',
+                                    const TextStyle(),
+                                    textAlign: TextAlign.right,
+                                    children: [
+                                      // ۱. نمایش نام نوع هشدار در خط اول
+                                      TextSpan(
+                                        text: "$titleStr\n",
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: "_________________\n",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      // ۲. مقدار عدد (سمت چپ)
+                                      TextSpan(
+                                        text: "\u2066$formattedVal\u2069",
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: " ",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                      // ۳. برچسب تعداد هشدار
+                                      const TextSpan(
+                                        text: "\u202bتعداد هشدار:\u202c",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
                             ),
+                            borderData: FlBorderData(border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey))),
+                            titlesData: FlTitlesData(
+                              show: true,
+                              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              bottomTitles: Constants().axisBottomTitles(typeName, "alertType"),
+                              leftTitles: Constants().leftTitles(
+                                interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
+                                scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                title: "تعداد هشدارها"
+                              ),
+                            ),
+                            barGroups: chartGroups,
                           ),
-                          barGroups: chartGroups,
                         ),
                       ),
                     ),

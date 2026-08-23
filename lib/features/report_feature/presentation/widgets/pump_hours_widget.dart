@@ -90,45 +90,109 @@ class PumpHoursChartWidget extends StatelessWidget {
             children: [
               SizedBox(
                 height: 300,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: SizedBox(
-                    width: chartWidth,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: BarChart(
-                        BarChartData(
-                          extraLinesData: ExtraLinesData(
-                            horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
-                          ),
-                          maxY: scale['maxY'],
-                          minY: scale['minY'],
-                          alignment: BarChartAlignment.spaceAround,
-                          gridData: const FlGridData(show: false),
-                          barTouchData: BarTouchData(
-                              handleBuiltInTouches: true,
-                              touchTooltipData: BarTouchTooltipData(
-                                maxContentWidth: 250.w,
-                                getTooltipColor: (group) => ColorPalette.lightGrey,
-                                fitInsideHorizontally: true,
-                                fitInsideVertically: true,
-                              )
-                          ),
-                          borderData: FlBorderData(border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey))),
-                          titlesData: FlTitlesData(
-                            show: true,
-                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                            bottomTitles: Constants().axisBottomTitles(xLabels,
-                                flowMeter.type=="all-well"?"nothing":flowMeter.type=="one-well"?"clock":"date"),
-                            leftTitles: Constants().leftTitles(
-                              interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
-                              scale: scale['step'] == 0 ? 10 : scale['step']!,
-
-                              title: "ساعت"
+                child: Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: chartWidth,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: BarChart(
+                          BarChartData(
+                            extraLinesData: ExtraLinesData(
+                              horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
                             ),
+                            maxY: scale['maxY'],
+                            minY: scale['minY'],
+                            alignment: BarChartAlignment.spaceAround,
+                            gridData: const FlGridData(show: false),
+                            barTouchData: BarTouchData(
+                                handleBuiltInTouches: true,
+                                touchTooltipData: BarTouchTooltipData(
+                                  maxContentWidth: 250.w,
+                                  getTooltipColor: (group) => ColorPalette.lightGrey,
+                                  fitInsideHorizontally: true,
+                                  fitInsideVertically: true,
+                                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                    final int xIndex = group.x.toInt();
+                                    // پیدا کردن تاریخ مربوط به این نقطه
+                                    final String dateStr = (xIndex >= 0 && xIndex < xLabels.length)
+                                        ? xLabels[xIndex].toString().toPersianDigit()
+                                        : "";
+
+                                    // فرمت کردن مقدار عدد از روی rod.toY (با مدیریت علامت منفی)
+                                    final double val = rod.toY;
+                                    final String formattedVal = val < 0
+                                        ? "-${(-val).toStringAsFixed(1).toString().toPersianDigit()}"
+                                        : val.toStringAsFixed(1).toString().toPersianDigit();
+
+                                    return BarTooltipItem(
+                                      '', // متن اصلی خالی
+                                      const TextStyle(),
+                                      textAlign: TextAlign.right,
+                                      children: [
+                                        // ۱. نمایش تاریخ در خط اول
+                                        TextSpan(
+                                          text: "$dateStr\n",
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: "_________________\n",
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                        // ۲. مقدار عدد (کاملاً در سمت چپ با ایزوله‌سازی LTR)
+                                        TextSpan(
+                                          text: "\u2066$formattedVal\u2069",
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        // ۳. فاصله
+                                        const TextSpan(
+                                          text: " ",
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                        // ۴. برچسب و دو نقطه
+                                        const TextSpan(
+                                          text: "\u202bحجم مصرف:\u202c",
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                )
+                            ),
+                            borderData: FlBorderData(border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey))),
+                            titlesData: FlTitlesData(
+                              show: true,
+                              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                              bottomTitles: Constants().axisBottomTitles(xLabels,
+                                  flowMeter.type=="all-well"?"nothing":flowMeter.type=="one-well"?"clock":"date"),
+                              leftTitles: Constants().leftTitles(
+                                interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
+                                scale: scale['step'] == 0 ? 10 : scale['step']!,
+
+                                title: "ساعت"
+                              ),
+                            ),
+                            barGroups: chartGroups,
                           ),
-                          barGroups: chartGroups,
                         ),
                       ),
                     ),

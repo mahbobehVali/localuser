@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/config/color_palette.dart';
+import 'package:mahaliii/features/report_feature/presentation/bloc/report_flow_meter_status.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/params/flowmeter_params.dart';
@@ -49,7 +50,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                             borderRadius: 50,
 
                             widget: Text("امروز",style: TextStyle(color: ColorPalette.black),),
-                            onTap: () {
+                            onTap:state.reportFlowMeterStatus is ReportFlowMeterLoading?null: () {
                               BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                                 type: 1,
                                 ids:int.parse(info[6]),
@@ -61,7 +62,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                               borderRadius: 50,
                               backColor: state.selectedChartTab==6?ColorPalette.inverseBlue:ColorPalette.lightGrey,
                               widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
-                              onTap: () {
+                              onTap:state.reportFlowMeterStatus is ReportFlowMeterLoading?null: () {
                                 BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                                   type: 6,
                                   ids:int.parse(info[6]),
@@ -305,7 +306,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
 
                                                 spans.add(
                                                   TextSpan(
-                                                    text: "$timeLabel\n",
+                                                    text: "ساعت: $timeLabel\n",
                                                     style: const TextStyle(
                                                       color: Colors.black87,
                                                       fontWeight: FontWeight.bold,
@@ -326,10 +327,15 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                                     if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
                                                       final double val = (yValues[sIndex] as num).toDouble();
                                                       final color = Constants().lineColors[i % Constants().lineColors.length];
+// ۱. فرمت کردن صحیح مقدار منفی
+                                                      final String formattedVal = val < 0
+                                                          ? "-${(-val).toStringAsFixed(1).toString().toPersianDigit()}"
+                                                          : val.toStringAsFixed(1).toString().toPersianDigit();
 
+                                          // ۲. اضافه کردن مقدار (سمت چپ)
                                                       spans.add(
                                                         TextSpan(
-                                                          text: "$name: ${val.toStringAsFixed(1).toString().toPersianDigit()}  ",
+                                                          text: "\u200E$formattedVal  ",
                                                           style: const TextStyle(
                                                             color: Colors.black87,
                                                             fontWeight: FontWeight.w500,
@@ -338,6 +344,19 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                                         ),
                                                       );
 
+                                            // ۳. اضافه کردن نام (وسط / سمت راستِ مقدار)
+                                                      spans.add(
+                                                        TextSpan(
+                                                          text: "$name ",
+                                                          style: const TextStyle(
+                                                            color: Colors.black87,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 11,
+                                                          ),
+                                                        ),
+                                                      );
+
+                                                // ۴. اضافه کردن فقط یک دایره رنگی در سمت راستِ نام (انتهای خط)
                                                       spans.add(
                                                         TextSpan(
                                                           text: "●\n",
@@ -352,7 +371,11 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                                   }
                                                 }
 
-                                                // ۴. اضافه کردن خط مجموع کل در انتها
+                                                // فرمت کردن مجموع کل با مدیریت عدد منفی
+                                                final String formattedTotal = totalSum < 0
+                                                    ? "-${(-totalSum).toStringAsFixed(1).toString().toPersianDigit()}"
+                                                    : totalSum.toStringAsFixed(1).toString().toPersianDigit();
+
                                                 spans.add(
                                                   const TextSpan(
                                                     text: "------------------------------\n",
@@ -363,10 +386,23 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                                     ),
                                                   ),
                                                 );
+
+                                            // اول مقدار (سمت چپ) و بعد برچسب «مجموع کل:» (سمت راست)
                                                 spans.add(
                                                   TextSpan(
-                                                    text: "مجموع کل: ${totalSum.toStringAsFixed(1).toString().toPersianDigit()}",
+                                                    text: "\u200E$formattedTotal", // مقدار عدد (سمت چپ)
                                                     style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                );
+
+                                                spans.add(
+                                                  const TextSpan(
+                                                    text: " :مجموع کل", // برچسب (سمت راست)
+                                                    style: TextStyle(
                                                       color: Colors.black87,
                                                       fontWeight: FontWeight.bold,
                                                       fontSize: 12,

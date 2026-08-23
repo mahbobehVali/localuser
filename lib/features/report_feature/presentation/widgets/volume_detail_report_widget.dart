@@ -215,7 +215,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                       final item = flatList[groupIndex];
 
                                       return BarTooltipItem(
-                                        'حجم مصرف: ${rod.toY.toString().toPersianDigit()}\nبیش از حد مجاز: ${item.capacity}',
+                                        'حجم مصرف: ${rod.toY.toString().toPersianDigit()} متر مکعب\nبیش از حد مجاز: ${item.capacity} متر مکعب',
                                         TextStyle(
                                           color: ColorPalette.black,
                                           fontWeight: FontWeight.bold,

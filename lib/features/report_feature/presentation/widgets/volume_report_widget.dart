@@ -116,15 +116,77 @@ class VolumeReportChartWidget extends StatelessWidget {
                           ),
                           gridData: const FlGridData(show: false),
                           lineTouchData: LineTouchData(
+                            handleBuiltInTouches: true,
                             touchTooltipData: LineTouchTooltipData(
                               maxContentWidth: 250.w,
                               getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
                               fitInsideHorizontally: true,
                               fitInsideVertically: true,
+                              getTooltipItems: (touchedSpots) {
+                                return touchedSpots.map((spot) {
+                                  final int xIndex = spot.x.toInt();
+                                  // پیدا کردن تاریخ مربوط به این نقطه
+                                  final String dateStr = (xIndex >= 0 && xIndex < xLabels.length)
+                                      ? xLabels[xIndex].toString().toPersianDigit()
+                                      : "";
+
+                                  // فرمت کردن مقدار عدد (با مدیریت علامت منفی)
+                                  final double val = spot.y;
+                                  final String formattedVal = val < 0
+                                      ? "-${(-val).toStringAsFixed(1).toString().toPersianDigit()}"
+                                      : val.toStringAsFixed(1).toString().toPersianDigit();
+
+                                  return LineTooltipItem(
+                                    '',
+                                    const TextStyle(),
+                                    textAlign: TextAlign.right,
+                                    children: [
+                                      // ۱. نمایش تاریخ در خط اول
+                                      TextSpan(
+                                        text: "$dateStr\n",
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: "_________________\n",
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                      // ۲. مقدار عدد (کاملاً در سمت چپ با ایزوله‌سازی LTR)
+                                      TextSpan(
+                                        text: "\u2066$formattedVal\u2069",
+                                        style: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      // ۳. فاصله
+                                      const TextSpan(
+                                        text: " ",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                      // ۴. برچسب و دو نقطه (با روشی که دو نقطه سر جایش بماند و نرود سمت چپ)
+                                      // با گذاشتن کاراکتر جهت‌دار راست‌به‌راست (RLI) دور برچسب
+                                      const TextSpan(
+                                        text: "\u202bحجم مصرف:\u202c",
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }).toList();
+                              },
                             ),
-
-                            handleBuiltInTouches: true,
-
                           ),
 
                           lineBarsData: [
