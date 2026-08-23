@@ -7,6 +7,7 @@ import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/params/flowmeter_params.dart';
 import '../../../../common/utils/constants.dart';
+import '../../../../common/widgets/global_elevated_button.dart';
 import '../../../../common/widgets/shimmer_class.dart';
 import '../../../../config/texts_style.dart';
 import '../bloc/status_summary_bloc/report_flowmeter_status.dart';
@@ -41,20 +42,33 @@ class SummaryFlowMeterChart extends StatelessWidget {
                     buildWhen: (previous, current) =>
                     current.selectedChartTab!=previous.selectedChartTab,
                     builder: (context, state) {
-                      return SegmentedButton(
+                      return Row(
+                        children: [
+                          GlobalElevatedButton(
+                            backColor: state.selectedChartTab==1?ColorPalette.inverseBlue:ColorPalette.lightGrey,
+                            borderRadius: 50,
 
-                          onSelectionChanged: (Set<int> newSelected) {
-                            BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
-                              type: newSelected.first,
-                              ids:int.parse(info[6]),
-                            )));
+                            widget: Text("امروز",style: TextStyle(color: ColorPalette.black),),
+                            onTap: () {
+                              BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
+                                type: 1,
+                                ids:int.parse(info[6]),
+                              )));
+                            },),
 
-                          },
-                          segments: [
-                            ButtonSegment(value: 1,label: Text("امروز")),
-                            ButtonSegment(value: 6,label: Text("هفته")),
-
-                          ], selected:{state.selectedChartTab});
+                          SizedBox(width: 10.w),
+                          GlobalElevatedButton(
+                              borderRadius: 50,
+                              backColor: state.selectedChartTab==6?ColorPalette.inverseBlue:ColorPalette.lightGrey,
+                              widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
+                              onTap: () {
+                                BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
+                                  type: 6,
+                                  ids:int.parse(info[6]),
+                                )));
+                              }),
+                        ],
+                      );
                     },
                   ),
 
@@ -92,24 +106,14 @@ class SummaryFlowMeterChart extends StatelessWidget {
                           return Constants.noData();
                         }
 
-                        // متد کمکی برای اعمال قوانین تبدیل مقدار (منفی -> ۳۰، صفر یا نال -> ۱۰)
-                        double getMappedValue(dynamic rawValue) {
-                          if (rawValue == null) return 10.0;
-                          final double val = (rawValue as num).toDouble();
-                          if (val < 0) {
-                            return 30.0;
-                          } else if (val == 0) {
-                            return 10.0;
-                          }
-                          return val;
-                        }
-
-                        // ترکیب تمام yAxisها در یک لیست واحد برای محاسبه اسکیل دقیق
+                        // ترکیب تمام yAxisها در یک لیست واحد برای محاسبه اسکیل دقیق (بدون تغییر مقادیر)
                         final List<dynamic> allYValues = [];
                         for (var series in seriesList) {
                           if (series.yAxis != null) {
                             for (var val in series.yAxis!) {
-                              allYValues.add(getMappedValue(val));
+                              if (val != null) {
+                                allYValues.add((val as num).toDouble());
+                              }
                             }
                           }
                         }
@@ -130,9 +134,9 @@ class SummaryFlowMeterChart extends StatelessWidget {
                             final date = xLabels[j];
                             final indexInSeries = xValues.indexOf(date);
 
-                            if (indexInSeries != -1 && indexInSeries < yValues.length) {
-                              double finalVal = getMappedValue(yValues[indexInSeries]);
-                              spots.add(FlSpot(j.toDouble(), finalVal));
+                            if (indexInSeries != -1 && indexInSeries < yValues.length && yValues[indexInSeries] != null) {
+                              double val = (yValues[indexInSeries] as num).toDouble();
+                              spots.add(FlSpot(j.toDouble(), val));
                             }
                           }
 
@@ -150,12 +154,13 @@ class SummaryFlowMeterChart extends StatelessWidget {
                           }
                         }
 
-                        // ۴. ساخت BarChartGroups برای تب ستونی / استک‌شده (BarChart)
+                        // ۴. ساخت BarChartGroups برای تب ستونی / استک‌شده (BarChart) با پشتیبانی از مثبت و منفی
                         List<BarChartGroupData> chartGroups = [];
                         chartGroups = List.generate(xLabels.length, (index) {
                           final currentDate = xLabels[index];
                           List<BarChartRodStackItem> stackItems = [];
                           double positiveSum = 0;
+                          double negativeSum = 0;
 
                           for (int i = 0; i < seriesList.length; i++) {
                             final currentSeries = seriesList[i];
@@ -164,19 +169,30 @@ class SummaryFlowMeterChart extends StatelessWidget {
 
                             if (yValues != null && xValues != null) {
                               final seriesIndex = xValues.indexOf(currentDate);
-                              if (seriesIndex != -1 && seriesIndex < yValues.length) {
-                                double yVal = getMappedValue(yValues[seriesIndex]);
+                              if (seriesIndex != -1 && seriesIndex < yValues.length && yValues[seriesIndex] != null) {
+                                double yVal = (yValues[seriesIndex] as num).toDouble();
+                                final color = Constants().lineColors[i % Constants().lineColors.length];
 
-                                if (yVal > 0) {
-                                  final color = Constants().lineColors[i % Constants().lineColors.length];
-                                  stackItems.add(
-                                    BarChartRodStackItem(
-                                      positiveSum,
-                                      positiveSum + yVal,
-                                      color,
-                                    ),
-                                  );
-                                  positiveSum += yVal;
+                                if (yVal != 0) {
+                                  if (yVal > 0) {
+                                    stackItems.add(
+                                      BarChartRodStackItem(
+                                        positiveSum,
+                                        positiveSum + yVal,
+                                        color,
+                                      ),
+                                    );
+                                    positiveSum += yVal;
+                                  } else {
+                                    stackItems.add(
+                                      BarChartRodStackItem(
+                                        negativeSum,
+                                        negativeSum + yVal,
+                                        color,
+                                      ),
+                                    );
+                                    negativeSum += yVal;
+                                  }
                                 }
                               }
                             }
@@ -199,7 +215,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                             x: index,
                             barRods: [
                               BarChartRodData(
-                                toY: positiveSum,
+                                toY: positiveSum > 0 ? positiveSum : 0,
                                 rodStackItems: stackItems,
                                 width: 12,
                                 borderRadius: BorderRadius.zero,
@@ -216,7 +232,10 @@ class SummaryFlowMeterChart extends StatelessWidget {
                         }
 
                         final double chartMaxY = (scale["maxY"] as num?)?.toDouble() ?? 100.0;
-                        final double chartMinY = 0.0;
+                        // اعمال minY واقعی برای نمایش مقادیر منفی در پایین محور
+                        final double chartMinY = (scale["minY"] != null && (scale["minY"] as num) < 0)
+                            ? (scale["minY"] as num).toDouble()
+                            : 0.0;
 
                         return Column(
                           children: [
@@ -246,13 +265,129 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                             ),
                                           ),
                                           lineTouchData: LineTouchData(
+                                            handleBuiltInTouches: true,
                                             touchTooltipData: LineTouchTooltipData(
-                                              getTooltipColor: (LineBarSpot touchedSpot) =>
-                                              ColorPalette.lightGrey,
+                                              getTooltipColor: (group) => const Color(0xFFF7F9FA),
                                               fitInsideHorizontally: true,
                                               fitInsideVertically: true,
+                                              maxContentWidth: 250.w,
+                                              // tooltipBorder: BorderSide(color: ColorPalette.grey),
+
+                                              // اصلاح مهم: در LineChart باید یک لیست از LineTooltipItem برگردانید
+                                              getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                                                if (touchedSpots.isEmpty) return [];
+
+                                                // فقط اولین نقطه را مبنا قرار می‌دهیم تا کل لیست یک بار ساخته شود و تکرار نشود
+                                                final spot = touchedSpots.first;
+                                                final int xIndex = spot.x.toInt();
+                                                if (xIndex < 0 || xIndex >= xLabels.length) return [];
+
+                                                final String currentDate = xLabels[xIndex];
+
+                                                List<TextSpan> spans = [];
+                                                double totalSum = 0;
+
+                                                // ۱. محاسبه مجموع کل مقادیر واقعی
+                                                for (var series in seriesList) {
+                                                  final yValues = series.yAxis;
+                                                  final xValues = series.xAxis;
+                                                  if (yValues != null && xValues != null) {
+                                                    final sIndex = xValues.indexOf(currentDate);
+                                                    if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
+                                                      totalSum += (yValues[sIndex] as num).toDouble();
+                                                    }
+                                                  }
+                                                }
+                                          // جدا کردن تاریخ و ساعت با فاصله و برداشتن بخش دوم (ساعت)
+                                                final String timeLabel = currentDate.contains(" ")
+                                                    ? currentDate.split(" ")[1].toString().toPersianDigit()
+                                                    : currentDate.toString().toPersianDigit();
+
+                                                spans.add(
+                                                  TextSpan(
+                                                    text: "$timeLabel\n",
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                );
+
+                                                // ۳. حلقه برای جزئیات هر سری با مقادیر واقعی
+                                                for (int i = 0; i < seriesList.length; i++) {
+                                                  final series = seriesList[i];
+                                                  final name = series.name ?? "بدون نام";
+                                                  final yValues = series.yAxis;
+                                                  final xValues = series.xAxis;
+
+                                                  if (yValues != null && xValues != null) {
+                                                    final sIndex = xValues.indexOf(currentDate);
+                                                    if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
+                                                      final double val = (yValues[sIndex] as num).toDouble();
+                                                      final color = Constants().lineColors[i % Constants().lineColors.length];
+
+                                                      spans.add(
+                                                        TextSpan(
+                                                          text: "$name: ${val.toStringAsFixed(1).toString().toPersianDigit()}  ",
+                                                          style: const TextStyle(
+                                                            color: Colors.black87,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 11,
+                                                          ),
+                                                        ),
+                                                      );
+
+                                                      spans.add(
+                                                        TextSpan(
+                                                          text: "●\n",
+                                                          style: TextStyle(
+                                                            color: color,
+                                                            fontWeight: FontWeight.bold,
+                                                            fontSize: 11,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  }
+                                                }
+
+                                                // ۴. اضافه کردن خط مجموع کل در انتها
+                                                spans.add(
+                                                  const TextSpan(
+                                                    text: "------------------------------\n",
+                                                    style: TextStyle(
+                                                      color: Colors.black87,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                );
+                                                spans.add(
+                                                  TextSpan(
+                                                    text: "مجموع کل: ${totalSum.toStringAsFixed(1).toString().toPersianDigit()}",
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                );
+
+                                                // برگرداندن لیست با طول مساوی تعداد نقاط، اما با این ترفند که فقط یک تول‌تیپ واحد و تمیز رندر شود
+                                                return touchedSpots.map((s) {
+                                                  if (s == spot) {
+                                                    return LineTooltipItem(
+                                                      textAlign: TextAlign.right,
+                                                      "",
+                                                      const TextStyle(),
+                                                      children: spans,
+                                                    );
+                                                  }
+                                                  return null; // بقیه نقاط خالی برگردانده شوند تا تکرار نشوند
+                                                }).toList();
+                                              },
                                             ),
-                                            handleBuiltInTouches: true,
                                           ),
                                           titlesData: FlTitlesData(
                                             bottomTitles: Constants().axisBottomTitles(xLabels, "day"),
@@ -303,10 +438,11 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                           barTouchData: BarTouchData(
                                             handleBuiltInTouches: true,
                                             touchTooltipData: BarTouchTooltipData(
-                                              getTooltipColor: (group) => ColorPalette.white,
+                                              getTooltipColor: (group) => Color(0xFFF7F9FA),
                                               fitInsideHorizontally: true,
                                               fitInsideVertically: true,
-                                              tooltipBorder: BorderSide(color: ColorPalette.grey),
+                                              maxContentWidth: 250.w,
+                                              // tooltipBorder: BorderSide(color: ColorPalette.grey),
                                               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                                 final int xIndex = group.x.toInt();
                                                 if (xIndex < 0 || xIndex >= xLabels.length) return null;
@@ -316,33 +452,32 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                                 List<TextSpan> spans = [];
                                                 double totalSum = 0;
 
-                                                // ۱. محاسبه مجموع کل مقادیر ابتدا (تا رقم نهایی درست دربیاد)
+                                                // ۱. محاسبه مجموع کل مقادیر واقعی
                                                 for (var series in seriesList) {
                                                   final yValues = series.yAxis;
                                                   final xValues = series.xAxis;
                                                   if (yValues != null && xValues != null) {
                                                     final sIndex = xValues.indexOf(currentDate);
-                                                    if (sIndex != -1 && sIndex < yValues.length) {
-                                                      totalSum += getMappedValue(yValues[sIndex]);
+                                                    if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
+                                                      totalSum += (yValues[sIndex] as num).toDouble();
                                                     }
                                                   }
                                                 }
 
-                                                // ۲. اضافه کردن خط تاریخ با رنگ خاکستری (طوسی)
+                                                final String weekDayName = Constants().weekDayNames[xIndex].name;
+
                                                 spans.add(
                                                   TextSpan(
-                                                    text: "تاریخ: ${currentDate.toString().toPersianDigit()}\n-------------------\n",
+                                                    text: " $weekDayName\n",
                                                     style: const TextStyle(
-                                                      color: Colors.black87, // رنگ طوسی برای تاریخ
+                                                      color: Colors.black87,
                                                       fontWeight: FontWeight.bold,
                                                       fontSize: 12,
                                                     ),
                                                   ),
                                                 );
 
-
-
-                                                // ۴. حلقه برای اضافه کردن جزئیات هر سری
+                                                // ۳. حلقه برای جزئیات هر سری با مقادیر واقعی
                                                 for (int i = 0; i < seriesList.length; i++) {
                                                   final series = seriesList[i];
                                                   final name = series.name ?? "بدون نام";
@@ -351,17 +486,27 @@ class SummaryFlowMeterChart extends StatelessWidget {
 
                                                   if (yValues != null && xValues != null) {
                                                     final sIndex = xValues.indexOf(currentDate);
-                                                    if (sIndex != -1 && sIndex < yValues.length) {
-                                                      final double val = getMappedValue(yValues[sIndex]);
-                                                      // (اختیاری) اگر می‌خواهید رنگ هر متن هماهنگ با رنگ چارت خودش باشد، می‌توانید از رنگ سری استفاده کنید
+                                                    if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
+                                                      final double val = (yValues[sIndex] as num).toDouble();
                                                       final color = Constants().lineColors[i % Constants().lineColors.length];
 
                                                       spans.add(
                                                         TextSpan(
-                                                          text: "$name: ${val.toStringAsFixed(1).toString().toPersianDigit()}\n",
-                                                          style: TextStyle(
-                                                            color: color, // یا Colors.black87 اگر رنگ ثابت می‌خواهید
+                                                          text: "$name: ${val.toStringAsFixed(1).toString().toPersianDigit()}  ",
+                                                          style: const TextStyle(
+                                                            color: Colors.black87,
                                                             fontWeight: FontWeight.w500,
+                                                            fontSize: 11,
+                                                          ),
+                                                        ),
+                                                      );
+
+                                                      spans.add(
+                                                        TextSpan(
+                                                          text: "●\n",
+                                                          style: TextStyle(
+                                                            color: color,
+                                                            fontWeight: FontWeight.bold,
                                                             fontSize: 11,
                                                           ),
                                                         ),
@@ -369,7 +514,18 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                                     }
                                                   }
                                                 }
-                                                // ۳. اضافه کردن خط مجموع کل
+
+                                                // ۴. اضافه کردن خط مجموع کل در انتها
+                                                spans.add(
+                                                  const TextSpan(
+                                                    text: "------------------------------\n",
+                                                    style: TextStyle(
+                                                      color: Colors.black87,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                );
                                                 spans.add(
                                                   TextSpan(
                                                     text: "مجموع کل: ${totalSum.toStringAsFixed(1).toString().toPersianDigit()}",
@@ -380,13 +536,10 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                                     ),
                                                   ),
                                                 );
-                                                // حذف خط اضافه آخر اگر وجود داشته باشد
-                                                if (spans.isNotEmpty) {
-                                                  // حذف \n آخر آخرین اسپم برای جلوگیری از پدینگ اضافی
-                                                }
 
                                                 return BarTooltipItem(
-                                                  "", // متن اصلی خالی گذاشته می‌شود چون از children استفاده می‌کنیم
+                                                  textAlign: TextAlign.right,
+                                                  "",
                                                   const TextStyle(),
                                                   children: spans,
                                                 );
@@ -420,7 +573,6 @@ class SummaryFlowMeterChart extends StatelessWidget {
                               runSpacing: 6,
                               alignment: WrapAlignment.center,
                               children: List.generate(seriesList.length, (index) {
-                                final currentSeries = seriesList.getRange; // اصلاح سیف
                                 final currentSeriesItem = seriesList[index];
                                 final color = Constants().lineColors[index % Constants().lineColors.length];
                                 final String seriesName = currentSeriesItem.name ?? "خط ${index + 1}";

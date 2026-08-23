@@ -418,7 +418,7 @@ class ShowDialogs {
                                   Expanded(
 
                                     child: GlobalElevatedButton(
-                                      borderRadius: BorderRadius.circular(2.5),
+                                      borderRadius: 2.5,
                                       backColor: Colors.grey[300]!,
                                       onTap:  () {
 
@@ -596,7 +596,7 @@ class ShowDialogs {
                                 Expanded(
 
                                   child: GlobalElevatedButton(
-                                    borderRadius: BorderRadius.circular(2.5),
+                                    borderRadius: 2.5,
                                     backColor: Colors.grey[300]!,
                                     onTap: () {
                                       wellDetailBloc.add(ResetDeleteStatus());
@@ -676,7 +676,7 @@ class ShowDialogs {
                     children: [
                       Expanded(
                         child: GlobalElevatedButton(
-                          borderRadius: BorderRadius.circular(2.5),
+                          borderRadius: 2.5,
                           backColor: Color(0xff5F8CC5),
                             onTap: () {
                               // Helper.saveUserLoggedInSharedPreference(false);
@@ -724,17 +724,18 @@ class ShowDialogs {
               child: BlocConsumer<WellDetailBloc, WellDetailState>(
                 listenWhen: (previous, current) {
                   // هر زمان که وضعیت onOffStatus تغییر کند (چه خطا، چه موفقیت)، لیسنر فعال می‌شود
-                  return previous.onOffStatus != current.onOffStatus;
+                  return previous.onOffStatus != current.onOffStatus ||
+                      previous.isSwitched!=current.isSwitched;
                 },
                 listener: (blocContext, state) {
-                  // 💡 ۱. در صورت موفقیت
+                  //  ۱. در صورت موفقیت
                   if (state.onOffStatus is OnOffSuccess) {
                     // پاک کردن اسنک‌بارهای قبلی
                     ScaffoldMessenger.of(context).clearSnackBars();
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text("دستور با موفقیت به پمپ ارسال شد"),
+                        content:  Text(state.isSwitched == true ? "با موفقیت روشن شد" : "با موفقیت خاموش شد"),
                         backgroundColor: Colors.green,
                         duration: const Duration(seconds: 3),
                       ),
@@ -777,7 +778,7 @@ class ShowDialogs {
                         children: [
                           Expanded(
                             child: GlobalElevatedButton(
-                              borderRadius: BorderRadius.circular(2.5),
+                              borderRadius: 2.5,
                               backColor: ColorPalette.darkBlue,
                               onTap: isLoading
                                   ? null
@@ -805,7 +806,7 @@ class ShowDialogs {
                           SizedBox(width: 10.w),
                           Expanded(
                             child: GlobalElevatedButton(
-                              borderRadius: BorderRadius.circular(2.5),
+                              borderRadius:2.5,
                               backColor: Colors.grey[300]!,
                               onTap: () {
                                 wellDetailBloc.add(ResetOnOffStatus());
@@ -1059,7 +1060,7 @@ class ShowDialogs {
                         child: BlocBuilder<AlertBloc, AlertState>(
                           builder: (context, state) {
                             return GlobalElevatedButton(
-                            borderRadius: BorderRadius.circular(2.5),
+                            borderRadius: 2.5,
                             backColor: Color(0xff5F8CC5),
                             onTap: (
                                 state.alertFilterModel?.filterType==null  &&

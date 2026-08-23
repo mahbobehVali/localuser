@@ -1,25 +1,15 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mahaliii/common/params/sign_up_params.dart';
 import 'package:mahaliii/common/widgets/refuse_button.dart';
-import 'package:mahaliii/features/sign_up_feature/domain/entity/area_entity.dart';
-import 'package:mahaliii/features/sign_up_feature/presentation/bloc/region_status.dart';
-import 'package:mahaliii/features/sign_up_feature/presentation/bloc/register_status.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/bloc/validation_status.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
-
 import '../../../../../common/widgets/global_elevated_button.dart';
 import '../../../../../common/widgets/show_snack_bar.dart';
 import '../../../../../config/color_palette.dart';
 import '../../../../../config/texts_style.dart';
-import '../../../../alert_feature/domain/entity/alert_type_entity.dart';
-import '../../../../auth_feature/presentation/screens/login_screen.dart';
-import '../../../domain/entity/region_entity.dart';
 import '../../bloc/again_validation_status.dart';
-import '../../bloc/area_status.dart';
 import '../../bloc/sign_up_bloc.dart';
 
 class ValidationScreen extends StatefulWidget {

@@ -20,7 +20,6 @@ import 'package:mahaliii/features/well_feature/presentation/screens/widgets/prog
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/constants.dart';
-import '../../../../common/widgets/global_snackbar.dart';
 import '../../../../common/widgets/icon_container.dart';
 import '../../../../common/widgets/indicator_widget.dart';
 import '../../../../common/widgets/show_dialogs.dart';
@@ -31,7 +30,6 @@ import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../domain/repository/wells_repository.dart';
 import '../../domain/usecase/alert_count_usecase.dart';
 import '../bloc/well_detail_bloc/finger_status.dart';
-import '../bloc/well_detail_bloc/on_off_status.dart';
 import '../bloc/well_detail_bloc/week_well_work_status.dart';
 
 class WellDetailScreen extends StatefulWidget {
@@ -55,7 +53,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       return switch (i) {
         0 =>
             PieChartSectionData(
-              color: ColorPalette.lightGreen,
+              color: ColorPalette.darkGreen,
               value: (on ?? 0).toDouble(),
               title: '',
               titleStyle: TextStyle(
@@ -494,6 +492,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                       gridData: const FlGridData(show: false),
                                                       lineTouchData: LineTouchData(
                                                         touchTooltipData: LineTouchTooltipData(
+                                                          maxContentWidth: 250.w,
                                                           getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
                                                           fitInsideHorizontally: true, // جلوگیری از بیرون زدن افقی از چپ/راست
                                                           fitInsideVertically: true,   // جلوگیری از بیرون زدن عمودی از بالا/پایین
@@ -553,6 +552,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                       barTouchData: BarTouchData(
                                                           handleBuiltInTouches: true,
                                                           touchTooltipData: BarTouchTooltipData(
+                                                            maxContentWidth: 250.w,
                                                             getTooltipColor: (group) => ColorPalette.lightGrey,
                                                             fitInsideHorizontally: true,
                                                             fitInsideVertically: true,
@@ -678,7 +678,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                               ],
                                             );
                                           });
-                                          double chartWidth = currentXValues!.length * 40.0;
+                                          double chartWidth = currentXValues.length * 40.0;
                                           double screenWidth = MediaQuery.of(context).size.width;
                                           if (chartWidth < screenWidth) {
                                             chartWidth = screenWidth; // اگر دیتا کم بود، چارت کل صفحه را پر کند
@@ -725,11 +725,13 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                           lineTouchData: LineTouchData(
                                                             handleBuiltInTouches: true,
                                                             touchTooltipData: LineTouchTooltipData(
+                                                              maxContentWidth: 250.w,
                                                               getTooltipColor: (group) => ColorPalette.lightGrey,
                                                               fitInsideHorizontally: true,
                                                               fitInsideVertically: true,
                                                             ),
                                                           ),
+
                                                           borderData: FlBorderData(
                                                             border: Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                                                           ),
@@ -741,6 +743,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                             leftTitles: Constants().leftTitles(
                                                               interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
                                                               scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                                              title: "ساعت"
                                                             ),
                                                           ),
                                                         ),
@@ -780,6 +783,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                               barTouchData: BarTouchData(
                                                                 handleBuiltInTouches: true,
                                                                 touchTooltipData: BarTouchTooltipData(
+                                                                  maxContentWidth: 250.w,
                                                                   getTooltipColor: (group) => ColorPalette.lightGrey,
                                                                   fitInsideHorizontally: true,
                                                                   fitInsideVertically: true,
@@ -996,8 +1000,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         } else if (state.weekWellWorkStatus is WeekWellWorkSuccess) {
                                           WeekWellWorkSuccess wellWorkSuccess = state.weekWellWorkStatus as WeekWellWorkSuccess;
                                           final dynamic on = wellWorkSuccess.currentWellWorkEntity.list.totalOn;
-                                          print("wellWorkSuccess.currentWellWorkEntity.list.totalOn${wellWorkSuccess.currentWellWorkEntity.list.totalOn}");
-                                          print("wellWorkSuccess.currentWellWorkEntity.list.totaloff${wellWorkSuccess.currentWellWorkEntity.list.totalOff}");
                                           final dynamic off = wellWorkSuccess.currentWellWorkEntity.list.totalOff;
                                           final double onVal = (on ?? 0).toDouble();
                                           final double offVal = (off ?? 0).toDouble();
@@ -1052,8 +1054,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      Indicator(color: ColorPalette.darkBlue, text: 'مجموع ساعات روشن بودن', isSquare: false),
-                                      Indicator(color: Colors.grey.shade400, text: 'مجموع ساعات خاموش بودن', isSquare: false),
+                                      Indicator(color: ColorPalette.darkGreen, text: 'مجموع ساعات روشن بودن', isSquare: false),
+                                      Indicator(color: ColorPalette.lightGrey, text: 'مجموع ساعات خاموش بودن', isSquare: false),
                                     ],
                                   ),
                                   SizedBox(height: 10.h),
@@ -1249,19 +1251,19 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                   BlocListener<WellDetailBloc, WellDetailState>(
                                     listenWhen: (previous, current) => previous.isSwitched!=current.isSwitched,
                                     listener: (context, state) {
-                                      if (state.onOffStatus is OnOffSuccess) {
-                                        // ۱. ابتدا دیالوگ باز شده را می‌بندیم (چون روی صفحه اصلی باز شده بود با کانتکست اصلی pop می‌شود)
-                                        // Navigator.of(context).pop();
-
-                                        // ۲. نمایش موفقیت
-                                        GlobalSnackBar.show(context,
-                                          message: state.isSwitched == true ? "با موفقیت روشن شد" : "با موفقیت خاموش شد",
-                                        );
-                                      }
-
-                                      if (state.onOffStatus is OnOffError) {
-                                        GlobalSnackBar.show(context, message: "خطایی رخ داده است");
-                                      }
+                                      // if (state.onOffStatus is OnOffSuccess) {
+                                      //   // ۱. ابتدا دیالوگ باز شده را می‌بندیم (چون روی صفحه اصلی باز شده بود با کانتکست اصلی pop می‌شود)
+                                      //   // Navigator.of(context).pop();
+                                      //
+                                      //   // ۲. نمایش موفقیت
+                                      //   GlobalSnackBar.show(context,
+                                      //     message: state.isSwitched == true ? "با موفقیت روشن شد" : "با موفقیت خاموش شد",
+                                      //   );
+                                      // }
+                                      //
+                                      // if (state.onOffStatus is OnOffError) {
+                                      //   GlobalSnackBar.show(context, message: "خطایی رخ داده است");
+                                      // }
                                     },
 
                                     child: CupertinoSwitch(
@@ -1270,7 +1272,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                       inactiveThumbColor: ColorPalette.black.withValues(alpha: 0.5),
                                       value: state.isSwitched!,
                                       onChanged: (value) {
-
                                         // print(value);
                                         ShowDialogs().turnPomp(context,
                                           BlocProvider.of<WellDetailBloc>(context),
@@ -1289,7 +1290,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                           ],
                         )
                       );
-                                    },
+                        },
                     );
                     },),
                   )

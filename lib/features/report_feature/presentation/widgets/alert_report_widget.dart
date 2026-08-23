@@ -92,6 +92,7 @@ class AlertsReportChartWidget extends StatelessWidget {
                             leftTitles: Constants().leftTitles(
                               interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
                               scale: scale['step'] == 0 ? 10 : scale['step']!,
+                              title: "تعداد هشدارها"
                             ),
                           ),
                           barGroups: chartGroups,

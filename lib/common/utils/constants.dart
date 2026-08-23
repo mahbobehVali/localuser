@@ -190,7 +190,29 @@ class Constants {
     AlertTypeEntity("دسترسی کاربران", 4),
 
   ];
+  String getWeekdayName(String dateStr) {
+    try {
+      // فرض کنید تاریخ شما به صورت رشته است (مثلا "2026-08-23" یا تاریخ شمسی)
+      // اگر تاریخ میلادی است:
+      DateTime parsedDate = DateTime.parse(dateStr);
 
+      // لیست نام روزهای هفته به فارسی
+      List<String> weekdays = [
+        'دوشنبه',
+        'سه‌شنبه',
+        'چهارشنبه',
+        'پنج‌شنبه',
+        'جمعه',
+        'شنبه',
+        'یکشنبه',
+      ];
+
+      // متد weekday در دارت از 1 (دوشنبه) تا 7 (یکشنبه) برمی‌گرداند
+      return weekdays[parsedDate.weekday - 1];
+    } catch (e) {
+      return dateStr; // اگر فرمت تاریخ نامعتبر بود، همان متن اصلی را برگردان
+    }
+  }
   BoxDecoration boxDecoration=BoxDecoration(
       borderRadius: BorderRadius.only(bottomRight:Radius.circular(5),
           topRight: Radius.circular(5)),

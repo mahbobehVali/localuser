@@ -108,6 +108,7 @@ class PumpHoursChartWidget extends StatelessWidget {
                           barTouchData: BarTouchData(
                               handleBuiltInTouches: true,
                               touchTooltipData: BarTouchTooltipData(
+                                maxContentWidth: 250.w,
                                 getTooltipColor: (group) => ColorPalette.lightGrey,
                                 fitInsideHorizontally: true,
                                 fitInsideVertically: true,
@@ -123,6 +124,8 @@ class PumpHoursChartWidget extends StatelessWidget {
                             leftTitles: Constants().leftTitles(
                               interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
                               scale: scale['step'] == 0 ? 10 : scale['step']!,
+
+                              title: "ساعت"
                             ),
                           ),
                           barGroups: chartGroups,

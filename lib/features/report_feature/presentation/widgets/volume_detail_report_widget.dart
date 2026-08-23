@@ -13,7 +13,6 @@ import '../../../../common/widgets/indicator_widget.dart';
 import '../../../../config/color_palette.dart';
 import '../../../../config/texts_style.dart';
 import '../bloc/report_bloc.dart';
-import '../bloc/report_flow_meter_status.dart';
 
 class VolumeDetailReportChartWidget extends StatelessWidget {
    VolumeDetailReportChartWidget({super.key});
@@ -111,7 +110,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
 
             Color normalColor = ColorPalette.darkBlue;
             Color capColor = ColorPalette.orange;
-            Color disCapColor = ColorPalette.darkRed;
+            // Color disCapColor = ColorPalette.darkRed;
 
             // اگر ظرفیت‌ها بیشتر از ۱ عدد نبود (نمودار معمولی)
             if (!hasMultipleCapacity) {
@@ -129,41 +128,15 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
             }
 
             final capacityItem = status.capacityEntity.capacityListEntity?[index];
-            final disconnectCap = (capacityItem?.disconnectCapacity ?? 0) *
-                getDaysBetweenShamsiDates(state.startDate, state.endDate);
+            // final disconnectCap = (capacityItem?.disconnectCapacity ?? 0) *
+            //     getDaysBetweenShamsiDates(state.startDate, state.endDate);
             final cap = (capacityItem?.capacity ?? 0) *
                 getDaysBetweenShamsiDates(state.startDate, state.endDate);
             List<BarChartRodStackItem> stackItems = [];
 
             final double currentVal = yValues[index].toDouble();
             final double capVal = cap.toDouble();
-            final double disconnectCapVal = disconnectCap.toDouble();
-
-            // if (currentVal > disconnectCapVal) {
-            //   // اگر از حد قطع بیشتر است، باید لایه‌ها به ترتیب زیر روی هم چیده شوند:
-            //
-            //   // ۱. لایه اول: از صفر تا ظرفیت عادی
-            //   if (capVal > 0) {
-            //     stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
-            //     // ۲. لایه دوم: از ظرفیت عادی تا ظرفیت قطعی
-            //     stackItems.add(BarChartRodStackItem(capVal, disconnectCapVal, capColor));
-            //     // ۳. لایه سوم: از ظرفیت قطعی تا مقدار کل مصرف
-            //     stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, disCapColor));
-            //   } else {
-            //     stackItems.add(BarChartRodStackItem(0, disconnectCapVal, normalColor));
-            //     stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, disCapColor));
-            //   }
-            //
-            // }
-            // else if (currentVal > capVal) {
-            //   // اگر فقط از ظرفیت عادی رد کرده ولی به حد قطع نرسیده است
-            //   stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
-            //   stackItems.add(BarChartRodStackItem(capVal, currentVal, capColor));
-            // }
-            // else {
-            //   // اگر کمتر از هر دو حد مجاز باشد
-            //   stackItems.add(BarChartRodStackItem(0, currentVal, normalColor));
-            // }
+            // final double disconnectCapVal = disconnectCap.toDouble();
 
 
             if (currentVal > capVal) {
@@ -234,6 +207,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                               barTouchData: BarTouchData(
                                   handleBuiltInTouches: true,
                                   touchTooltipData: BarTouchTooltipData(
+                                    maxContentWidth: 250.w,
                                     getTooltipColor: (group) => ColorPalette.lightGrey,
                                     fitInsideHorizontally: true,
                                     fitInsideVertically: true,
@@ -241,9 +215,9 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                       final item = flatList[groupIndex];
 
                                       return BarTooltipItem(
-                                        'حجم مصرف: \u200E${rod.toY.toString().toPersianDigit()}\nبیش از حد مجاز: ${item.capacity}',
+                                        'حجم مصرف: ${rod.toY.toString().toPersianDigit()}\nبیش از حد مجاز: ${item.capacity}',
                                         TextStyle(
-                                          color: ColorPalette.darkBlue,
+                                          color: ColorPalette.black,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       );

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 //custom elevatedButton
 
 class GlobalElevatedButton extends StatelessWidget {
-  const GlobalElevatedButton({
+   GlobalElevatedButton({
     super.key,
     this.text,
     required this.widget,
@@ -13,7 +13,8 @@ class GlobalElevatedButton extends StatelessWidget {
     this.textColor,
     this.height,
     this.width,
-    this.borderRadius,
+    this.borderRadius= 20,
+
   });
 
   final String? text;
@@ -23,7 +24,7 @@ class GlobalElevatedButton extends StatelessWidget {
   final Color? borderColor;
   final double? height;
   final double? width;
-  final BorderRadius? borderRadius;
+  double? borderRadius;
   final Widget widget;
 
   @override
@@ -38,7 +39,7 @@ class GlobalElevatedButton extends StatelessWidget {
               backgroundColor: WidgetStatePropertyAll(backColor),
               shape: WidgetStatePropertyAll(
               RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(borderRadius!),
                 side: BorderSide(
                   color: borderColor??Colors.transparent,
 

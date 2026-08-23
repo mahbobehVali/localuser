@@ -49,7 +49,7 @@ class SocketRepository {
 
   /// ۱. این متد را فقط یک‌بار در ابتدای برنامه یا ورود کاربر صدا می‌زنید
   Future<void> initAndConnect(String pin) async {
-    print("piiiiiiin$pin");
+    print("initAndConnectCalled---pin:$pin");
 
 // اگر سوکت ساخته شده و وصل است، فقط اتاق را عوض کن یا خارج شو
     if (_socket != null && _socket!.connected) {
@@ -74,7 +74,7 @@ class SocketRepository {
 
     setupGlobalListeners();
     _socket!.onConnect((_) async {
-      print('✅ Socket Connected globally!');
+      print(' Socket Connected globally!');
       // یک‌بار برای همیشه وارد اتاق می‌شویم
       _socket!.emit("join/room", {'room': pin});
 
@@ -82,7 +82,7 @@ class SocketRepository {
     });
 
     _socket!.onDisconnect((data) {
-      print('Disconnected');
+      print('Socket Disconnected');
       isConnecting = false;
     });
     _socket!.onConnectError((data) => print(' Connect Error: $data'));
@@ -114,12 +114,10 @@ class SocketRepository {
         // تبدیل به مدل و اضافه کردن به استریم آب
         try {
           final model=WellFlowMeterOneModel.fromJson(data);
-          print("model cre");
 
           _todayController.add(model);
-          print("add");
 
-          print(' Data Water Today successfully added to stream');
+          print(' flowmeter Today successfully added to stream');
         } catch (e,s) {
 
           print('JSON 2 Parsing Error: $e');
@@ -131,9 +129,9 @@ class SocketRepository {
       if (data != null && !_createTimeController.isClosed) {
         // تبدیل به مدل و اضافه کردن به استریم آب
         try {
-          print("program:$data");
-          print(' Data successfully added to stream');
           _createTimeController.add(data["status"]);
+          print(' program/add successfully added to stream');
+
         } catch (e) {
           print('JSON Parsing Error: $e');
         }
@@ -146,7 +144,7 @@ class SocketRepository {
         try {
           _deleteTimeController.add(data["status"]);
 
-          print(' Data Delete successfully added to stream');
+          print(' program/delete successfully added to stream');
         } catch (e) {
           print('JSON Parsing Error: $e');
         }      }
@@ -158,7 +156,7 @@ class SocketRepository {
         try {
           _onAndOffTimeController.add(data["status"]);
 
-          print(' Data successfully added to stream');
+          print(' motor/status successfully added to stream');
         } catch (e) {
           print(' JSON Parsing Error: $e');
         }      }
@@ -204,12 +202,6 @@ class SocketRepository {
               ),
             );
 
-            // ۱. خاموش کردن لیسنر اول
-            // _socket!.off("fingerprint/request_response");
-            // print(' Off request_response listener');
-
-            // ۲. خاموش کردن لیسنر دوم (برای اطمینان از عدم ثبت تکراری) و سپس روشن کردن آن
-            // _socket!.off("fingerprint/status");
             print(' Activating fingerprint/status listener...');
 
             _socket!.on("fingerprint/status", onFingerprintStatus);
@@ -223,6 +215,7 @@ class SocketRepository {
                 source: FingerprintSource.requestResponse,
               ),
             );
+            print(' Activating fingerprint/status listener...');
           }
           // بخش else اضافی حذف شد چون بالا به استریم add شده است.
 
@@ -267,10 +260,13 @@ class SocketRepository {
   }
 
   void requestWaterData(dynamic level, dynamic areaId) {
+    print(' dashboard/data Request');
     safeEmit("dashboard/data/request", {"level": level, "id": areaId,"pin": "manger"});
   }
 
   void requestCreateTimeData(CreateTimeParams params) {
+    print(' program/add Request');
+
     safeEmit("program/add", {
       "pin": params.pin,
       "code": params.code,
@@ -283,6 +279,8 @@ class SocketRepository {
   }
 
   Future<void> requestFinger(dynamic deviceId, String pin) async {
+    print(' fingerprint/add_request Request');
+
     // اگر سوکت کلاً ساخته نشده، اول وصلش کن
     if (_socket == null) {
       await initAndConnect(pin);
@@ -294,7 +292,7 @@ class SocketRepository {
 
   Future<void> requestDeleteTimeData(CreateTimeParams params) async {
 
-    print("request");
+    print(' program/delete Request');
     safeEmit("program/delete", {
       "pin": params.pin,
       "code": params.code,
@@ -308,6 +306,8 @@ class SocketRepository {
   }
 
   void onAndOff(CreateTimeParams params) {
+    print(' motor/change/status Request');
+
     safeEmit("motor/change/status", {
       "pin": params.pin,
       "code": params.code,
@@ -318,6 +318,7 @@ class SocketRepository {
   }
 
   void dispose() {
+    print("dispose");
     _socket?.off("dashboard/total/water");
     _socket?.off("program/add");
     _socket?.off("program/delete");

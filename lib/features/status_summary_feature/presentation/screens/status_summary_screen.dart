@@ -92,7 +92,10 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                 children:[
                   Text("خلاصه عملکرد چاه‌ها",style: TextStyleP.f16Bold),
                   SizedBox(height: 16.h),
+
+                  Text("وضعیت مصرف آب همه چاه‌های تحت مدیریت",style: TextStyleP.f14Bold),
                   ///socket water
+                  SizedBox(height: 8.h),
 
                   BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
                     builder: (context, state) {
@@ -100,28 +103,41 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                         final waterSuccess = state.waterStatus as WaterSuccess;
 
                         if (waterSuccess.waterData != null) {
-                          return SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            physics: const BouncingScrollPhysics(),
-                            child: Row(
-                              children: [
-                                WaterAmountContainer(
-                                  title: "حجم کل آب مصرف شده",
-                                  amount: "${waterSuccess.waterData!.total!.toString()} m³",
+                          return Column(
 
-                                ),
-                                const SizedBox(width: 8),
-                                WaterAmountContainer(
-                                  title: "حجم آب مصرف شده ماه",
-                                  amount: "${waterSuccess.waterData!.monthly!.toString()} m³",
-                                ),
-                                const SizedBox(width: 8),
-                                WaterAmountContainer(
-                                  title: "حجم آب مصرف شده امروز",
-                                  amount:"${waterSuccess.waterData!.today!.toString()} m³",
-                                ),
-                              ],
-                            ),
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: WaterAmountContainer(
+                                      image: "assets/icons/flowmeter.png",
+
+                                      title: "امروز",
+                                      amount:"${waterSuccess.waterData!.today!.toString()} m³",
+                                    ),
+                                  ),
+
+                                   SizedBox(width: 8.w),
+                                  Expanded(
+                                    child: WaterAmountContainer(
+                                      image: "assets/icons/flowmeter.png",
+
+                                      title: "این ماه",
+                                      amount: "${waterSuccess.waterData!.monthly!.toString()} m³",
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+                               SizedBox(height: 8.h),
+                              WaterAmountContainer(
+                                image: "assets/icons/flowmeter.png",
+                                title: "از ابتدای سال",
+                                amount: "${waterSuccess.waterData!.total!.toString()} m³",
+                                year: true,
+
+                              ),
+                            ],
                           );
                         } else {
                           return const SizedBox();
