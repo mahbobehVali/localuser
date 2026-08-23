@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/config/color_palette.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/params/flowmeter_params.dart';
 import '../../../../common/utils/constants.dart';
@@ -78,45 +79,67 @@ class SummaryFlowMeterChart extends StatelessWidget {
                           return Constants.noData();
                         }
 
+                        // ۲. استخراج تمام تاریخ‌های یکتا (xAxis) از کل سری‌ها و مرتب‌سازی آن‌ها
+                        final Set<String> allDatesSet = {};
+                        for (var series in seriesList) {
+                          if (series.xAxis != null) {
+                            allDatesSet.addAll(series.xAxis!.map((e) => e.toString()));
+                          }
+                        }
+                        final List<String> xLabels = allDatesSet.toList()..sort();
+
+                        if (xLabels.isEmpty) {
+                          return Constants.noData();
+                        }
+
+                        // متد کمکی برای اعمال قوانین تبدیل مقدار (منفی -> ۳۰، صفر یا نال -> ۱۰)
+                        double getMappedValue(dynamic rawValue) {
+                          if (rawValue == null) return 10.0;
+                          final double val = (rawValue as num).toDouble();
+                          if (val < 0) {
+                            return 30.0;
+                          } else if (val == 0) {
+                            return 10.0;
+                          }
+                          return val;
+                        }
+
                         // ترکیب تمام yAxisها در یک لیست واحد برای محاسبه اسکیل دقیق
                         final List<dynamic> allYValues = [];
                         for (var series in seriesList) {
                           if (series.yAxis != null) {
-                            allYValues.addAll(series.yAxis!);
+                            for (var val in series.yAxis!) {
+                              allYValues.add(getMappedValue(val));
+                            }
                           }
                         }
 
                         final scale = Constants().getScale(allYValues);
 
+                        // ۳. ساخت LineChartBars برای تب خطی (LineChart)
                         List<LineChartBarData> chartBars = [];
-                        final validSeries = seriesList.firstWhere(
-                              (element) => element.xAxis != null && element.yAxis != null &&
-                              element.yAxis!.isNotEmpty,
-                          orElse: () => seriesList.first,
-                        );
-                        final xLabels = validSeries.xAxis;
-
                         for (int i = 0; i < seriesList.length; i++) {
                           final currentSeries = seriesList[i];
                           final yValues = currentSeries.yAxis;
+                          final xValues = currentSeries.xAxis;
 
-                          if (yValues == null || yValues.isEmpty) continue;
+                          if (yValues == null || yValues.isEmpty || xValues == null) continue;
 
                           List<FlSpot> spots = [];
-                          for (int j = 0; j < xLabels!.length; j++) {
-                            // مراقبت از اینکه مقدار y نال نباشه یا طول آرایه فراتر نره
-                            if (j < yValues.length && yValues[j] != null) {
-                              spots.add(FlSpot(j.toDouble(), yValues[j].toDouble()));
+                          for (int j = 0; j < xLabels.length; j++) {
+                            final date = xLabels[j];
+                            final indexInSeries = xValues.indexOf(date);
+
+                            if (indexInSeries != -1 && indexInSeries < yValues.length) {
+                              double finalVal = getMappedValue(yValues[indexInSeries]);
+                              spots.add(FlSpot(j.toDouble(), finalVal));
                             }
                           }
 
-                          // اضافه کردن خط تولید شده به لیست خطوط
                           if (spots.isNotEmpty) {
                             chartBars.add(
                               LineChartBarData(
-
                                 isCurved: true,
-                                // انتخاب رنگ بر اساس اندیس (اگر تعداد خطوط بیشتر از رنگ‌ها شد، از اول چرخ می‌خوره)
                                 color: Constants().lineColors[i % Constants().lineColors.length],
                                 barWidth: 2.5,
                                 isStrokeCapRound: true,
@@ -126,11 +149,74 @@ class SummaryFlowMeterChart extends StatelessWidget {
                             );
                           }
                         }
-                        double chartWidth = xLabels!.length * 40.0;
+
+                        // ۴. ساخت BarChartGroups برای تب ستونی / استک‌شده (BarChart)
+                        List<BarChartGroupData> chartGroups = [];
+                        chartGroups = List.generate(xLabels.length, (index) {
+                          final currentDate = xLabels[index];
+                          List<BarChartRodStackItem> stackItems = [];
+                          double positiveSum = 0;
+
+                          for (int i = 0; i < seriesList.length; i++) {
+                            final currentSeries = seriesList[i];
+                            final yValues = currentSeries.yAxis;
+                            final xValues = currentSeries.xAxis;
+
+                            if (yValues != null && xValues != null) {
+                              final seriesIndex = xValues.indexOf(currentDate);
+                              if (seriesIndex != -1 && seriesIndex < yValues.length) {
+                                double yVal = getMappedValue(yValues[seriesIndex]);
+
+                                if (yVal > 0) {
+                                  final color = Constants().lineColors[i % Constants().lineColors.length];
+                                  stackItems.add(
+                                    BarChartRodStackItem(
+                                      positiveSum,
+                                      positiveSum + yVal,
+                                      color,
+                                    ),
+                                  );
+                                  positiveSum += yVal;
+                                }
+                              }
+                            }
+                          }
+
+                          if (stackItems.isEmpty) {
+                            return BarChartGroupData(
+                              x: index,
+                              barRods: [
+                                BarChartRodData(
+                                  toY: 0,
+                                  color: Colors.transparent,
+                                  width: 12,
+                                ),
+                              ],
+                            );
+                          }
+
+                          return BarChartGroupData(
+                            x: index,
+                            barRods: [
+                              BarChartRodData(
+                                toY: positiveSum,
+                                rodStackItems: stackItems,
+                                width: 12,
+                                borderRadius: BorderRadius.zero,
+                              ),
+                            ],
+                          );
+                        });
+
+                        // ۵. تنظیم عرض چارت بر اساس تعداد داده‌ها
+                        double chartWidth = xLabels.length * 60.0;
                         double screenWidth = MediaQuery.of(context).size.width;
                         if (chartWidth < screenWidth) {
-                          chartWidth = screenWidth; // اگر دیتا کم بود، چارت کل صفحه را پر کند
+                          chartWidth = screenWidth;
                         }
+
+                        final double chartMaxY = (scale["maxY"] as num?)?.toDouble() ?? 100.0;
+                        final double chartMinY = 0.0;
 
                         return Column(
                           children: [
@@ -143,35 +229,184 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                     width: chartWidth,
                                     child: Padding(
                                       padding: const EdgeInsets.all(12),
-                                      child: LineChart(
+                                      child: state.selectedChartTab == 1
+                                          ? LineChart(
                                         LineChartData(
                                           extraLinesData: ExtraLinesData(
-                                            horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
+                                            horizontalLines: Constants().generateHorizontalLines(
+                                              (scale['step'] as num).toDouble(),
+                                              chartMaxY,
+                                              chartMinY,
+                                            ),
                                           ),
                                           borderData: FlBorderData(
                                             show: true,
-                                            border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
+                                            border: Border(
+                                              bottom: BorderSide(color: ColorPalette.lightGrey),
+                                            ),
                                           ),
                                           lineTouchData: LineTouchData(
                                             touchTooltipData: LineTouchTooltipData(
-                                              getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
+                                              getTooltipColor: (LineBarSpot touchedSpot) =>
+                                              ColorPalette.lightGrey,
                                               fitInsideHorizontally: true,
                                               fitInsideVertically: true,
                                             ),
                                             handleBuiltInTouches: true,
                                           ),
                                           titlesData: FlTitlesData(
-                                            bottomTitles: Constants().axisBottomTitles(xLabels,state.selectedChartTab==1? "day":"week"),
-                                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-
-                                            leftTitles: Constants().leftTitles(interval:scale["maxY"]! > 1000 ? 65.w : 40.w,
-                                                scale:  scale['step'] == 0 ? 10 : scale['step']!),
+                                            bottomTitles: Constants().axisBottomTitles(xLabels, "day"),
+                                            rightTitles: const AxisTitles(
+                                              sideTitles: SideTitles(showTitles: false),
+                                            ),
+                                            topTitles: const AxisTitles(
+                                              sideTitles: SideTitles(showTitles: false),
+                                            ),
+                                            leftTitles: Constants().leftTitles(
+                                              interval: chartMaxY > 1000 ? 65.w : 40.w,
+                                              scale: scale['step'] == 0 ? 10 : (scale['step'] as num).toDouble(),
+                                            ),
                                           ),
-                                          gridData: FlGridData(show: false),
+                                          gridData: const FlGridData(show: false),
                                           lineBarsData: chartBars,
-                                          maxY: scale["maxY"],
-                                          minY: scale["minY"],
+                                          maxY: chartMaxY,
+                                          minY: chartMinY,
+                                        ),
+                                      )
+                                          : BarChart(
+                                        BarChartData(
+                                          extraLinesData: ExtraLinesData(
+                                            horizontalLines: Constants().generateHorizontalLines(
+                                              (scale['step'] as num).toDouble(),
+                                              chartMaxY,
+                                              chartMinY,
+                                            ),
+                                          ),
+                                          maxY: chartMaxY,
+                                          minY: chartMinY,
+                                          alignment: BarChartAlignment.spaceAround,
+                                          gridData: FlGridData(
+                                            show: false,
+                                            verticalInterval: (scale['step'] as num?)?.toDouble() ?? 1,
+                                            getDrawingHorizontalLine: (value) {
+                                              return const FlLine(
+                                                strokeWidth: 1,
+                                                color: Colors.grey,
+                                              );
+                                            },
+                                          ),
+                                          borderData: FlBorderData(
+                                            border: Border(
+                                              bottom: BorderSide(color: ColorPalette.lightGrey),
+                                            ),
+                                          ),
+                                          barTouchData: BarTouchData(
+                                            handleBuiltInTouches: true,
+                                            touchTooltipData: BarTouchTooltipData(
+                                              getTooltipColor: (group) => ColorPalette.white,
+                                              fitInsideHorizontally: true,
+                                              fitInsideVertically: true,
+                                              tooltipBorder: BorderSide(color: ColorPalette.grey),
+                                              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                                final int xIndex = group.x.toInt();
+                                                if (xIndex < 0 || xIndex >= xLabels.length) return null;
+
+                                                final String currentDate = xLabels[xIndex];
+
+                                                List<TextSpan> spans = [];
+                                                double totalSum = 0;
+
+                                                // ۱. محاسبه مجموع کل مقادیر ابتدا (تا رقم نهایی درست دربیاد)
+                                                for (var series in seriesList) {
+                                                  final yValues = series.yAxis;
+                                                  final xValues = series.xAxis;
+                                                  if (yValues != null && xValues != null) {
+                                                    final sIndex = xValues.indexOf(currentDate);
+                                                    if (sIndex != -1 && sIndex < yValues.length) {
+                                                      totalSum += getMappedValue(yValues[sIndex]);
+                                                    }
+                                                  }
+                                                }
+
+                                                // ۲. اضافه کردن خط تاریخ با رنگ خاکستری (طوسی)
+                                                spans.add(
+                                                  TextSpan(
+                                                    text: "تاریخ: ${currentDate.toString().toPersianDigit()}\n-------------------\n",
+                                                    style: const TextStyle(
+                                                      color: Colors.black87, // رنگ طوسی برای تاریخ
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                );
+
+
+
+                                                // ۴. حلقه برای اضافه کردن جزئیات هر سری
+                                                for (int i = 0; i < seriesList.length; i++) {
+                                                  final series = seriesList[i];
+                                                  final name = series.name ?? "بدون نام";
+                                                  final yValues = series.yAxis;
+                                                  final xValues = series.xAxis;
+
+                                                  if (yValues != null && xValues != null) {
+                                                    final sIndex = xValues.indexOf(currentDate);
+                                                    if (sIndex != -1 && sIndex < yValues.length) {
+                                                      final double val = getMappedValue(yValues[sIndex]);
+                                                      // (اختیاری) اگر می‌خواهید رنگ هر متن هماهنگ با رنگ چارت خودش باشد، می‌توانید از رنگ سری استفاده کنید
+                                                      final color = Constants().lineColors[i % Constants().lineColors.length];
+
+                                                      spans.add(
+                                                        TextSpan(
+                                                          text: "$name: ${val.toStringAsFixed(1).toString().toPersianDigit()}\n",
+                                                          style: TextStyle(
+                                                            color: color, // یا Colors.black87 اگر رنگ ثابت می‌خواهید
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 11,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  }
+                                                }
+                                                // ۳. اضافه کردن خط مجموع کل
+                                                spans.add(
+                                                  TextSpan(
+                                                    text: "مجموع کل: ${totalSum.toStringAsFixed(1).toString().toPersianDigit()}",
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                );
+                                                // حذف خط اضافه آخر اگر وجود داشته باشد
+                                                if (spans.isNotEmpty) {
+                                                  // حذف \n آخر آخرین اسپم برای جلوگیری از پدینگ اضافی
+                                                }
+
+                                                return BarTooltipItem(
+                                                  "", // متن اصلی خالی گذاشته می‌شود چون از children استفاده می‌کنیم
+                                                  const TextStyle(),
+                                                  children: spans,
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          titlesData: FlTitlesData(
+                                            bottomTitles: Constants().axisBottomTitles(xLabels, "week"),
+                                            rightTitles: const AxisTitles(
+                                              sideTitles: SideTitles(showTitles: false),
+                                            ),
+                                            topTitles: const AxisTitles(
+                                              sideTitles: SideTitles(showTitles: false),
+                                            ),
+                                            leftTitles: Constants().leftTitles(
+                                              interval: chartMaxY > 1000 ? 65.w : 40.w,
+                                              scale: scale['step'] == 0 ? 10 : (scale['step'] as num).toDouble(),
+                                            ),
+                                          ),
+                                          barGroups: chartGroups,
                                         ),
                                       ),
                                     ),
@@ -179,22 +414,20 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            // ۶. راهنمای رنگ‌ها (Legend) پایین چارت
                             Wrap(
                               spacing: 12,
                               runSpacing: 6,
                               alignment: WrapAlignment.center,
                               children: List.generate(seriesList.length, (index) {
-                                final currentSeries = seriesList[index];
-
+                                final currentSeries = seriesList.getRange; // اصلاح سیف
+                                final currentSeriesItem = seriesList[index];
                                 final color = Constants().lineColors[index % Constants().lineColors.length];
-
-                                // دریافت نام سری
-                                final String seriesName = currentSeries.name ?? "خط ${index + 1}";
+                                final String seriesName = currentSeriesItem.name ?? "خط ${index + 1}";
 
                                 return Row(
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.center,
-
                                   children: [
                                     Container(
                                       width: 10,

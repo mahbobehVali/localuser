@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,8 +17,17 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setup();
   customRedScreenError();
+  // ۲. تضمین مقداردهی اولیه بایندینگ‌ها
+  WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(const MyApp());
+  // ۳. قفل کردن چرخش صفحه روی حالت فقط عمودی
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown, // اختیاری (معمولاً همین portraitUp کافیست)
+  ]).then((_) {
+    runApp(const MyApp());
+  });
+
 }
 
 class MyApp extends StatefulWidget {

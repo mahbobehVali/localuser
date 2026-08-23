@@ -51,11 +51,11 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       // final isTouched = i == touchedIndex;
       // final fontSize = isTouched ? 25.0 : 16.0;
       // final radius = isTouched ? 60.0 : 50.0;
-      const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
+      final shadows = [Shadow(color: ColorPalette.black, blurRadius: 2)];
       return switch (i) {
         0 =>
             PieChartSectionData(
-              color: ColorPalette.darkBlue,
+              color: ColorPalette.lightGreen,
               value: (on ?? 0).toDouble(),
               title: '',
               titleStyle: TextStyle(
@@ -66,12 +66,12 @@ class _WellDetailScreenState extends State<WellDetailScreen>
             ),
         1 =>
             PieChartSectionData(
-              color: Colors.grey.shade400,
+              color: ColorPalette.lightGrey,
               value: (off ?? 0).toDouble(),
               title: '',
               titleStyle: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: ColorPalette.white,
                 shadows: shadows,
               ),
             ),

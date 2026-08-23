@@ -71,15 +71,16 @@ class Constants {
   ];
 
   final List<Color> lineColors = [
-    ColorPalette.darkRed,
-    ColorPalette.darkBlue,
+    ColorPalette.lightBlue,
+    ColorPalette.lightOrange,
     ColorPalette.darkGreen,
-    ColorPalette.lightGreen,
+    ColorPalette.darkBlue,
     ColorPalette.orange,
-    Colors.purple,
-    Colors.amber.withValues(alpha: 0.5),
-    Colors.pinkAccent,
     Colors.brown,
+    Colors.purple,
+    Colors.pinkAccent,
+
+    Color(0xff228367DD),
   ];
 
   List<dynamic> alert = [
@@ -431,9 +432,21 @@ class Constants {
     );
   }
 
-  AxisTitles leftTitles({required double scale, required double interval}) {
+  AxisTitles leftTitles({required double scale, required double interval, String title='متر مکعب'}) {
     return AxisTitles(
-
+      // این بخش عنوان محور را کنترل می‌کند
+      axisNameWidget: Padding(
+        padding: EdgeInsets.only(bottom: 8.h),
+        child: Text(
+          title,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ),
+      axisNameSize: 24, // فضای لازم برای نمایش متن کنار محور
       sideTitles: SideTitles(
         showTitles: true,
         interval:scale ,

@@ -16,6 +16,7 @@ class ColorPalette{
   static Color black=Colors.black;
   static Color white=Colors.white;
   static Color orange=Color(0xffF39C12);
+  static Color lightOrange=Color(0xffF8D5B8);
   static Color backColor=Color(0xffEDEDED);
   static Color iconContainerColor=Color(0xffECF1F9);
   static Color analysingColor=Color(0xffFCDEB1);
