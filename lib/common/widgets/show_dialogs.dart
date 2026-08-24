@@ -438,6 +438,7 @@ class ShowDialogs {
                                   Expanded(
                                       flex:2,
                                       child: GlobalElevatedButton(
+                                        borderRadius: 2.5,
                                     backColor: ColorPalette.darkBlue,
                                     widget: state.createTimeStatus is CreateTimeLoading?
                                   CircularProgressIndicator(): Text("ثبت زمان",style: TextStyle(color: ColorPalette.black),),
@@ -595,20 +596,22 @@ class ShowDialogs {
                               children: [
                                 Expanded(
 
-                                  child: GlobalElevatedButton(
+
+                                  child: RefuseButton(
                                     borderRadius: 2.5,
-                                    backColor: Colors.grey[300]!,
+                                    // backColor: Colors.grey[300]!,
                                     onTap: () {
                                       wellDetailBloc.add(ResetDeleteStatus());
                                       Navigator.of(dialogContext).pop();
                                     },
-                                    widget: const Text("انصراف", style: TextStyle(color: Colors.black)),
+                                    // widget: const Text("انصراف", style: TextStyle(color: Colors.black)),
                                   ),
                                 ),
                                 SizedBox(width: 10.w),
                                 Expanded(
                                     flex: 2,
                                     child: GlobalElevatedButton(
+                                      borderRadius: 2.5,
                                   onTap:isLoading?null: () {
 
                                     wellDetailBloc.add(DeleteTime(
@@ -675,6 +678,7 @@ class ShowDialogs {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
+                        flex: 2,
                         child: GlobalElevatedButton(
                           borderRadius: 2.5,
                           backColor: Color(0xff5F8CC5),
@@ -692,7 +696,7 @@ class ShowDialogs {
                       SizedBox(
                         width: 10.w,
                       ),
-                      Expanded(child: RefuseButton())
+                      Expanded(flex:1,child: RefuseButton(borderRadius: 2.5,))
                     ],
                   )
                 ],

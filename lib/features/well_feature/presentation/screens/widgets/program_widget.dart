@@ -63,6 +63,7 @@ class Program extends StatelessWidget {
                       Builder(
                         builder: (context) {
                           return GlobalElevatedButton(
+                            borderRadius: 2.5,
                             widget: Text(
                               "ثبت زمان جدید",
                               style: TextStyle(color: Colors.black),

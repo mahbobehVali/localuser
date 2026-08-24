@@ -187,7 +187,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 60),
+      duration: const Duration(seconds: 90),
     );
 
     _controller.addStatusListener((status) {
@@ -226,8 +226,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
     return BlocProvider.value(
       value: _bloc,
       child: Scaffold(
+
           body:  Padding(
-            padding:  EdgeInsets.only(top:45.h),
+            padding:  EdgeInsets.only(top:20.h),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1070,7 +1071,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   ),
                                                   child: const Row(
                                                     children: [
-                                                      Expanded(child: Text("تاریخ", textAlign: TextAlign.center)),
+                                                      Expanded(flex:2,child: Text("روز/ تاریخ", textAlign: TextAlign.center)),
                                                       Expanded(child: Text("ساعات کارکرد پمپ", textAlign: TextAlign.center)),
                                                       Expanded(child: Text("حجم مصرفی", textAlign: TextAlign.center)),
                                                       Expanded(child: Text("تعداد هشدار", textAlign: TextAlign.center)),
@@ -1107,8 +1108,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                 ),
                                                 child: Row(
                                                   children: [
-                                                    Expanded(
-                                                      child: Text(currentDate.toString().toPersianDigit(),
+                                                    Expanded(flex:2,
+                                                      child: Text("${Constants().weekDayNames[dataIndex].name} ${currentDate.toString().toPersianDigit()} ",
                                                         textAlign: TextAlign.center,
                                                       ),
                                                     ),
@@ -1474,6 +1475,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
     required bool isDisabled,
   }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (message.isNotEmpty) ...[
           Text(message,style: TextStyleP.f12Regular),
@@ -1481,7 +1483,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
         ],
         GlobalElevatedButton(
           widget:  Text("ثبت اثر انگشت",style: TextStyle(color: ColorPalette.black),),
-          backColor: ColorPalette.darkBlue,
+          backColor: isDisabled ? ColorPalette.lightGrey :ColorPalette.darkBlue,
           // با پاس دادن null به onTap، دکمه غیرفعال می‌شود
           onTap: isDisabled ? null : _startProcess,
         ),
@@ -1491,21 +1493,43 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
   // ویجت نوار پیشرفت تایمر
   Widget _buildProgressBar() {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return SizedBox(
-          width: double.infinity,
-          height: 15,
-          child: LinearProgressIndicator(
-            value: _controller.value,
-            borderRadius: BorderRadius.circular(15),
-            backgroundColor: const Color(0xffD3D9E0),
-            color: ColorPalette.darkBlue,
-          ),
-        );
-      },
+    return Column(
+      children: [
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            // محاسبه ثانیه‌های باقی‌مانده بر اساس مقدار انیمیشن
+            final totalSeconds = _controller.duration?.inSeconds ?? 0;
+            final remainingSeconds = (totalSeconds * (1.0 - _controller.value)).ceil();
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // نمایش زمان باقی‌مانده
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('برقراری ارتباط'),
+                    Text('${remainingSeconds.toString().toPersianDigit()} ثانیه'),
+
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  height: 15,
+                  child: LinearProgressIndicator(
+                    value: _controller.value,
+                    borderRadius: BorderRadius.circular(15),
+                    backgroundColor: const Color(0xffD3D9E0),
+                    color: ColorPalette.darkBlue,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
-
 }
