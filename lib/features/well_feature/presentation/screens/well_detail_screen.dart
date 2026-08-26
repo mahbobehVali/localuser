@@ -228,7 +228,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       child: Scaffold(
 
           body:  Padding(
-            padding:  EdgeInsets.only(top:20.h),
+            padding:  EdgeInsets.only(top:40.h),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
