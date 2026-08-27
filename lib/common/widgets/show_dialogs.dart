@@ -950,43 +950,46 @@ class ShowDialogs {
                           SizedBox(
                               height: 6.h
                           ),
-                          BlocBuilder<AlertBloc, AlertState>(
-                            // buildWhen: (previous, current) => previous.alertStartDate!=current.alertStartDate || previous.alertEndDate!=current.alertEndDate,
+                          Container(
 
-                            builder: (context, state) {
-                              return GestureDetector(
-                                onTap: () async{
-                                  var picked = await showPersianDateRangePicker(
-                                      context: context,
+                            child: BlocBuilder<AlertBloc, AlertState>(
+                              // buildWhen: (previous, current) => previous.alertStartDate!=current.alertStartDate || previous.alertEndDate!=current.alertEndDate,
 
-                                      firstDate: Jalali(1385, 8),
-                                      lastDate: Jalali.now(),
-                                      initialDate: Jalali.now(),
-                                      cancelText: "انصراف"
-                                  );
+                              builder: (context, state) {
+                                return GestureDetector(
+                                  onTap: () async{
+                                    var picked = await showPersianDateRangePicker(
+                                        context: context,
 
-                                  String  start = picked==null?"": "${picked.start.year}/${picked.start.month.toString().padLeft(2, '0')}/${picked.start.day.toString().padLeft(2, '0')}";
-                                  String  end = picked==null?"": "${picked.end.year}/${picked.end.month.toString().padLeft(2, '0')}/${picked.end.day.toString().padLeft(2, '0')}";
-                                  // var label = picked.formatFullDate();
-                                  if(picked!=null) {
-                                    alertBloc.add(AlertChangeDate(start, end,state.alertFilterModel!.copyWith(
-                                  newFilterDate: true,
-                                      newStartDate: start,
-                                      newEndDate: end
-                                  )));
-                                  }
+                                        firstDate: Jalali(1385, 8),
+                                        lastDate: Jalali.now(),
+                                        initialDate: Jalali.now(),
+                                        cancelText: "انصراف"
+                                    );
 
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 50,
-                                  decoration:  BoxDecoration(border: Border.all(color: Colors.grey)),
+                                    String  start = picked==null?"": "${picked.start.year}/${picked.start.month.toString().padLeft(2, '0')}/${picked.start.day.toString().padLeft(2, '0')}";
+                                    String  end = picked==null?"": "${picked.end.year}/${picked.end.month.toString().padLeft(2, '0')}/${picked.end.day.toString().padLeft(2, '0')}";
+                                    // var label = picked.formatFullDate();
+                                    if(picked!=null) {
+                                      alertBloc.add(AlertChangeDate(start, end,state.alertFilterModel!.copyWith(
+                                    newFilterDate: true,
+                                        newStartDate: start,
+                                        newEndDate: end
+                                    )));
+                                    }
 
-                                  child: Center(child: Text(
-                                      "${state.alertEndDate!} - ${state.alertStartDate}")),
-                                ),
-                              );
-                            },
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    decoration:  BoxDecoration(border: Border.all(color: Colors.grey)),
+
+                                    child: Center(child: Text(
+                                        "${state.alertEndDate!} - ${state.alertStartDate}")),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
 
                           SizedBox(
