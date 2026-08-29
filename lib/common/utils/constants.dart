@@ -363,6 +363,7 @@ class Constants {
       TitleMeta meta,
       List<dynamic> customTitles,
       String day,
+     {int leng=0}
       ) {
     final int index = value.toInt();
 
@@ -390,34 +391,46 @@ class Constants {
       final parts = titleString.split('/');
 
       if (parts.length > 1) {
-        print("parts.length > 1");
         // ۱. بررسی یکسان بودن ماه در کل لیست customTitles
         final firstParts = customTitles.first?.toString().split('/') ?? [];
         final firstMonth = firstParts.length > 1 ? firstParts[1] : null;
 
-        final bool isSameMonthForAll = customTitles.every((element) {
-          final p = element?.toString().split('/') ?? [];
-          return p.length > 1 && p[1] == firstMonth;
-        });
 
-        // ۲. تصمیم‌گیری بر اساس یکسان بودن یا نبودن ماه
-        if (isSameMonthForAll) {
-          print("isSameMonthForAll");
-          // اگر ماه در کل لیست یکسان بود -> روز را نشان بده
-          displayText = parts.length > 2 ? parts[2] : titleString;
+        // ۲. تصمیم‌گیری بر اساس یکسان بودن یا نبودن ماه در کل بازه
+        if (leng<=31) {
+          print("customTitles.lengthyes");
+          displayText = parts.length > 2 ? "${parts[1]}/${parts[2]}" : titleString;
         } else {
-          // اگر ماه متغیر بود -> نام ماه را نشان بده
+          print("customTitles.lengthno");
+          print("x,zlsmdslkc");
+          // دریافت نام ماه برای ایندکس فعلی
           final monthNum = int.tryParse(parts[1]) ?? 0;
-          if (monthNum >= 1 && monthNum <= 12) {
-            displayText = Constants().monthNames[monthNum - 1];
+          print("monthNum----------${monthNum}");
+          final String currentMonthName = (monthNum >= 1 && monthNum <= 12)
+              ? Constants().monthNames[monthNum - 1]
+              : titleString;
+
+          // بررسی تغییر ماه نسبت به عنصر قبلی
+          if (index > 0) {
+            final prevParts = customTitles[index - 1]?.toString().split('/') ?? [];
+            final prevMonth = prevParts.length > 1 ? prevParts[1] : null;
+
+            // اگر ماه تغییر کرده بود، یا اولین عنصر بود، نام ماه را نشان بده
+            if (prevMonth != parts[1]) {
+              displayText = currentMonthName;
+            } else {
+              // در غیر این صورت فقط عدد روز را نشان بده
+              displayText = parts.length > 2 ? parts[2] : titleString;
+            }
           } else {
-            displayText = titleString;
+            displayText = currentMonthName;
           }
         }
       } else {
         displayText = titleString;
       }
-    }    else if (day == "week") {
+    }
+    else if (day == "week") {
       displayText = (index < Constants().weekDayNames.length)
           ? Constants().weekDayNames[index].name
           : titleString;
@@ -485,7 +498,7 @@ class Constants {
     );
   }
 
-  AxisTitles axisBottomTitles(List<dynamic> xLabels,String selected) {
+  AxisTitles axisBottomTitles(List<dynamic> xLabels,String selected,{int leng=0}) {
     return  AxisTitles(
       sideTitles: SideTitles(
         interval: 1,
@@ -494,7 +507,7 @@ class Constants {
           if (value < 0 || value >= xLabels.length || value % 1 != 0) {
             return const SizedBox();
           }
-          return Constants().bottomTitles(value, meta, xLabels,selected);
+          return Constants().bottomTitles(value, meta, xLabels,selected,leng: leng);
         },
         reservedSize: 40.h,
       ),

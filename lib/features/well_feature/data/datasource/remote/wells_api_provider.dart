@@ -27,7 +27,7 @@ class WellsApiProvider {
 
     try {
       final response = await dio.post("report/command/count",data: data);
-      print("addsedd${response.data}");
+      // print("addsedd${response.data}");
       return response;
     } on DioException catch (e) {
       return CheckExceptions.response(e.response);

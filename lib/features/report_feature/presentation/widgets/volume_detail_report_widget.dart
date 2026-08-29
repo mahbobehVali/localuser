@@ -18,23 +18,23 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
    VolumeDetailReportChartWidget({super.key});
 
   List<VolumeSlot> flatList = [];
+   int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
+     // جدا کردن سال، ماه و روز
+     final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
+     final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
+
+     // تبدیل تاریخ‌های شمسی به DateTime
+     final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
+     final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
+
+     // محاسبه اختلاف به روز
+     return date2.difference(date1).inDays;
+   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ReportBloc, ReportState>(
       builder: (context, state) {
-        int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
-          // جدا کردن سال، ماه و روز
-          final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
-          final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
-
-          // تبدیل تاریخ‌های شمسی به DateTime
-          final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
-          final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
-
-          // محاسبه اختلاف به روز
-          return date2.difference(date1).inDays;
-        }
         final status = state.reportDetailFlowMeterStatus;
         if (status is ReportDetailFlowMeterSuccess) {
 

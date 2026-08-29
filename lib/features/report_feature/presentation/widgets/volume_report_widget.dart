@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/constants.dart';
@@ -16,6 +17,18 @@ class VolumeReportChartWidget extends StatelessWidget {
    VolumeReportChartWidget({super.key});
 
   List<VolumeSlot> flatList = [];
+   int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
+     // جدا کردن سال، ماه و روز
+     final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
+     final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
+
+     // تبدیل تاریخ‌های شمسی به DateTime
+     final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
+     final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
+
+     // محاسبه اختلاف به روز
+     return date2.difference(date1).inDays;
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +117,9 @@ class VolumeReportChartWidget extends StatelessWidget {
                           titlesData: FlTitlesData(
                             bottomTitles: Constants().axisBottomTitles(
                               xLabels,
-                              flowMeter.type=="all-well" ? "nothing" :
+
                               state.startDate==state.endDate ? "day" :  "date",
+                              leng: getDaysBetweenShamsiDates(state.startDate, state.endDate)
                             ),
                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
