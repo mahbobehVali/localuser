@@ -30,6 +30,7 @@ import '../../../well_feature/domain/usecase/alert_count_usecase.dart';
 import '../../../well_feature/domain/usecase/well_work_usecase.dart';
 import '../bloc/report_bloc.dart';
 import '../widgets/alert_report_widget.dart';
+import '../widgets/custom_well_multi_select.dart';
 import '../widgets/key_index_widget.dart';
 import '../widgets/last_activity.dart';
 import '../widgets/pump_hours_widget.dart';
@@ -93,47 +94,14 @@ class ReportScreen extends StatelessWidget {
                               final status = state.wellReportStatus;
 
                               if (status is WellReportSuccess) {
-                                // ۱. دریافت لیست آی‌دی‌های انتخاب شده فعلی از استیت برای مقداردهی اولیه
-                                // نکته: برای initialValue، پکیج نیاز به خودِ آبجکت‌ها دارد، پس آن‌ها را فیلتر و پیدا می‌کنیم
-                                final List<WellsDataEntity> initialSelectedObjects = status.wellsEntity
-                                    .where((well) => well.data != null && (state.oneWell).contains(well.data!.deviceId))
-                                    .map((well) => well.data!)
-                                    .toList();
 
-                                return MultiSelectDialogField<WellsDataEntity>(
-
-                                  // 💡 ۲. محدود کردن ارتفاع دیالوگ به اندازه محتوا
-                                  // با محاسبه تعداد آیتم‌ها، ارتفاع به صورت دینامیک تنظیم می‌شود
-                                  dialogHeight: (status.wellsEntity.where((w) => w.data != null).length * 60.0).clamp(100.0, 400.0),
-                                  selectedColor: ColorPalette.darkBlue,
-
-                                  buttonText: Text(
-                                    initialSelectedObjects.isEmpty
-                                        ? "انتخاب چاه"
-                                        : "${initialSelectedObjects.length.toString().toPersianDigit()} چاه",
-                                  ),
-                                  title: const SizedBox(), // مخفی کردن تایتل بالای دیالوگ
-                                  chipDisplay: MultiSelectChipDisplay.none(), // مخفی کردن چیپ‌های زیر باکس
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.transparent), // مخفی کردن بوردر پیش‌فرض
-                                  ),
-
-                                  cancelText: const Text("بستن", style: TextStyle(color: Colors.black)),
-                                  confirmText: const Text("تایید", style: TextStyle(color: Colors.black)),
-
-                                  // ۲. تبدیل اطلاعات چاه‌ها به آیتم‌های قابل فهم برای پکیج
-                                  items: status.wellsEntity
-                                      .where((well) => well.data != null)
-                                      .map((well) => MultiSelectItem<WellsDataEntity>(well.data!, well.data!.wellName.toString()))
-                                      .toList(),
-
-                                  initialValue: initialSelectedObjects,
-
-                                  // ۳. گرفتن لیست آبجکت‌های انتخاب شده، تبدیل به آی‌دی (int) و ارسال به بلاک
-                                  onConfirm: (values) {
-                                    List<int> selectedIds = values.map((e) => e.deviceId!).toList();
-
-                                    context.read<ReportBloc>().add(WellSelected(selectedIds));
+                                return CustomWellMultiSelectField(
+                                  allWells: status.wellsEntity,
+                                  selectedWellIds: state.oneWell,
+                                  onConfirm: (selectedIds) {
+                                    context.read<ReportBloc>().add(
+                                      WellSelected(selectedIds,),
+                                    );
                                   },
                                 );
                               }
