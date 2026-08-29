@@ -218,6 +218,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     });
 
     on<WellWorkHourStart>((event, emit) async {
+      print("event.flowMeterParams.type${event.flowMeterParams.type}");
       emit(state.copyWith(newWeekWellWorkStatus: WeekWellWorkLoading(),
           newSelectedChartTab: event.flowMeterParams.type));
       if(event.flowMeterParams.type==0){
@@ -241,6 +242,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
             type: (event.flowMeterParams.type)!+1));
 
         if (previousDataState is DataSuccess && currentDataState is DataSuccess) {
+          print("previousDataState.data---${previousDataState.data.list.xAxis}");
 
           emit(state.copyWith(newWeekWellWorkStatus: WeekWellWorkSuccess(
               currentWellWorkEntity: currentDataState.data,

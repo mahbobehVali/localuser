@@ -443,7 +443,8 @@ class Constants {
     final Widget text = Transform.rotate(
       angle: -20 * math.pi / 180,
       child: Padding(
-        padding: const EdgeInsets.all(2),
+        // مقدار left را بیشتر کنید تا متن به سمت راست رانده شود
+        padding: const EdgeInsets.only(left: 10, top: 3, bottom: 3, right: 0),
         child: Text(
           displayText.toPersianDigit(),
           style: const TextStyle(
@@ -462,7 +463,7 @@ class Constants {
         distanceFromEdge: 0,
       ),
       meta: meta,
-      space: 16,
+      space: 12,
       child: text,
     );
   }

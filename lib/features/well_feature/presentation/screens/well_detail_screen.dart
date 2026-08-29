@@ -313,7 +313,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         Text("میزان حجم آب عبوری دبی سنج", style: TextStyleP.f12Regular),
                                         BlocBuilder<WellDetailBloc, WellDetailState>(
                                           buildWhen: (previous, current) =>
-                                          current.selectedChartVolumeTab!=previous.selectedChartVolumeTab,
+                                          current.selectedChartVolumeTab!=previous.selectedChartVolumeTab ||
+                                          current.flowMeterStatus!=previous.flowMeterStatus,
                                           builder: (context, state) {
                                             return Row(
                                               children: [
@@ -668,7 +669,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         Text("ساعات فعالیت پمپ",style: TextStyleP.f12Regular,),
                                         BlocBuilder<WellDetailBloc, WellDetailState>(
                                           buildWhen: (previous, current) =>
-                                          current.selectedChartTab!=previous.selectedChartTab,
+                                          current.selectedChartTab!=previous.selectedChartTab ||
+                                          current.weekWellWorkStatus!=previous.weekWellWorkStatus,
                                           builder: (context, state) {
                                             return Row(
                                               children: [
@@ -678,8 +680,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
                                                   widget: Text("امروز",style: TextStyle(color: ColorPalette.black),),
                                                   onTap:state.weekWellWorkStatus is WeekWellWorkLoading?null: () {
+                                                    print("000");
                                                     BlocProvider.of<WellDetailBloc>(context).add(
-                                                      FlowMeterEvent(
+                                                      WellWorkHourStart(
                                                         FlowMeterParams(
                                                           type: 0,
                                                           ids: [widget.wellsDataEntity.deviceId!],
@@ -694,8 +697,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                     backColor: state.selectedChartTab==2?ColorPalette.inverseBlue:ColorPalette.lightGrey,
                                                     widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
                                                     onTap:state.weekWellWorkStatus is WeekWellWorkLoading?null: () {
+                                                      print("22222");
                                                       BlocProvider.of<WellDetailBloc>(context).add(
-                                                        FlowMeterEvent(
+                                                        WellWorkHourStart(
                                                           FlowMeterParams(
                                                             type: 2,
                                                             ids: [widget.wellsDataEntity.deviceId!],
@@ -724,7 +728,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                           List<dynamic> previousXLabels=[];
                                           if(successState.previousWellWorkEntity!=null){
                                              previousYValues = successState.previousWellWorkEntity!.list.yAxis! ;
-                                             previousXLabels = successState.currentWellWorkEntity.list.xAxis! ;
+                                             previousXLabels = successState.previousWellWorkEntity!.list.xAxis! ;
                                           }
 
                                           if ((currentYValues==null || currentYValues.isEmpty) ||
@@ -762,6 +766,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                           if (chartWidth < screenWidth) {
                                             chartWidth = screenWidth; // اگر دیتا کم بود، چارت کل صفحه را پر کند
                                           }
+
                                           return Directionality(
                                             textDirection: TextDirection.ltr,
                                             child: SingleChildScrollView(
@@ -886,15 +891,14 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                   fitInsideVertically: true,
                                                                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                                                     final int xIndex = group.x.toInt();
-                                                                    if (xIndex < 0 || xIndex >= currentYValues.length) return null;
-
-                                                                    // استخراج روز هفته یا برچسب محور X
-                                                                    // final String dayStr = (xIndex < currentXValues.length)
-                                                                    //     ? currentXValues[xIndex].toString().toPersianDigit()
-                                                                    //     : "";
 
                                                                     List<TextSpan> spans = [];
-                                                                    final String weekDayName = Constants().weekDayNames[xIndex].name;
+
+                                                                    // گرفتن نام روز هفته با ایمنی بالا
+                                                                    final String weekDayName = (xIndex < Constants().weekDayNames.length)
+                                                                        ? Constants().weekDayNames[xIndex].name
+                                                                        : "";
+
                                                                     // ۱. نمایش روز هفته در خط اول
                                                                     spans.add(
                                                                       TextSpan(
@@ -907,7 +911,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                       ),
                                                                     );
 
-                                                                    // خط جداکننده زیر روز هفته
+                                                                    // خط جداکننده
                                                                     spans.add(
                                                                       const TextSpan(
                                                                         text: "_________________\n",
@@ -919,14 +923,12 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                       ),
                                                                     );
 
-                                                                    // بررسی اینکه آیا داده‌های هفته گذشته وجود دارند یا خیر
-                                                                    final bool hasPrevious = successState.previousWellWorkEntity != null &&
-                                                                        xIndex < previousYValues.length;
+                                                                    // استخراج مقدار هفته جاری (اگر ایندکس معتبر باشد مقدار را بگیر، وگرنه صفر در نظر بگیر)
+                                                                    final bool hasCurrentIndex = xIndex < currentYValues.length && currentYValues[xIndex] != null;
+                                                                    final double currentV = hasCurrentIndex ? currentYValues[xIndex].toDouble() : 0.0;
+                                                                    final String currentLabel = currentV == 0.0 ? "__" : currentV.toStringAsFixed(1).toString().toPersianDigit();
 
-                                                                    final double currentV = currentYValues[xIndex].toDouble();
-                                                                    final String currentLabel = currentV.toStringAsFixed(1).toString().toPersianDigit();
-
-                                                                    // ۲. هفته جاری (عدد در سمت چپ، متن در وسط، دایره نارنجی در سمت راست)
+                                                                    // ۲. نمایش هفته جاری (حتی اگر صفر باشد)
                                                                     spans.add(
                                                                       TextSpan(
                                                                         text: "\u2066$currentLabel\u2069 :هفته جاری ",
@@ -948,7 +950,12 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                       ),
                                                                     );
 
-                                                                    // ۳. هفته گذشته (فقط اگر وجود داشته باشد)
+                                                                    // ۳. بررسی و نمایش هفته گذشته (فقط اگر وجود داشته باشد)
+                                                                    final bool hasPrevious = successState.previousWellWorkEntity != null &&
+                                                                        previousYValues.isNotEmpty &&
+                                                                        xIndex < previousYValues.length &&
+                                                                        previousYValues[xIndex] != null;
+
                                                                     if (hasPrevious) {
                                                                       spans.add(
                                                                         const TextSpan(
@@ -999,9 +1006,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                 show: true,
                                                                 rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                                                 topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                                                bottomTitles: successState.previousWellWorkEntity == null
-                                                                    ? Constants().axisBottomTitles(currentXValues, "clock")
-                                                                    : Constants().axisBottomTitles(previousXLabels, "week"),
+                                                                bottomTitles:
+
+                                                                Constants().axisBottomTitles(previousXLabels, "week"),
                                                                 leftTitles: Constants().leftTitles(
                                                                   interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
                                                                   scale: scale['step'] == 0 ? 10 : scale['step']!,
@@ -1060,7 +1067,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                 children: [
                                   Text("عملکرد پمپ چاه در هفته جاری",style: TextStyleP.f12Regular,),
                                   SizedBox(
-                                    height: 10,
+                                    height: 10.h,
                                   ),
                                   BlocBuilder<WellDetailBloc,WellDetailState>(builder: (context, state) {
                                     if(state.wellPerformanceStatus is WellPerformanceSuccess){

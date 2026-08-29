@@ -20,6 +20,17 @@ class WellWorkModel extends WellWorkEntity {
 
 dynamic findFlowMeterElement(List<dynamic> list) {
 
+// اول تلاش می‌کنه total رو پیدا کنه
+  final totalElement = list.firstWhere(
+        (element) => element["type"] == "total",
+    orElse: () => null,
+  );
+
+  if (totalElement != null) {
+    print("total");
+    return totalElement;
+  }
+
   final allElement = list.firstWhere(
         (element) =>
     element["type"] == "all-well" &&
@@ -31,15 +42,12 @@ dynamic findFlowMeterElement(List<dynamic> list) {
   // print(allElement["totalOn"]);
   // print(allElement["totalOff"]);
 
-  if (allElement != null) return allElement;
+  if (allElement != null) {
+    print("allwell");
 
-// اول تلاش می‌کنه total رو پیدا کنه
-  final totalElement = list.firstWhere(
-        (element) => element["type"] == "total",
-    orElse: () => null,
-  );
+    return allElement;
+  }
 
-  if (totalElement != null) return totalElement;
 
 // اگر total نبود، دنبال onwell می‌گرده
   final onWellElement = list.firstWhere(
