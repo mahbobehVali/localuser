@@ -118,7 +118,7 @@ class SocketRepository {
           _todayController.add(model);
 
           print(' flowmeter Today successfully added to stream');
-        } catch (e,s) {
+        } catch (e) {
 
           print('JSON 2 Parsing Error: $e');
         }      }

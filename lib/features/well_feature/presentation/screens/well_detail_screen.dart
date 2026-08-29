@@ -313,27 +313,45 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         Text("میزان حجم آب عبوری دبی سنج", style: TextStyleP.f12Regular),
                                         BlocBuilder<WellDetailBloc, WellDetailState>(
                                           buildWhen: (previous, current) =>
-                                          current.selectedChartVolumeTab != previous.selectedChartVolumeTab,
+                                          current.selectedChartVolumeTab!=previous.selectedChartVolumeTab,
                                           builder: (context, state) {
-                                            return SegmentedButton(
-                                              onSelectionChanged: (Set<int> newSelected) {
-                                                BlocProvider.of<WellDetailBloc>(context).add(
-                                                  FlowMeterEvent(
-                                                    FlowMeterParams(
-                                                      type: newSelected.first,
-                                                      ids: [widget.wellsDataEntity.deviceId!],
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              segments: const [
-                                                ButtonSegment(value: 0, label: Text("امروز")),
-                                                ButtonSegment(value: 6, label: Text("هفته")),
+                                            return Row(
+                                              children: [
+                                                GlobalElevatedButton(
+                                                  backColor: state.selectedChartVolumeTab==0?ColorPalette.inverseBlue:ColorPalette.lightGrey,
+                                                  borderRadius: 50,
+
+                                                  widget: Text("امروز",style: TextStyle(color: ColorPalette.black),),
+                                                  onTap:state.flowMeterStatus is FlowMeterLoading?null: () {
+                                                    BlocProvider.of<WellDetailBloc>(context).add(
+                                                      FlowMeterEvent(
+                                                        FlowMeterParams(
+                                                          type: 0,
+                                                          ids: [widget.wellsDataEntity.deviceId!],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },),
+
+                                                SizedBox(width: 10.w),
+                                                GlobalElevatedButton(
+                                                    borderRadius: 50,
+                                                    backColor: state.selectedChartVolumeTab==6?ColorPalette.inverseBlue:ColorPalette.lightGrey,
+                                                    widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
+                                                    onTap:state.flowMeterStatus is FlowMeterLoading?null: () {
+                                                      BlocProvider.of<WellDetailBloc>(context).add(
+                                                        FlowMeterEvent(
+                                                          FlowMeterParams(
+                                                            type: 6,
+                                                            ids: [widget.wellsDataEntity.deviceId!],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }),
                                               ],
-                                              selected: {state.selectedChartVolumeTab},
                                             );
                                           },
-                                        )
+                                        ),
                                       ],
                                     ),
                                     BlocConsumer<WellDetailBloc, WellDetailState>(
@@ -652,23 +670,43 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                           buildWhen: (previous, current) =>
                                           current.selectedChartTab!=previous.selectedChartTab,
                                           builder: (context, state) {
-                                            return SegmentedButton(
+                                            return Row(
+                                              children: [
+                                                GlobalElevatedButton(
+                                                  backColor: state.selectedChartTab==0?ColorPalette.inverseBlue:ColorPalette.lightGrey,
+                                                  borderRadius: 50,
 
-                                                onSelectionChanged: (Set<int> newSelected) {
-                                                  BlocProvider.of<WellDetailBloc>(context).add(
-                                                      WellWorkHourStart(FlowMeterParams(
-                                                    type: newSelected.first,
-                                                    ids:[widget.wellsDataEntity.deviceId!],
-                                                  )));
+                                                  widget: Text("امروز",style: TextStyle(color: ColorPalette.black),),
+                                                  onTap:state.weekWellWorkStatus is WeekWellWorkLoading?null: () {
+                                                    BlocProvider.of<WellDetailBloc>(context).add(
+                                                      FlowMeterEvent(
+                                                        FlowMeterParams(
+                                                          type: 0,
+                                                          ids: [widget.wellsDataEntity.deviceId!],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },),
 
-                                                },
-                                                segments: [
-                                                  ButtonSegment(value: 0,label: Text("امروز")),
-                                                  ButtonSegment(value: 2,label: Text("هفته")),
-
-                                                ], selected:{state.selectedChartTab});
+                                                SizedBox(width: 10.w),
+                                                GlobalElevatedButton(
+                                                    borderRadius: 50,
+                                                    backColor: state.selectedChartTab==2?ColorPalette.inverseBlue:ColorPalette.lightGrey,
+                                                    widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
+                                                    onTap:state.weekWellWorkStatus is WeekWellWorkLoading?null: () {
+                                                      BlocProvider.of<WellDetailBloc>(context).add(
+                                                        FlowMeterEvent(
+                                                          FlowMeterParams(
+                                                            type: 2,
+                                                            ids: [widget.wellsDataEntity.deviceId!],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }),
+                                              ],
+                                            );
                                           },
-                                        )
+                                        ),
                                       ],
                                     ),
                                     BlocConsumer<WellDetailBloc, WellDetailState>(
@@ -977,7 +1015,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                       ),
                                                       const SizedBox(height: 10),
                                                       Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                         children:  [
                                                           Indicator(color: ColorPalette.orange, text: 'هفته جاری', isSquare: true),
                                                           Indicator(color: ColorPalette.grey, text: 'هفته گذشته', isSquare: true),
@@ -1059,7 +1097,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                             shrinkWrap: true,
                                             physics: const NeverScrollableScrollPhysics(),
                                             padding: EdgeInsets.zero,
-                                            itemCount: baseListX.length + 1,
+                                            itemCount: flowMeterX.length + 1,
                                             itemBuilder: (context, index) {
 
                                               if (index == 0) {
@@ -1072,7 +1110,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   child: const Row(
                                                     children: [
                                                       Expanded(flex:2,child: Text("روز/ تاریخ", textAlign: TextAlign.center)),
-                                                      Expanded(child: Text("ساعات کارکرد پمپ", textAlign: TextAlign.center)),
+                                                      Expanded(flex:2,child: Text("ساعات کارکرد پمپ", textAlign: TextAlign.center)),
                                                       Expanded(child: Text("حجم مصرفی", textAlign: TextAlign.center)),
                                                       Expanded(child: Text("تعداد هشدار", textAlign: TextAlign.center)),
                                                     ],
@@ -1196,7 +1234,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                     children: [
                                                       Text(
                                                         textAlign: TextAlign.center,
-                                                        "${wellWorkSuccess.currentWellWorkEntity.list.totalOn.toString().toPersianDigit()} ساعت\nاز ${(on+off).toStringAsFixed(2).toString().toPersianDigit()} ساعت",
+                                                        "\u200E${wellWorkSuccess.currentWellWorkEntity.list.totalOn.toString().toPersianDigit()} ساعت\nاز \u200E${(on + off).toStringAsFixed(2).toString().toPersianDigit()} ساعت",
                                                         style: TextStyleP.f14Bold,
                                                       ),
                                                       const SizedBox(height: 10),

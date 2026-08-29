@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/utils/constants.dart';
+import 'package:mahaliii/common/widgets/global_snackbar.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
@@ -152,7 +153,9 @@ class Program extends StatelessWidget {
 
 
                                 return GestureDetector(
-                                    onTap: () {
+                                    onTap:p.own==0?() {
+                                      ShowDialogs().customDialog(context);
+                                    }: () {
                                       ShowDialogs().deleteClock(context: context,wellDetailBloc: BlocProvider.of<WellDetailBloc>(context),
                                           wellsDataEntity:wellsDataEntity,startTime:p.startTime.toString().toPersianDigit(),
                                          endTime: p.endTime.toString().toPersianDigit(),

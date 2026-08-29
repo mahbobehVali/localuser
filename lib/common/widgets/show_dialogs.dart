@@ -707,6 +707,44 @@ class ShowDialogs {
       },
     );
   }
+  Future<void> customDialog(
+      BuildContext context,
+      ) {
+    return showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return Scaffold(
+          backgroundColor: Colors.transparent,
+
+          body: Directionality(
+            textDirection: TextDirection.rtl,
+            child: AlertDialog(
+              content: SizedBox(
+                height: 30.h,
+                child: const Center(child: Text("این برنامه توسط شخص دیگری ثبت شده است.")),
+              ),
+              actionsAlignment: MainAxisAlignment.center,
+              actions: [
+
+                GlobalElevatedButton(
+                    borderRadius: 2.5,
+                    width: MediaQuery.sizeOf(context).width/3,
+                    backColor: Color(0xff5F8CC5),
+                    onTap: () {
+
+                      Navigator.of(context).pop();
+
+                    },
+                    widget:  Text("باشه",style: TextStyle(color: Colors.black),)
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
 
   Future<void> turnPomp(

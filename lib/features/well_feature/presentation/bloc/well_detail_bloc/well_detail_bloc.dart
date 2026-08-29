@@ -138,7 +138,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
           },
         );
       },
-      transformer: restartable(), // 👈 حتما اضافه شود تا استریم‌های قبلی کنسل شوند
+      transformer: restartable(), //  حتما اضافه شود تا استریم‌های قبلی کنسل شوند
     );
 
 
