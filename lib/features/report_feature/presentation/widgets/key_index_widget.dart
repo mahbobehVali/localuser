@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../common/widgets/shimmer_class.dart';
 import '../../../../common/widgets/water_amount_container.dart';
@@ -24,11 +25,13 @@ class KeyIndexWidget extends StatelessWidget {
             buildWhen: (previous, current) {
               return previous.reportFlowMeterStatus is! ReportFlowMeterSuccess;
             },
+
             builder: (context, state) {
               if(state.reportFlowMeterStatus is ReportFlowMeterSuccess){
                 ReportFlowMeterSuccess reportFlowMeterSuccess=state.reportFlowMeterStatus as ReportFlowMeterSuccess;
                 return  WaterAmountContainer(title: "حجم کل آب مصرف شده",
-                    amount: "${reportFlowMeterSuccess.wellReportFlowMeter.list.total.toString()} m³");
+                    amount:"${NumberFormat.decimalPattern().format(reportFlowMeterSuccess.wellReportFlowMeter.list.total.toDouble().round())} m³",
+                );
 
               }else  if(state.reportFlowMeterStatus is ReportFlowMeterLoading){
                 return SizedBox(width: 120.w,child: ShimmerClass.shimmerContainer(height: 70));

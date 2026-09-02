@@ -98,31 +98,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 child: IntrinsicHeight(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    // crossAxisAlignment: CrossAxisAlignment.start,
                     // mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          Image.asset("assets/images/logo.png",width: 28,),
-                          SizedBox(
-                            width: 14.w,
-                          ),
-                          Text(
-                            "پنل مدیریت هوشمند آب شهرداری تهران",
-                              style: TextStyleP.f14Bold.copyWith(color: ColorPalette.primaryTextGreen)                          ),
-                        ],
+                      Image.asset("assets/images/blackLogo.png",width: 100,),
+                      SizedBox(
+                        width: 14.w,
                       ),
-                      SizedBox(height: 30.h),
+                      SizedBox(height: 26.h),
 
                       Text("ورود به پلتفرم هوشمند مدیریت مصرف آب",style: TextStyleP.f16Medium,),
                       SizedBox(height: 40.h),
-                      Text("شماره تماس"),
-                      SizedBox(height: 8.h),
+
                       Form(
                         key: loginKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            Text("شماره تماس"),
+                            SizedBox(height: 8.h),
                             TextFormField(
 
                               controller: mobileController,
@@ -177,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                       },child: SizedBox(
                           width: MediaQuery.sizeOf(context).width,
-                          child: Text("فراموشی رمز عبور؟",textAlign: TextAlign.end,style: TextStyle(color: ColorPalette.darkBlue),)),),
+                          child: Text("فراموشی رمز عبور؟",textAlign: TextAlign.end,style: TextStyle(color: ColorPalette.textBlue),)),),
 
                       SizedBox(height: 32.h),
 
@@ -245,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               return SignUpScreen();
                             },));
 
-                          },child: Text("ثبت نام کنید",style: TextStyle(color: ColorPalette.darkBlue),),)
+                          },child: Text("ثبت نام کنید",style: TextStyle(color: ColorPalette.textBlue),),)
                         ],
                       )
 

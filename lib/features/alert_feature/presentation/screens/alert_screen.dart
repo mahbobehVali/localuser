@@ -155,20 +155,25 @@ class AlertScreen extends StatelessWidget {
                                                     Expanded(flex: 2,child: Text(data[index-1].clock!.toPersianDigit(), textAlign: TextAlign.center)),
 
                                                     Expanded(flex: 3,child: Text(data[index-1].date!.toPersianDigit(), textAlign: TextAlign.center)),
-                                                    Expanded(flex: 4,child: Container(
-                                                      padding: EdgeInsets.all(5),
-                                                      decoration: BoxDecoration(
-                                                        color: data[index-1].status==0 ?ColorPalette.lightBlue:
-                                                        data[index-1].status==1?ColorPalette.analysingColor:
-                                                        ColorPalette.solvedColor,
-                                                        borderRadius: BorderRadius.circular(5)
+                                                    Expanded(flex: 4,child: Align(
+                                                      alignment: Alignment.center,
+                                                      child: Container(
+                                                          padding: const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 5),
+                                                        decoration: BoxDecoration(
+                                                          color: data[index-1].status==0 ?ColorPalette.lightBlue:
+                                                          data[index-1].status==1?ColorPalette.analysingColor:
+                                                          ColorPalette.solvedColor,
+                                                          borderRadius: BorderRadius.circular(5)
+                                                        ),
+                                                        child: Text(data[index-1].status==0 ?"جدید":
+                                                        data[index-1].status==1?"در حال بررسی":
+                                                        "رفع شده",textAlign: TextAlign.center,
+                                                        style: TextStyle(color: data[index-1].status==0 ?ColorPalette.newTextColor:
+                                                        data[index-1].status==1?ColorPalette.analysingTextColor:
+                                                        ColorPalette.solvedTextColor),),
                                                       ),
-                                                      child: Text(data[index-1].status==0 ?"جدید":
-                                                      data[index-1].status==1?"در حال بررسی":
-                                                      "رفع شده",textAlign: TextAlign.center,
-                                                      style: TextStyle(color: data[index-1].status==0 ?ColorPalette.newTextColor:
-                                                      data[index-1].status==1?ColorPalette.analysingTextColor:
-                                                      ColorPalette.solvedTextColor),),
                                                     )),
 
                                                   ],
@@ -182,6 +187,11 @@ class AlertScreen extends StatelessWidget {
                                       selected: state.selectedAlertPage ?? 1,
                                       lastPage: alertSuccess.alertsEntity.meta.lastPage!,
                                       onPageChanged: (newPage) {
+                                        print("state.alertFilterModel!.filterType${state.alertFilterModel!.filterType}");
+                                        print("state.alertFilterModel!.filterStatus${state.alertFilterModel!.filterStatus}");
+                                        print("state.alertFilterModel!.filterWellName${state.alertFilterModel!.filterWellName}");
+                                        print("state.alertFilterModel!.filterDate${state.alertFilterModel!.filterDate}");
+
                                         BlocProvider.of<AlertBloc>(context).add(
                                           AlertStart(
                                             alertFilterParams: AlertFilterParams(

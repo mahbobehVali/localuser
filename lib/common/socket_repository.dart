@@ -99,6 +99,8 @@ class SocketRepository {
     _socket?.off("fingerprint/request_response");
 
     _socket!.on("dashboard/total/water", (data) {
+      print("dashboard/total/water");
+
       if (data != null && !_waterController.isClosed) {
         // تبدیل به مدل و اضافه کردن به استریم آب
         try {
@@ -110,6 +112,7 @@ class SocketRepository {
     });
 
     _socket!.on("flowmeter/today", (data) {
+      // print("todayyyyyyyyyy");
       if (data != null && !_todayController.isClosed) {
         // تبدیل به مدل و اضافه کردن به استریم آب
         try {
@@ -117,7 +120,7 @@ class SocketRepository {
 
           _todayController.add(model);
 
-          print(' flowmeter Today successfully added to stream');
+          // print(' flowmeter Today successfully added to stream');
         } catch (e) {
 
           print('JSON 2 Parsing Error: $e');
@@ -151,6 +154,7 @@ class SocketRepository {
     });
 
     _socket!.on("motor/status", (data) {
+      print("pomplisten");
       if (data != null && !_onAndOffTimeController.isClosed) {
         // تبدیل به مدل و اضافه کردن به استریم آب
         try {
@@ -229,7 +233,7 @@ class SocketRepository {
   Completer<void>? _connectingCompleter;
 
   Future<void> safeEmit(String event, Map<String, dynamic> data) async {
-    print("pin${data["pin"]}");
+    print("pin:${data["pin"]}");
     // اگر سوکت وصل نیست
     if (_socket == null || !_socket!.connected) {
 
@@ -242,6 +246,7 @@ class SocketRepository {
 
         int attempts = 0;
         while ((_socket == null || !_socket!.connected) && attempts < 40) {
+          print("attempts");
           await Future.delayed(const Duration(milliseconds: 100));
           attempts++;
         }
@@ -251,7 +256,6 @@ class SocketRepository {
 
     // ارسال داده در صورت اتصال
     if (_socket != null && _socket!.connected) {
-      print("_socket != null && _socket!.connected${_socket != null && _socket!.connected}");
       print("🚀 Emitting $event to server...");
       _socket!.emit(event, data);
     } else {
@@ -283,8 +287,10 @@ class SocketRepository {
 
     // اگر سوکت کلاً ساخته نشده، اول وصلش کن
     if (_socket == null) {
+      print("_socketnull");
       await initAndConnect(pin);
     }
+    print("nonull");
 
     // _socket?.off("fingerprint/request_response");
     await safeEmit("fingerprint/add_request", {"deviceID": deviceId , "pin": pin});

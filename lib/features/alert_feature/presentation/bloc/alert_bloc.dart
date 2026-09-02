@@ -53,6 +53,7 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
     on<AlertStart>((event, emit) async {
 
       emit(state.copyWith(newAlertStatus: AlertLoading(),
+
           newSelectedAlertPage:event.filter==true?1: event.alertFilterParams.page));
       DataState dataState = await alertUseCase(event.alertFilterParams);
       if (dataState is DataSuccess) {
@@ -105,7 +106,10 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
       add(AlertStart(filter: true,alertFilterParams: AlertFilterParams(
           type: event.filter.filterType==true? state.selectedAlertType :null,
           status: event.filter.filterStatus==true? state.selectedAlertStatus :null,
-          wellName: event.filter.filterWellName==true? state.oneWell!.data!.wellName : null
+          wellName: event.filter.filterWellName==true? state.oneWell!.data!.wellName : null,
+          startDate: event.filter.filterDate==true? state.alertStartDate : null,
+          endDate: event.filter.filterDate==true? state.alertEndDate : null,
+
       )));
 
     });

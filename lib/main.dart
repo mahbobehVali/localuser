@@ -10,10 +10,23 @@ import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bottom_nav/bottom_nav_cubit.dart';
+import 'common/socket_repository.dart';
 import 'common/widgets/function_widgets.dart';
+import 'features/status_summary_feature/domain/usecase/wells_list_usecase.dart';
+import 'features/well_feature/domain/repository/wells_repository.dart';
+import 'features/well_feature/domain/usecase/alert_count_usecase.dart';
+import 'features/well_feature/domain/usecase/flow_meter_usecase.dart';
+import 'features/well_feature/domain/usecase/get_program_usecase.dart';
+import 'features/well_feature/domain/usecase/well_work_usecase.dart';
+import 'features/well_feature/presentation/bloc/well_detail_bloc/on_off_status.dart';
+import 'features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 import 'locator.dart';
 
+
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await setup();
   customRedScreenError();
@@ -35,9 +48,23 @@ class MyApp extends StatefulWidget {
 
   @override
   State<MyApp> createState() => _MyAppState();
+
 }
 
 class _MyAppState extends State<MyApp> {
+
+  final socketRepository = locator<SocketRepository>();
+  late WellDetailBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    // سوکت باید فقط یک‌بار در زمان ساخت اپلیکیشن متصل شود
+    socketRepository.initAndConnect("manger");
+    _bloc = locator<WellDetailBloc>();
+
+  }
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -51,16 +78,29 @@ class _MyAppState extends State<MyApp> {
           return MultiBlocProvider(
               providers: [
                 BlocProvider<BottomNavCubit>(create: (_) => BottomNavCubit()),
+                // BlocProvider<WellDetailBloc>(create: (_) {
+                //    return WellDetailBloc(
+                //   locator<WellsRepository>(),
+                //   locator<WellWorkHourUseCase>(),
+                //   locator<WellFlowMeterUseCase>(),
+                //   locator<WellsListUseCase>(),
+                //   locator<GetProgramUseCase>(),
+                //   socketRepository,
+                //   locator<AlertCountUseCase>(),
+                // );
+                //
+                // }),
 
               ], child: ScreenUtilInit(
-            designSize: const Size(360, 690),
-            minTextAdapt: true,
-            splitScreenMode: true,
-            builder: (context, Widget? child) {
+                          designSize: const Size(360, 690),
+                          minTextAdapt: true,
+                          splitScreenMode: true,
+                          builder: (context, Widget? child) {
 
               return child!;
-            },
-            child: MaterialApp(
+                          },
+                          child: MaterialApp(
+              scaffoldMessengerKey: rootScaffoldMessengerKey, // این خط را اضافه کنید
 
               debugShowCheckedModeBanner: false,
 
@@ -138,8 +178,8 @@ class _MyAppState extends State<MyApp> {
               locale: const Locale("fa", "IR"), // زبان پیش‌فرض برنامه
 
               home: token.isEmpty? LoginScreen():Wrapper(),
-            ),
-          ));
+                          ),
+                        ));
         }else{
           return CircularProgressIndicator();
         }

@@ -13,7 +13,7 @@ class ReportFlowMeterUseCase extends UseCase<DataState<dynamic>,FlowMeterParams>
   @override
   Future<DataState<dynamic>> call(flowMeterParams) {
 
-    return statusSummaryRepository.flowMeter(flowMeterParams);
+    return statusSummaryRepository.summaryFlowMeter(flowMeterParams);
 
   }
 

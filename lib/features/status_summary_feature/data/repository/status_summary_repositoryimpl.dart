@@ -50,10 +50,10 @@ class StatusSummaryRepositoryImpl extends StatusSummaryRepository {
   }
 
   @override
-  Future<DataState> flowMeter(flowMeterParams) async {
+  Future<DataState> summaryFlowMeter(flowMeterParams) async {
 
     try {
-      Response response = await statusSummaryApiProvider.flowMeter(flowMeterParams);
+      Response response = await statusSummaryApiProvider.summaryFlowMeter(flowMeterParams);
 
       SummaryFlowMeterEntity flowMeterEntity=SummaryFlowMeterModel.fromJson(response.data);
 

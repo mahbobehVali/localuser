@@ -57,8 +57,12 @@ class LastActivityWidget extends StatelessWidget {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
 
-          child: SizedBox(
+          child: Container(
             width: 500,
+            decoration: BoxDecoration(
+                border: BoxBorder.all(color: ColorPalette.lightGrey),
+                borderRadius: BorderRadius.circular(5)
+            ),
 
             child: ListView.builder(
               shrinkWrap: true,
@@ -87,7 +91,7 @@ class LastActivityWidget extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20),
                     decoration: BoxDecoration(
-                        border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey,
+                        border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.lightGrey,
                            ))
                     ),
                     child: Row(

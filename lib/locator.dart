@@ -56,6 +56,7 @@ import 'features/well_feature/domain/usecase/alert_count_usecase.dart';
 import 'features/well_feature/domain/usecase/flow_meter_usecase.dart';
 import 'features/well_feature/domain/usecase/get_program_usecase.dart';
 import 'features/well_feature/domain/usecase/well_work_usecase.dart';
+import 'features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 
 final locator = GetIt.instance;
 // import کنید جایی که SharedPrefOperator در آن قرار دارد
@@ -86,7 +87,15 @@ Future<void> setup() async {
 
   Dio dio = Dio(BaseOptions(baseUrl: Constants.baseUrl));
   dio.interceptors.add(AuthInterceptor());
-
+  locator.registerLazySingleton(() => WellDetailBloc(
+    locator<WellsRepository>(),
+    locator<WellWorkHourUseCase>(),
+    locator<WellFlowMeterUseCase>(),
+    locator<WellsListUseCase>(),
+    locator<GetProgramUseCase>(),
+    locator<SocketRepository>(),
+    locator<AlertCountUseCase>(),
+  ));
   locator.registerFactory<SignUpApiProvider>(() =>SignUpApiProvider(dio));
   locator.registerFactory<SignUpRepository>(() =>SignUpRepositoryImpl(apiProvider: locator()));
   locator.registerFactory<RegisterUseCase>(() =>RegisterUseCase(locator()));

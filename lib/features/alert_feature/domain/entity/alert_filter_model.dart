@@ -69,7 +69,7 @@ class AlertFilterModel {
       status: newStatus??status,
       type: newType ??type,
       startDate: newStartDate ?? startDate,
-      endDate: newEndDate ?? startDate,
+      endDate: newEndDate ?? endDate,
       wellName: newWellName??wellName,
       filterType: newFilterType ??filterType,
       filterStatus: newFilterStatus ?? filterStatus,

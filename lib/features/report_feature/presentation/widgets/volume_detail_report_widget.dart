@@ -101,6 +101,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                     toY: 0,
                     color: Colors.transparent,
                     width: 12,
+
                   ),
                 ],
               );
@@ -120,7 +121,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                   BarChartRodData(
                     toY: yVal,
                     color: normalColor,
-                    width: 12,
+                    width: 16.w,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ],
@@ -160,7 +161,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                   toY: yVal, // ارتفاع کل میله دقیقاً برابر با yVal است
                   rodStackItems: stackItems,
                   color: Colors.transparent,
-                  width: 12,
+                  width: 16.w,
                   borderRadius: BorderRadius.zero,
                 ),
               ],
@@ -182,7 +183,9 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(top: 40, right: 18.0,bottom: 10),
                           child: BarChart(
+
                             BarChartData(
+
                               extraLinesData: ExtraLinesData(
                                 horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
                               ),
@@ -271,8 +274,12 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
 
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: SizedBox(
+                child: Container(
                   width: 500,
+                  decoration: BoxDecoration(
+                      border: BoxBorder.all(color: ColorPalette.lightGrey),
+                      borderRadius: BorderRadius.circular(5)
+                  ),
                   child: ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.zero,
@@ -300,7 +307,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                         decoration: BoxDecoration(
-                          border: Border(bottom: BorderSide(color: ColorPalette.grey, width: 1)),
+                          border: Border(bottom: BorderSide(color: ColorPalette.lightGrey, width: 1)),
                         ),
                         child: Row(
                           children: [

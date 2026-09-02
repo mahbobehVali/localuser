@@ -26,11 +26,11 @@ dynamic findFlowMeterElement(List<dynamic> list) {
   );
   if (onwellElement != null) return onwellElement;
 
-  final totalElement = list.firstWhere(
-        (element) => element["type"] == "total",
-    orElse: () => null,
-  );
-  if (totalElement != null) return totalElement;
+  // final totalElement = list.firstWhere(
+  //       (element) => element["type"] == "total",
+  //   orElse: () => null,
+  // );
+  // if (totalElement != null) return totalElement;
 
 
 // اگر هیچ‌کدوم نبودن خطا میده

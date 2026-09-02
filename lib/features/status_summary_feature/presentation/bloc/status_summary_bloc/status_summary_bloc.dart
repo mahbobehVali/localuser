@@ -57,6 +57,8 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
     });
 
     on<ReportFlowMeter>((event, emit) async {
+      if (state.reportFlowMeterStatus is SummaryFlowMeterLoading) return;
+
       emit(state.copyWith(newReportFlowMeterStatus: SummaryFlowMeterLoading(),
           newSelectedChartTab: event.flowMeterParams.type));
       DataState dataState = await reportFlowMeterUseCase(event.flowMeterParams);
@@ -93,19 +95,18 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
     });
 
     on<SocketEvent>((event, emit) async {
+      print("socketStart");
       // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
       if (state.waterStatus is! WaterSuccess) {
         emit(state.copyWith(newWaterStatus: WaterLoading()));
       }
 
       // ۱. فرمان اتصال به ریپازیتوری
-      // ارسال درخواست مخصوص این صفحه
       socketRepository.requestWaterData(event.level, event.areaId);
       // socketRepository.connect(event.level, event.areaId);
 
       // ۲. مدیریت استریم با emit.forEach
       await emit.forEach<dynamic>(
-        // statusSummaryRepository.dashboardStatusWater,
         socketRepository.waterStream,
         onData: (waterModel) {
           return state.copyWith(
@@ -113,18 +114,17 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
           );
         },
         onError: (error, stackTrace) {
-          print("❌ BLoC Stream Error: $error");
+          print(" BLoC Stream Error: $error");
           return state.copyWith(
             newWaterStatus: WaterError(error.toString()),
           );
         },
       );
     }
-, transformer: restartable() // این باعث می‌شود اگر دوباره رویداد آمد، استریم قبلی بسته شود
     );
   }
 
-  // 🔥 این بخش حیاتی برای "خروج از صفحه" است
+  //  این بخش حیاتی برای "خروج از صفحه" است
   @override
   Future<void> close() {
     socketRepository.dispose(); // قطع سوکت دقیقا هنگام خروج از صفحه

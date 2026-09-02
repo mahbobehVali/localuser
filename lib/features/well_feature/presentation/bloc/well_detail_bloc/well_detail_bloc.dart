@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
@@ -39,6 +41,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
   GetProgramUseCase getProgramUseCase;
   SocketRepository socketRepository;
   AlertCountUseCase alertCountUseCase;
+  StreamSubscription? _socketSubscription;
 
   WellDetailBloc(this.wellsRepository,this.wellWorkUseCase,
       this.wellFlowMeterUseCase,this.wellsListUseCase,
@@ -67,6 +70,48 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     today: -1,
     flowMeterTodayStatus: FlowMeterTodayInitial()
   )) {
+
+    // ۱. گوش دادن دائمی به استریم در زمان ساخت BLoC (خارج از ایونت‌ها)
+    _socketSubscription = socketRepository.onAndOffTimeStream.timeout(
+      const Duration(seconds: 60),
+      onTimeout: (sink) {
+        sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
+      },
+    ).listen(
+          (onOff) {
+        // هر زمان دیتایی آمد، یک ایونت داخلی به بلاک اضافه می‌کنیم
+        add(InternalPumpDataReceived(onOff));
+      },
+      onError: (error) {
+        add(InternalPumpErrorOccurred(error.toString()));
+      },
+    );
+
+    on<SwitchClicked>((event, emit) async {
+      emit(state.copyWith(newOnOffStatus: OnOffLoading()));
+      socketRepository.onAndOff(event.createTimeParams);
+      // دیگر نیازی به emit.forEach در اینجا نیست!
+    });
+
+    // ۳. مدیریت دیتای دریافتی از سوکت
+    on<InternalPumpDataReceived>((event, emit) {
+      print("onOfffgg: ${event.onOff}");
+      print("OnOffSuccess");
+
+      emit(state.copyWith(
+        newIsSwitched: event.onOff == 1,
+        newOnOffStatus: OnOffSuccess(event.onOff),
+      ));
+      print("OnOffSuccess");
+    });
+
+    // ۴. مدیریت خطای سوکت
+    on<InternalPumpErrorOccurred>((event, emit) {
+      print("❌ BLoC Stream Error: ${event.error}");
+      emit(state.copyWith(
+        newOnOffStatus: OnOffError(event.error),
+      ));
+    });
     on<WellStart>((event, emit) async {
       emit(state.copyWith(newWellStatus: WellLoading()));
 
@@ -159,44 +204,46 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
     });
 
-    on<SwitchClicked>((event, emit) async {
-      // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
-      // if (state.onOffStatus is! OnOffSuccess) {
-      //   emit(state.copyWith(newOnOffStatus: OnOffSuccess()));
-      // }
-      // ارسال درخواست مخصوص این صفحه
-      emit(state.copyWith(newOnOffStatus: OnOffLoading()));
+    // on<SwitchClicked>((event, emit) async {
+    //   // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
+    //   // if (state.onOffStatus is! OnOffSuccess) {
+    //   //   emit(state.copyWith(newOnOffStatus: OnOffSuccess()));
+    //   // }
+    //   // ارسال درخواست مخصوص این صفحه
+    //   emit(state.copyWith(newOnOffStatus: OnOffLoading()));
+    //
+    //   socketRepository.onAndOff(event.createTimeParams);
+    //
+    //   // ۲. مدیریت استریم با emit.forEach
+    //   await emit.forEach<dynamic>(
+    //     // socketRepository.onAndOffTimeStream,
+    //     socketRepository.onAndOffTimeStream.timeout(
+    //       const Duration(seconds: 60),
+    //       onTimeout: (sink) {
+    //         // زمانی که ۶۰ ثانیه بگذرد و هیچ دیتایی نیاید، این بخش اجرا می‌شود
+    //         sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
+    //       },
+    //     ),
+    //     onData: (onOff) {
+    //       print("onOff$onOff");
+    //       // دیتای دریافتی را به وضعیت موفقیت می‌بریم
+    //       return state.copyWith(
+    //         newIsSwitched: onOff==1?true:false,
+    //         newOnOffStatus: OnOffSuccess(onOff)
+    //       );
+    //     },
+    //       onError: (error, stackTrace) {
+    //       print("❌ BLoC Stream Error: $error");
+    //       return state.copyWith(
+    //         newOnOffStatus: OnOffError(error.toString()),
+    //       );
+    //     },
+    //   );
+    //
+    // });
 
-      socketRepository.onAndOff(event.createTimeParams);
-
-      // ۲. مدیریت استریم با emit.forEach
-      await emit.forEach<dynamic>(
-        // socketRepository.onAndOffTimeStream,
-        socketRepository.onAndOffTimeStream.timeout(
-          const Duration(seconds: 60),
-          onTimeout: (sink) {
-            // زمانی که ۶۰ ثانیه بگذرد و هیچ دیتایی نیاید، این بخش اجرا می‌شود
-            sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
-          },
-        ).take(1),
-        onData: (onOff) {
-          print("onOff$onOff");
-          // دیتای دریافتی را به وضعیت موفقیت می‌بریم
-          return state.copyWith(
-            newIsSwitched: onOff==1?true:false,
-            newOnOffStatus: OnOffSuccess(onOff)
-          );
-        },
-          onError: (error, stackTrace) {
-          print("❌ BLoC Stream Error: $error");
-          return state.copyWith(
-            newOnOffStatus: OnOffError(error.toString()),
-          );
-        },
-      );
-
-    });
     // در فایل well_detail_bloc.dart
+
     on<ResetOnOffStatus>((event, emit) {
       // مقدار استاتوس را دوباره به حالت اولیه (یا موفقیت قبلی/خالی) برمی‌گردانیم
       emit(state.copyWith(newOnOffStatus: OnOffInitial()));
@@ -311,6 +358,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     });
 
     on<FlowMeterToday>((event, emit) async {
+      print("todaybloc");
       // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
       // if (state.onOffStatus is! OnOffSuccess) {
       //   emit(state.copyWith(newOnOffStatus: OnOffSuccess()));

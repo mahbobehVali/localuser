@@ -36,6 +36,14 @@ class SwitchClicked extends WellDetailEvent {
   // TODO: implement props
   List<Object?> get props => [isSwitch,createTimeParams];
 }
+class AutomaticSwitch extends WellDetailEvent {
+
+  const AutomaticSwitch();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
 
 class FirstSwitch extends WellDetailEvent {
   final bool isSwitch;
@@ -214,6 +222,26 @@ class FlowMeterEvent extends WellDetailEvent {
 class FlowMeterToday extends WellDetailEvent {
 
   const FlowMeterToday();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
+// ایونت داخلی برای دیتای سوکت
+class InternalPumpDataReceived extends WellDetailEvent {
+  final dynamic onOff;
+  InternalPumpDataReceived(this.onOff);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
+
+// ایونت خطای داخلی سوکت
+class InternalPumpErrorOccurred extends WellDetailEvent {
+  final String error;
+  InternalPumpErrorOccurred(this.error);
 
   @override
   // TODO: implement props

@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/features/alert_feature/domain/entity/alert_type_entity.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../config/color_palette.dart';
@@ -55,6 +56,54 @@ class Constants {
   //   final emailRegExp = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
   //   return emailRegExp.hasMatch(email);
   // }
+
+  String getPersianWeekDay(String date) {
+    try {
+      final parts = date.split('/');
+
+      final year = int.parse(parts[0]);
+      final month = int.parse(parts[1]);
+      final day = int.parse(parts[2]);
+
+      final jalali = Jalali(year, month, day);
+      final gregorian = jalali.toGregorian();
+
+      final weekday = DateTime(
+        gregorian.year,
+        gregorian.month,
+        gregorian.day,
+      ).weekday;
+
+      switch (weekday) {
+        case DateTime.saturday:
+          return "شنبه";
+
+        case DateTime.sunday:
+          return "یکشنبه";
+
+        case DateTime.monday:
+          return "دوشنبه";
+
+        case DateTime.tuesday:
+          return "سه شنبه";
+
+        case DateTime.wednesday:
+          return "چهارشنبه";
+
+        case DateTime.thursday:
+          return "پنج شنبه";
+
+        case DateTime.friday:
+          return "جمعه";
+
+        default:
+          return date;
+      }
+    } catch (e) {
+      return date;
+    }
+  }
+
 
   final monthNames = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
@@ -432,7 +481,7 @@ class Constants {
     }
     else if (day == "week") {
       displayText = (index < Constants().weekDayNames.length)
-          ? Constants().weekDayNames[index].name
+          ? getPersianWeekDay(titleString)
           : titleString;
     }
     else {

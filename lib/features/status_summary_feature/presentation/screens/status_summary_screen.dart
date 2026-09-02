@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:mahaliii/common/params/flowmeter_params.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/config/texts_style.dart';
@@ -108,12 +109,14 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                             children: [
                               Row(
                                 children: [
+
+
                                   Expanded(
                                     child: WaterAmountContainer(
                                       image: "assets/icons/flowmeter.png",
 
                                       title: "امروز",
-                                      amount:"${waterSuccess.waterData!.today!.toString()} m³",
+                                      amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.today!.toDouble().round())} m³",
                                     ),
                                   ),
 
@@ -123,7 +126,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                                       image: "assets/icons/flowmeter.png",
 
                                       title: "این ماه",
-                                      amount: "${waterSuccess.waterData!.monthly!.toString()} m³",
+                                      amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.monthly!.toDouble().round())} m³",
                                     ),
                                   ),
 
@@ -133,7 +136,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                               WaterAmountContainer(
                                 image: "assets/icons/flowmeter.png",
                                 title: "از ابتدای سال",
-                                amount: "${waterSuccess.waterData!.total!.toString()} m³",
+                                amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.total!.toDouble().round())} m³",
                                 year: true,
 
                               ),
@@ -142,7 +145,8 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
                         } else {
                           return const SizedBox();
                         }
-                      } else if (state.waterStatus is WaterLoading) {
+                      }
+                      else if (state.waterStatus is WaterLoading) {
                         return ShimmerClass.shimmerListviewHor(height: 100);
                       } else {
                         return const SizedBox();

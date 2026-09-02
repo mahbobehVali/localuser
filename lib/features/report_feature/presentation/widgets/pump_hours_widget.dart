@@ -211,42 +211,53 @@ class PumpHoursChartWidget extends StatelessWidget {
                       icon:Icon(Icons.file_download_outlined))
                 ],
               ),
-              Padding(
-                padding:  EdgeInsets.only(bottom: 30.h),
-                child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  itemCount: yValues.length + 1,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    if (index == 0) {
-                      return Container(
-                        padding: const EdgeInsets.all(10),
-                        color: ColorPalette.lightGrey,
-                        child: Row(
-                          children: [
-                            Expanded(flex: 3, child: Text( state.oneWell.length==1? "تاریخ":"چاه", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
-                            Expanded(flex: 2, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
-                          ],
-                        ),
-                      );
-                    }else{
+              Container(
+                decoration: BoxDecoration(
+                  border: BoxBorder.all(color: ColorPalette.lightGrey),
+                  borderRadius: BorderRadius.circular(5)
+                ),
+                child: Padding(
+                  padding:  EdgeInsets.only(bottom: 30.h),
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    itemCount: yValues.length + 1,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return Container(
+                          padding:  EdgeInsets.symmetric(vertical: 10.h),
 
-                      final item = flatList[index - 1];
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(topRight: Radius.circular(5),
+                              topLeft: Radius.circular(5)),
+                            color: ColorPalette.lightGrey,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(flex: 2, child: Text( state.oneWell.length==1? "تاریخ":"چاه", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
+                              Expanded(flex: 2, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
+                            ],
+                          ),
+                        );
+                      }else{
 
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                        decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
-                        child: Row(
-                          children: [
-                            Expanded(flex: 3, child: Text(item.name.toString().toPersianDigit(),textAlign: TextAlign.center)),
-                            Expanded(flex: 2, child: Text('\u200E${item.amount}',textAlign: TextAlign.center)),
-                          ],
-                        ),
-                      );
-                    }
+                        final item = flatList[index - 1];
 
-                  },
+                        return Container(
+                          padding:  EdgeInsets.symmetric( vertical: 20),
+                          decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.lightGrey, width: 1))),
+                          child: Row(
+                            children: [
+                              Expanded(flex: 2, child: Text(item.name.toString().toPersianDigit(),textAlign: TextAlign.center)),
+                              Expanded(flex: 2, child: Text('\u200E${item.amount}',textAlign: TextAlign.center)),
+                            ],
+                          ),
+                        );
+                      }
+
+                    },
+                  ),
                 ),
               )
             ],

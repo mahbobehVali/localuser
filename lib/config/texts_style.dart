@@ -30,6 +30,8 @@ abstract class TextStyleP {
   TextStyle(fontFamily: fontFamily,fontSize: 16.sp, fontWeight: FontWeight.bold);
 static TextStyle f12Regular =
   TextStyle(fontFamily: fontFamily,fontSize: 12.sp, fontWeight: FontWeight.w400);
+static TextStyle f12Bold =
+  TextStyle(fontFamily: fontFamily,fontSize: 12.sp, fontWeight: FontWeight.bold);
 static TextStyle f10Regular =
   TextStyle(fontFamily: fontFamily,fontSize: 10.sp, fontWeight: FontWeight.w400);
 static TextStyle f8Medium =

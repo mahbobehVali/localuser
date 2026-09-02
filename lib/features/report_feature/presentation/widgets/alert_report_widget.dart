@@ -178,7 +178,7 @@ class AlertsReportChartWidget extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Container(
-                decoration: BoxDecoration(border: Border.all(color: ColorPalette.grey), borderRadius: BorderRadius.circular(5)),
+                decoration: BoxDecoration(border: Border.all(color:ColorPalette.lightGrey), borderRadius: BorderRadius.circular(5)),
                 child: ListView.builder(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,

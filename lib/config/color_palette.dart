@@ -12,6 +12,7 @@ class ColorPalette{
   static Color darkRed=Color(0xffC0392B);
   static Color inverseGrey=Color(0xffB7BFCC);
   static Color darkBlue=Color(0xff5F8CC5);
+  static Color textBlue=Color(0xff1161AD);
   static Color lightBlue=Color(0xffB3D7F6);
   static Color inverseBlue=Color(0xff7EB9EE);
   static Color black=Colors.black;

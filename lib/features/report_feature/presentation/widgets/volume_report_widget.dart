@@ -248,44 +248,50 @@ class VolumeReportChartWidget extends StatelessWidget {
               ),
               SizedBox(height: 8.h,),
 
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                itemCount: flatList.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
+              Container(
+                decoration: BoxDecoration(
+                    border: BoxBorder.all(color: ColorPalette.lightGrey),
+                    borderRadius: BorderRadius.circular(5)
+                ),
+                child: ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemCount: flatList.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Container(
+                        padding: const EdgeInsets.all(10),
+                        color: ColorPalette.lightGrey,
+                        child: Row(
+                          children: [
+                            Expanded( child: Text( "تاریخ",
+                                style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                            Expanded( child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                            Expanded( child: Text("وضعیت", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                          ],
+                        ),
+                      );
+                    }
+
+                    // دسترسی آسان به دیتای آماده از flatList
+                    final item = flatList[index - 1];
+
                     return Container(
-                      padding: const EdgeInsets.all(10),
-                      color: ColorPalette.lightGrey,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: ColorPalette.lightGrey, width: 1)),
+                      ),
                       child: Row(
                         children: [
-                          Expanded( child: Text( "تاریخ",
-                              style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
-                          Expanded( child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
-                          Expanded( child: Text("وضعیت", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                          Expanded( child: Text(item.name??"", textAlign: TextAlign.center)),
+                          Expanded(child: Text('\u200E${item.amount}', textAlign: TextAlign.center)),
+                          Expanded( child: Text(item.status??"", textAlign: TextAlign.center)),
                         ],
                       ),
                     );
-                  }
-
-                  // دسترسی آسان به دیتای آماده از flatList
-                  final item = flatList[index - 1];
-
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: ColorPalette.grey, width: 1)),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded( child: Text(item.name??"", textAlign: TextAlign.center)),
-                        Expanded(child: Text('\u200E${item.amount}', textAlign: TextAlign.center)),
-                        Expanded( child: Text(item.status??"", textAlign: TextAlign.center)),
-                      ],
-                    ),
-                  );
-                },
+                  },
+                ),
               )
 
             ],

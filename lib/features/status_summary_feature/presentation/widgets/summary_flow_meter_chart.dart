@@ -29,7 +29,8 @@ class SummaryFlowMeterChart extends StatelessWidget {
             borderRadius: BorderRadius.circular(5),
             color: Colors.white
         ),
-        child: Padding(padding: EdgeInsets.all(12),
+        child: Padding(
+          padding: EdgeInsets.all(12.sp),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -40,9 +41,11 @@ class SummaryFlowMeterChart extends StatelessWidget {
                 children: [
                   Text("روند مصرف آب چاه‌ها",style: TextStyleP.f14Medium),
                   BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
-                    buildWhen: (previous, current) =>
-                    current.selectedChartTab!=previous.selectedChartTab,
+                    buildWhen: (previous, current) => current.selectedChartTab!=previous.selectedChartTab ||
+                     current.reportFlowMeterStatus!=previous.reportFlowMeterStatus,
                     builder: (context, state) {
+                      print("dfksldfklsd");
+                      print(state.reportFlowMeterStatus);
                       return Row(
                         children: [
                           GlobalElevatedButton(
@@ -50,7 +53,9 @@ class SummaryFlowMeterChart extends StatelessWidget {
                             borderRadius: 50,
 
                             widget: Text("امروز",style: TextStyle(color: ColorPalette.black),),
-                            onTap:state.reportFlowMeterStatus is ReportFlowMeterLoading?null: () {
+                            onTap:(state.reportFlowMeterStatus is ReportFlowMeterLoading ||
+                                state.selectedChartTab == 1)?null: () {
+                              print("11111111111");
                               BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                                 type: 1,
                                 ids:int.parse(info[6]),
@@ -62,7 +67,9 @@ class SummaryFlowMeterChart extends StatelessWidget {
                               borderRadius: 50,
                               backColor: state.selectedChartTab==6?ColorPalette.inverseBlue:ColorPalette.lightGrey,
                               widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
-                              onTap:state.reportFlowMeterStatus is ReportFlowMeterLoading?null: () {
+                              onTap:(state.reportFlowMeterStatus is ReportFlowMeterLoading ||
+                                  state.selectedChartTab == 6)?null: () {
+                                print("66666");
                                 BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                                   type: 6,
                                   ids:int.parse(info[6]),
@@ -76,7 +83,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical:20),
+                padding:  EdgeInsets.symmetric(vertical:20.h),
                 child: SizedBox(
                   height: 300.h,
                   child: BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
@@ -329,7 +336,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                                     if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
                                                       final double val = (yValues[sIndex] as num).toDouble();
                                                       final color = Constants().lineColors[i % Constants().lineColors.length];
-// ۱. فرمت کردن صحیح مقدار منفی
+                                              // ۱. فرمت کردن صحیح مقدار منفی
                                                       final String formattedVal = val < 0
                                                           ? "-${(-val).toStringAsFixed(1).toString().toPersianDigit()}"
                                                           : val.toStringAsFixed(1).toString().toPersianDigit();

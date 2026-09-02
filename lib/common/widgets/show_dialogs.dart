@@ -244,7 +244,7 @@ class ShowDialogs {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("برنامه زمانی چاه ${wellsDataEntity.wellName}",style: TextStyleP.f14Medium,),
+                          Text("برنامه زمانی ${wellsDataEntity.wellName}",style: TextStyleP.f14Medium,),
                           SizedBox(height: 14.h),
 
                           Text("انتخاب روز"),
@@ -295,17 +295,18 @@ class ShowDialogs {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // 🕐 فیلد ساعت شروع
+                              //  فیلد ساعت شروع
                               BlocBuilder<WellDetailBloc, WellDetailState>(
                                 buildWhen: (prev, curr) => prev.startHour != curr.startHour ||
                                     prev.daySelected != curr.daySelected,
                                 builder: (context, state) {
-                                  final displayStart = (state.startHour?.isNotEmpty == true) ? state.startHour! : "00:00";
+                                  final displayStart = (state.startHour?.isNotEmpty == true) ? state.startHour! : "";
 
                                   return TimePickerField(
                                     title: "ساعت شروع",
                                     displayText: displayStart,
-                                    ignoring: state.daySelected.id == -1,
+                                    ignoring: false,
+                                    // ignoring: state.daySelected.id == -1,
                                     onTap: () async {
                                       final picked = await Constants().showCustomTimePicker(context);
                                       if (picked != null && context.mounted) {
@@ -327,7 +328,7 @@ class ShowDialogs {
                                 prev.endHour != curr.endHour || prev.startHour != curr.startHour || curr.daySelected != prev.daySelected,
                                 builder: (context, state) {
                                   final isStartEmpty = state.startHour?.isEmpty ?? true;
-                                  final displayEnd = (state.endHour?.isNotEmpty == true) ? state.endHour! : "00:00";
+                                  final displayEnd = (state.endHour?.isNotEmpty == true) ? state.endHour! : "";
 
                                   return TimePickerField(
                                     title: "ساعت پایان",
@@ -519,7 +520,7 @@ class ShowDialogs {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("برنامه زمانی چاه بوستان ولایت ${wellsDataEntity.wellName}"),
+                        Text("برنامه زمانی ${wellsDataEntity.wellName}"),
                         SizedBox(height: 14,),
 
                         Text("آیا اطمینان دارید که می‌خواهید زمان مورد نظر خود را حذف کنید؟"),
@@ -764,47 +765,13 @@ class ShowDialogs {
             child: Directionality(
               textDirection: TextDirection.rtl,
               child: BlocConsumer<WellDetailBloc, WellDetailState>(
-                listenWhen: (previous, current) {
-                  // هر زمان که وضعیت onOffStatus تغییر کند (چه خطا، چه موفقیت)، لیسنر فعال می‌شود
-                  return previous.onOffStatus != current.onOffStatus ||
-                      previous.isSwitched!=current.isSwitched;
-                },
-                listener: (blocContext, state) {
-                  //  ۱. در صورت موفقیت
+                listener: (context, state) {
                   if (state.onOffStatus is OnOffSuccess) {
-                    // پاک کردن اسنک‌بارهای قبلی
-                    ScaffoldMessenger.of(context).clearSnackBars();
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content:  Text(state.isSwitched == true ? "با موفقیت روشن شد" : "با موفقیت خاموش شد"),
-                        backgroundColor: Colors.green,
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-
-                    // بستن دیالوگ
-                    Navigator.of(dialogContext).pop();
+                    Navigator.of(context).pop();
                   }
 
-                  if (state.onOffStatus is OnOffError) {
-                    final errorState = state.onOffStatus as OnOffError;
-
-                    // پاک کردن اسنک‌بارهای قبلی
-                    ScaffoldMessenger.of(context).clearSnackBars();
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(errorState.error),
-                        backgroundColor: Colors.red,
-                        duration: const Duration(seconds: 3),
-                      ),
-                    );
-
-                    // ریست کردن استاتوس جهت جلوگیری از اجرای تکراری
-                    wellDetailBloc.add(ResetOnOffStatus());
-                  }
                 },
+
                 builder: (context, state) {
                   final isLoading = state.onOffStatus is OnOffLoading;
 
@@ -1010,7 +977,7 @@ class ShowDialogs {
                                     // var label = picked.formatFullDate();
                                     if(picked!=null) {
                                       alertBloc.add(AlertChangeDate(start, end,state.alertFilterModel!.copyWith(
-                                    newFilterDate: true,
+                                        newFilterDate: true,
                                         newStartDate: start,
                                         newEndDate: end
                                     )));
@@ -1138,7 +1105,7 @@ class ShowDialogs {
                       SizedBox(
                         width: 10.w,
                       ),
-                      Expanded(child: RefuseButton())
+                      Expanded(child: RefuseButton(borderRadius: 2.5,))
                     ],
                   )
                 ],
