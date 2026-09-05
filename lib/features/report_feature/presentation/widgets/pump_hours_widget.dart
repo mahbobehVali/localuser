@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
+import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/constants.dart';
@@ -15,7 +16,18 @@ import '../bloc/report_command_status.dart';
 class PumpHoursChartWidget extends StatelessWidget {
    PumpHoursChartWidget({super.key});
   List<VolumeSlot> flatList = [];
+   int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
+     // جدا کردن سال، ماه و روز
+     final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
+     final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
 
+     // تبدیل تاریخ‌های شمسی به DateTime
+     final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
+     final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
+
+     // محاسبه اختلاف به روز
+     return date2.difference(date1).inDays;
+   }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ReportBloc, ReportState>(
@@ -30,20 +42,28 @@ class PumpHoursChartWidget extends StatelessWidget {
             return Constants.noData();
           }
 
-          if(state.oneWell.length==1){
-            final firstParts = xLabels.first?.toString().split('/') ?? [];
-            final firstMonth = firstParts.length > 1 ? firstParts[1] : null;
-            final bool isSameMonthForAll = xLabels.every((element) {
-              final p = element.toString().split('/');
-              return p.length > 1 && p[1] == firstMonth;
-            });
+          if(state.oneWell.length==1 ){
+
             for (int i = 0; i < yValues.length; i++) {
               final val = yValues[i];
               final parts = xLabels[i].split('/');
               final monthNum = int.tryParse(parts[1]) ?? 0;
 
-              String name =  isSameMonthForAll?
+              String name =  getDaysBetweenShamsiDates(state.startDate, state.endDate)<31?
               xLabels[i].toString().toPersianDigit():Constants().monthNames[monthNum - 1];
+
+              final amount= val.toString().toPersianDigit()  ;
+              flatList.add(VolumeSlot(
+                  name: name,
+                  amount: amount
+              ));
+
+            }
+          }else{
+            for (int i = 0; i < yValues.length; i++) {
+              final val = yValues[i];
+
+              String name = xLabels[i].toString().toPersianDigit();
 
               final amount= val.toString().toPersianDigit()  ;
               flatList.add(VolumeSlot(
@@ -54,22 +74,11 @@ class PumpHoursChartWidget extends StatelessWidget {
             }
           }
 
-          for (int i = 0; i < yValues.length; i++) {
-            final val = yValues[i];
 
-            String name = xLabels[i].toString().toPersianDigit();
-
-            final amount= val.toString().toPersianDigit()  ;
-            flatList.add(VolumeSlot(
-                name: name,
-                amount: amount
-            ));
-
-          }
 
 
           final scale = Constants().getScale(yValues);
-          double chartWidth = (xLabels.length * 20.0).clamp(MediaQuery.sizeOf(context).width, double.infinity);
+          double chartWidth = (xLabels.length * 20.0).clamp(MediaQuery.sizeOf(context).width, double.infinity)+100;
 
           List<BarChartGroupData> chartGroups = List.generate(xLabels.length, (index) {
             return BarChartGroupData(
@@ -84,6 +93,7 @@ class PumpHoursChartWidget extends StatelessWidget {
               ],
             );
           });
+          print(flatList.length + 1);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +193,9 @@ class PumpHoursChartWidget extends StatelessWidget {
                               rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                               topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                               bottomTitles: Constants().axisBottomTitles(xLabels,
-                                  flowMeter.type=="all-well"?"nothing":flowMeter.type=="one-well"?"clock":"date"),
+                                  flowMeter.type=="all-well"?"nothing":flowMeter.type=="one-well"?"clock":"date",
+                              leng: getDaysBetweenShamsiDates(state.startDate, state.endDate)),
+
                               leftTitles: Constants().leftTitles(
                                 interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
                                 scale: scale['step'] == 0 ? 10 : scale['step']!,
@@ -216,48 +228,45 @@ class PumpHoursChartWidget extends StatelessWidget {
                   border: BoxBorder.all(color: ColorPalette.lightGrey),
                   borderRadius: BorderRadius.circular(5)
                 ),
-                child: Padding(
-                  padding:  EdgeInsets.only(bottom: 30.h),
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: yValues.length + 1,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return Container(
-                          padding:  EdgeInsets.symmetric(vertical: 10.h),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemCount: flatList.length + 1,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Container(
+                        padding:  EdgeInsets.symmetric(vertical: 10.h),
 
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(topRight: Radius.circular(5),
-                              topLeft: Radius.circular(5)),
-                            color: ColorPalette.lightGrey,
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(flex: 2, child: Text( state.oneWell.length==1? "تاریخ":"چاه", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
-                              Expanded(flex: 2, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
-                            ],
-                          ),
-                        );
-                      }else{
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(topRight: Radius.circular(5),
+                            topLeft: Radius.circular(5)),
+                          color: ColorPalette.lightGrey,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 2, child: Text( state.oneWell.length==1? "تاریخ":"چاه", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
+                            Expanded(flex: 2, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
+                          ],
+                        ),
+                      );
+                    }else{
 
-                        final item = flatList[index - 1];
+                      final item = flatList[index - 1];
 
-                        return Container(
-                          padding:  EdgeInsets.symmetric( vertical: 20),
-                          decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.lightGrey, width: 1))),
-                          child: Row(
-                            children: [
-                              Expanded(flex: 2, child: Text(item.name.toString().toPersianDigit(),textAlign: TextAlign.center)),
-                              Expanded(flex: 2, child: Text('\u200E${item.amount}',textAlign: TextAlign.center)),
-                            ],
-                          ),
-                        );
-                      }
+                      return Container(
+                        padding:  EdgeInsets.symmetric( vertical: 20),
+                        decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.lightGrey, width: 1))),
+                        child: Row(
+                          children: [
+                            Expanded(flex: 2, child: Text(item.name.toString().toPersianDigit(),textAlign: TextAlign.center)),
+                            Expanded(flex: 2, child: Text('\u200E${item.amount}',textAlign: TextAlign.center)),
+                          ],
+                        ),
+                      );
+                    }
 
-                    },
-                  ),
+                  },
                 ),
               )
             ],

@@ -212,9 +212,7 @@ class Constants {
     AlertTypeEntity("کاربر محلی", 0),
     AlertTypeEntity("مدیر منطقه", 1),
 
-
   ];
-
 
   List<AlertTypeEntity> alertStatus = [
     AlertTypeEntity("جدید", 0),

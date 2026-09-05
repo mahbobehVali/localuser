@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class GlobalSnackBar {
   // متد را به صورت استاتیک تعریف می‌کنیم تا بدون ساختن نمونه شیء، قابل صدا زدن باشد
-  static void show(BuildContext context, {required String message}) {
+  static void show(BuildContext context, {required String message, int duration=3}) {
 
     // قبل از نمایش اسنک‌بار جدید، قبلی‌ها را می‌بندیم تا صفی از اسنک‌بارها درست نشود
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -12,8 +12,9 @@ class GlobalSnackBar {
       SnackBar(
         dismissDirection: DismissDirection.up,
 
+
         behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 1),
+        duration:  Duration(seconds: duration),
         elevation: 0,
         backgroundColor: Color(0xff5F8CC5),
         margin: EdgeInsets.only(

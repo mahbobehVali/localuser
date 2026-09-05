@@ -33,15 +33,7 @@ class _WellScreenState extends State<WellScreen> {
     return Scaffold(
       body: BlocProvider<WellDetailBloc>(
         create: (context) {
-          WellDetailBloc wellBloc= WellDetailBloc(
-            locator<WellsRepository>(),
-            locator<WellWorkHourUseCase>(),
-            locator<WellFlowMeterUseCase>(),
-            locator<WellsListUseCase>(),
-            locator<GetProgramUseCase>(),
-            locator<SocketRepository>(),
-            locator<AlertCountUseCase>(),
-          );
+          WellDetailBloc wellBloc= locator<WellDetailBloc>();
           wellBloc.add(WellStart());
           return wellBloc;
         },
@@ -78,19 +70,9 @@ class _WellScreenState extends State<WellScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => BlocProvider<WellDetailBloc>(
-                                      create: (context) => WellDetailBloc(
-                                        locator<WellsRepository>(),
-                                        locator<WellWorkHourUseCase>(),
-                                        locator<WellFlowMeterUseCase>(),
-                                        locator<WellsListUseCase>(),
-                                        locator<GetProgramUseCase>(),
-                                        locator<SocketRepository>(),
-                                        locator<AlertCountUseCase>(),
-                                      ),
-                                      child: WellDetailScreen(
-                                        wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!,
-                                      ),
+                                    builder: (_) => WellDetailScreen(
+                                      wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!,
+
                                     ),
                                   ),
                                 );

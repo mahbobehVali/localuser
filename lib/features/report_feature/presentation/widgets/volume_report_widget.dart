@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
@@ -56,30 +57,23 @@ class VolumeReportChartWidget extends StatelessWidget {
           if (spots.isEmpty) return Constants.noData();
         // ۱. ساخت و پر کردن flatList قبل از رندر UI
 
-          final firstParts = xLabels.first?.toString().split('/') ?? [];
-          final firstMonth = firstParts.length > 1 ? firstParts[1] : null;
-          final bool isSameMonthForAll = xLabels.every((element) {
-            final p = element.toString().split('/');
-            return p.length > 1 && p[1] == firstMonth;
-          });
-
           for (int i = 0; i < yValues.length; i++) {
             final val = yValues[i];
             print("xLabels[i]${xLabels[i]}");
              final parts = xLabels[i].split('/');
              final monthNum = int.tryParse(parts[1]) ?? 0;
 
-            String name =  isSameMonthForAll?
+            String name =  getDaysBetweenShamsiDates(state.startDate, state.endDate)<31?
              xLabels[i].toString().toPersianDigit():Constants().monthNames[monthNum - 1];
 
-            final amount = val.toString().toPersianDigit();
+            final amount = val.toString();
 
             String statusMessage = "نرمال";
 
-              if (val > status.capacityEntity.totalDisconnectCapacity) {
+              if (val > (status.capacityEntity.totalDisconnectCapacity??0)*getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
                 statusMessage = "اخطار";
               }
-              else if (val > status.capacityEntity.totalCapacity) {
+              else if (val > (status.capacityEntity.totalCapacity??0)*getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
                 statusMessage = "بیش از حد مجاز";
               }
 
@@ -206,7 +200,7 @@ class VolumeReportChartWidget extends StatelessWidget {
                           lineBarsData: [
                             LineChartBarData(
                               preventCurveOverShooting: true,
-                              preventCurveOvershootingThreshold: 0,
+                              // preventCurveOvershootingThreshold: 0,
                               dotData: const FlDotData(show: false ),
                               isCurved: true,
                               belowBarData: BarAreaData(
@@ -267,7 +261,7 @@ class VolumeReportChartWidget extends StatelessWidget {
                           children: [
                             Expanded( child: Text( "تاریخ",
                                 style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
-                            Expanded( child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
+                            Expanded(flex: 2, child: Text("میزان حجم مصرف کل", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
                             Expanded( child: Text("وضعیت", style: TextStyleP.f10Regular, textAlign: TextAlign.center)),
                           ],
                         ),
@@ -276,6 +270,7 @@ class VolumeReportChartWidget extends StatelessWidget {
 
                     // دسترسی آسان به دیتای آماده از flatList
                     final item = flatList[index - 1];
+                    double? parsedAmountValue = double.tryParse(item.amount ?? '');
 
                     return Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
@@ -285,7 +280,9 @@ class VolumeReportChartWidget extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded( child: Text(item.name??"", textAlign: TextAlign.center)),
-                          Expanded(child: Text('\u200E${item.amount}', textAlign: TextAlign.center)),
+                          Expanded(flex: 2, child: Text(parsedAmountValue != null
+                              ? NumberFormat.decimalPattern().format(parsedAmountValue).toPersianDigit()
+                              : "۰.۰",textAlign: TextAlign.center,)),
                           Expanded( child: Text(item.status??"", textAlign: TextAlign.center)),
                         ],
                       ),

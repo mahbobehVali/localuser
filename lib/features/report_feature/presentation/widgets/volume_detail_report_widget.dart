@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 import 'package:mahaliii/common/widgets/export_to_excel.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/features/report_feature/presentation/bloc/report_detail_flow_meter_status.dart';
@@ -56,7 +57,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
           for (int i = 0; i < yValues.length; i++) {
             final val = yValues[i];
             String name=xLabels[i].toString().toPersianDigit();
-            final amount = val.toString().toPersianDigit();
+            final amount = val.toString();
 
             String statusMessage = "نرمال";
             String overCapacity = "۰.۰";
@@ -74,9 +75,9 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
               }
 
               if (val > cap) {
-                overCapacity = (val - cap).toString().toPersianDigit();
+                overCapacity = (val - cap).toString();
               }else if (val > disconnectCap) {
-                overCapacity = (val - disconnectCap).toString().toPersianDigit();
+                overCapacity = (val - disconnectCap).toString();
               }
 
               flatList.add(VolumeSlot(
@@ -89,7 +90,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
           }
           int totalItems = xLabels.length;
           double columnWidth = 80.0;
-          double calculatedChartWidth = (totalItems * columnWidth).clamp(350.0, 2000.0);
+          double calculatedChartWidth = (totalItems * columnWidth).clamp(350.0, 2000.0)+100;
 
           List<BarChartGroupData> chartGroups = List.generate(xLabels.length, (index) {
             final double yVal = index < yValues.length ? yValues[index].toDouble() : 0.0;
@@ -218,7 +219,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                       final item = flatList[groupIndex];
 
                                       return BarTooltipItem(
-                                        'حجم مصرف: ${rod.toY.toString().toPersianDigit()} متر مکعب\nبیش از حد مجاز: ${item.capacity} متر مکعب',
+                                        'حجم مصرف: ${rod.toY.toString().toPersianDigit()} متر مکعب\nبیش از حد مجاز: ${double.tryParse(item.capacity ?? '')?.toStringAsFixed(3).toPersianDigit() ?? "۰.۰"} متر مکعب',
                                         TextStyle(
                                           color: ColorPalette.black,
                                           fontWeight: FontWeight.bold,
@@ -303,7 +304,8 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
 
                       // دسترسی آسان به دیتای آماده از flatList
                       final item = flatList[index - 1];
-
+                      double? parsedValue = double.tryParse(item.capacity ?? '');
+                      double? parsedAmountValue = double.tryParse(item.amount ?? '');
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                         decoration: BoxDecoration(
@@ -312,8 +314,14 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(flex: 4, child: Text(item.name??"",textAlign: TextAlign.center,)),
-                            Expanded(flex: 3, child: Text('\u200E${item.amount}', textAlign: TextAlign.center)),
-                              Expanded(flex: 4, child: Text(item.capacity ?? "۰.۰",textAlign: TextAlign.center,)),
+                            // Expanded(flex: 3, child: Text('\u200E${item.amount}', textAlign: TextAlign.center)),
+                              Expanded(flex: 4, child: Text(parsedAmountValue != null
+                                  ? NumberFormat.decimalPattern().format(parsedAmountValue).toPersianDigit()
+                                  : "۰.۰",textAlign: TextAlign.center,)),
+                            Expanded(flex: 4, child: Text(parsedValue != null
+                                  ? NumberFormat.decimalPattern().format(parsedValue).toPersianDigit()
+                                  : "۰.۰",textAlign: TextAlign.center,)),
+
                             Expanded(flex: 2, child: Text(item.status??"", textAlign: TextAlign.center)),
                           ],
                         ),

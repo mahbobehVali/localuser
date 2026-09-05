@@ -205,7 +205,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
   @override
   void dispose() {
     _controller.dispose();
-    _bloc.close();
     super.dispose();
   }
 
@@ -1134,7 +1133,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                           child: Container(
                                             width: 500,
                                             decoration: BoxDecoration(
-                                                border: Border.all(color: ColorPalette.grey),
+                                                border: Border.all(color: ColorPalette.lightGrey),
                                                 borderRadius: BorderRadius.circular(3)
 
                                             ),
@@ -1147,10 +1146,10 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
                                                 if (index == 0) {
                                                   return Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                                    padding:  EdgeInsets.symmetric(vertical: 15.h),
                                                     decoration: BoxDecoration(
-                                                      color: const Color(0xffD7D7D7),
-                                                      border: Border(bottom: BorderSide(color: ColorPalette.grey)),
+                                                      color: ColorPalette.lightGrey,
+                                                      border: Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                                                     ),
                                                     child: const Row(
                                                       children: [
@@ -1185,9 +1184,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                     : "-";
 
                                                 return Container(
-                                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                                                  padding:  EdgeInsets.symmetric(vertical: 15.h),
                                                   decoration: BoxDecoration(
-                                                    border: Border(bottom: BorderSide(color: ColorPalette.grey, width: 1)),
+                                                    border: Border(bottom: BorderSide(color: ColorPalette.lightGrey, width: 1)),
                                                   ),
                                                   child: Row(
                                                     children: [
@@ -1197,6 +1196,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         ),
                                                       ),
                                                       Expanded(
+                                                        flex:2,
                                                         child: Text(workHours,
                                                           textAlign: TextAlign.center,
                                                         ),
@@ -1538,6 +1538,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                 // ۲. نمایش موفقیت
                                                 GlobalSnackBar.show(context,
                                                   message: state.isSwitched == true ? "با موفقیت روشن شد" : "با موفقیت خاموش شد",
+                                                  duration: 3
+
                                                 );
                                               }
 

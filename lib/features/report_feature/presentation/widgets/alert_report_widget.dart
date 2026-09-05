@@ -203,7 +203,7 @@ class AlertsReportChartWidget extends StatelessWidget {
                       ));
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                        decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.grey, width: 1))),
+                        decoration: BoxDecoration(border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.lightGrey, width: 1))),
                         child: Row(
                           children: [
                             Expanded(child: Text(typeName[index - 1],textAlign: TextAlign.center)),
