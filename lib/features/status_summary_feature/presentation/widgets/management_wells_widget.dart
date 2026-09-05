@@ -50,6 +50,7 @@ class ManagementWellsWidget extends StatelessWidget {
               builder: (context, state) {
                 if(state.statusSummaryStatus is StatusSummarySuccess){
                   StatusSummarySuccess statusSummarySuccess=state.statusSummaryStatus as StatusSummarySuccess;
+                  
                   return ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,

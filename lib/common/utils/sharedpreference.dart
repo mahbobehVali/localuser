@@ -46,6 +46,13 @@ class SharedPrefOperator {
   Future<int> getAlertTyp()  async {
     return sharedPreferences.getInt("alert")??0;
   }
+  Future<void> saveSwitch(bool value)  async {
+    // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+     sharedPreferences.setBool("switch",value) ;
+  }
+  Future<bool> getSwitch()  async {
+    return sharedPreferences.getBool("switch")??false;
+  }
 
   Future<void> saveAUserLocalId(int? userLocalId) async {
     if (userLocalId == null) {
@@ -61,11 +68,11 @@ class SharedPrefOperator {
   }
 
 
-
-  Future<void> saveSwitch(bool value)  async {
-    // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setBool("switch",value) ;
-  }
+  //
+  // Future<void> saveSwitch(bool value)  async {
+  //   // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   sharedPreferences.setBool("switch",value) ;
+  // }
 
 
 

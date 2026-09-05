@@ -9,6 +9,7 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/well_detail_screen.dart';
 
+import '../../../../common/utils/sharedpreference.dart';
 import '../../../../locator.dart';
 import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
@@ -66,7 +67,8 @@ class _WellScreenState extends State<WellScreen> {
                         itemCount: statusSummarySuccess.wellsEntity.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                await locator<SharedPrefOperator>().saveSwitch(statusSummarySuccess.wellsEntity[index].data!.statusWell == 1);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

@@ -61,30 +61,36 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
 
             String statusMessage = "نرمال";
             String overCapacity = "۰.۰";
+            String disCapacity = "۰.۰";
 
-              final capacityItem = status.capacityEntity.capacityListEntity?[i];
-              final disconnectCap = (capacityItem?.disconnectCapacity ?? 0) *
-                  getDaysBetweenShamsiDates(state.startDate, state.endDate);
-              final cap = (capacityItem?.capacity ?? 0) *
-                  getDaysBetweenShamsiDates(state.startDate, state.endDate);
+            final capacityItem = (status.capacityEntity.capacityListEntity != null &&
+                i < status.capacityEntity.capacityListEntity!.length)
+                ? status.capacityEntity.capacityListEntity![i]
+                : null;
 
-              if (val > disconnectCap) {
-                statusMessage = "اخطار";
-              } else if (val > cap) {
-                statusMessage = "بیش از حد مجاز";
-              }
+            final days = getDaysBetweenShamsiDates(state.startDate, state.endDate);
+            final disconnectCap = (capacityItem?.disconnectCapacity ?? 0) * days;
+            final cap = (capacityItem?.capacity ?? 0) * days;
+            print("val${val}");
+            print("disconnectCap${disconnectCap}");
+            print("cap${cap}");
 
-              if (val > cap) {
-                overCapacity = (val - cap).toString();
-              }else if (val > disconnectCap) {
-                overCapacity = (val - disconnectCap).toString();
-              }
+            if (val > disconnectCap) {
+              print("yes");
+              statusMessage = "اخطار";
+              disCapacity = (val - disconnectCap).toString();
+              overCapacity = (disconnectCap - cap).toString(); // اگر بحرانی است، یعنی از حد مجاز هم رد شده
+            } else if (val > cap) {
+              statusMessage = "بیش از حد مجاز";
+              overCapacity = (val - cap).toString();
+            }
 
               flatList.add(VolumeSlot(
                 name: name,
                 amount: amount,
                 status: statusMessage,
                 capacity: overCapacity,
+                disCapacity: disCapacity,
               ));
 
           }
@@ -112,6 +118,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
 
             Color normalColor = ColorPalette.darkBlue;
             Color capColor = ColorPalette.orange;
+            Color disCapColor = ColorPalette.darkRed;
             // Color disCapColor = ColorPalette.darkRed;
 
             // اگر ظرفیت‌ها بیشتر از ۱ عدد نبود (نمودار معمولی)
@@ -134,24 +141,29 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
             //     getDaysBetweenShamsiDates(state.startDate, state.endDate);
             final cap = (capacityItem?.capacity ?? 0) *
                 getDaysBetweenShamsiDates(state.startDate, state.endDate);
+            final dis = (capacityItem?.disconnectCapacity ?? 0) *
+                getDaysBetweenShamsiDates(state.startDate, state.endDate);
             List<BarChartRodStackItem> stackItems = [];
 
             final double currentVal = yValues[index].toDouble();
             final double capVal = cap.toDouble();
+            final double disconnectCapVal = dis.toDouble();
             // final double disconnectCapVal = disconnectCap.toDouble();
 
 
-            if (currentVal > capVal) {
-              // اگر مصرف از ظرفیت عادی بیشتر است، میله به دو لایه تقسیم می‌شود:
-
-              // ۱. لایه اول: از صفر تا ظرفیت عادی (رنگ نرمال)
+            if (currentVal > disconnectCapVal) {
+              if (capVal > 0) {
+                stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
+                stackItems.add(BarChartRodStackItem(capVal, disconnectCapVal, capColor));
+                stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, disCapColor));
+              } else {
+                stackItems.add(BarChartRodStackItem(0, disconnectCapVal, normalColor));
+                stackItems.add(BarChartRodStackItem(disconnectCapVal, currentVal, disCapColor));
+              }
+            } else if (currentVal > capVal) {
               stackItems.add(BarChartRodStackItem(0, capVal, normalColor));
-
-              // ۲. لایه دوم: از ظرفیت عادی تا مقدار کل مصرف (رنگ اخطار / بیش از حد مجاز)
               stackItems.add(BarChartRodStackItem(capVal, currentVal, capColor));
-            }
-            else {
-              // اگر مصرف کمتر یا مساوی ظرفیت مجاز باشد (فقط یک لایه)
+            } else {
               stackItems.add(BarChartRodStackItem(0, currentVal, normalColor));
             }
 
@@ -219,7 +231,9 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                       final item = flatList[groupIndex];
 
                                       return BarTooltipItem(
-                                        'حجم مصرف: ${rod.toY.toString().toPersianDigit()} متر مکعب\nبیش از حد مجاز: ${double.tryParse(item.capacity ?? '')?.toStringAsFixed(3).toPersianDigit() ?? "۰.۰"} متر مکعب',
+                                        'حجم مصرف: ${rod.toY.toString().toPersianDigit()} متر مکعب'
+                                            '\nبیش از حد مجاز: ${double.tryParse(item.capacity ?? '')?.toStringAsFixed(3).toPersianDigit() ?? "۰.۰"} متر مکعب'
+                                            '\nبیش از حد قطع: ${double.tryParse(item.disCapacity ?? '')?.toStringAsFixed(3).toPersianDigit() ?? "۰.۰"} متر مکعب',
                                         TextStyle(
                                           color: ColorPalette.black,
                                           fontWeight: FontWeight.bold,

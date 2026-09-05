@@ -28,7 +28,7 @@ class WaterAmountContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       // height: 100.h,
-      padding: const EdgeInsets.all(8),
+      // padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(5),
@@ -40,39 +40,45 @@ class WaterAmountContainer extends StatelessWidget {
           Row(
             children: [
               image==null?SizedBox(): Padding(
-                padding:  EdgeInsets.only(left: 16.w),
+                padding:  EdgeInsets.symmetric(horizontal: 10.w,vertical: 10.h),
                 child: IconContainer(icon: Image.asset(image!),color: ColorPalette.inverseBlue,),
               ),
-              Text(
-                title,
-                style: TextStyleP.f14Bold,
+              Padding(
+                padding:  EdgeInsets.symmetric(horizontal: 16.w,vertical: 8.h),
+                child: Text(
+                  title,
+                  style: TextStyleP.f14Bold,
+                ),
               ),
             ],
           ),
-           SizedBox(height: 16.h),
+           SizedBox(height: 10.h),
           Stack(
             children: [
               year?Image.asset("assets/icons/group.png"):SizedBox(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                textDirection: TextDirection.rtl, // اجبار جهت راست‌به‌چپ برای چینش
-                children: [
-                  // ابتدا مقدار عدد
-                  Directionality(
-                    textDirection: TextDirection.ltr,
-                    child: Text(
-                      amount.toPersianDigit(),
-                      style: TextStyleP.f16Bold,
+              Padding(
+                padding:  EdgeInsets.only(left: 16.w,bottom: 8.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  textDirection: TextDirection.rtl, // اجبار جهت راست‌به‌چپ برای چینش
+                  children: [
+                    // ابتدا مقدار عدد
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: Text(
+                        amount.toPersianDigit(),
+                        style: TextStyleP.f16Bold,
+                      ),
                     ),
-                  ),
-                   SizedBox(width: 4.w),
+                     SizedBox(width: 4.w),
 
-                  if (unit.isNotEmpty)
-                    Text(
-                      unit,
-                      style: TextStyleP.f16Bold,
-                    ),
-                ],
+                    if (unit.isNotEmpty)
+                      Text(
+                        unit,
+                        style: TextStyleP.f16Bold,
+                      ),
+                  ],
+                ),
               ),
             ],
           ),

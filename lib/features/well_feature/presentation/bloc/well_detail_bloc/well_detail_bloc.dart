@@ -18,7 +18,9 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_status.dart';
 
 import '../../../../../common/utils/data_state.dart';
+import '../../../../../common/utils/sharedpreference.dart';
 import '../../../../../common/utils/use_case.dart';
+import '../../../../../locator.dart';
 import '../../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
 import '../../../domain/repository/wells_repository.dart';
 import '../../../domain/usecase/alert_count_usecase.dart';
@@ -94,15 +96,15 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     });
 
     // ۳. مدیریت دیتای دریافتی از سوکت
-    on<InternalPumpDataReceived>((event, emit) {
+    on<InternalPumpDataReceived>((event, emit) async {
       print("onOfffgg: ${event.onOff}");
-      print("OnOffSuccess");
 
       emit(state.copyWith(
         newIsSwitched: event.onOff == 1,
         newOnOffStatus: OnOffSuccess(event.onOff),
       ));
-      print("OnOffSuccess");
+
+      await locator<SharedPrefOperator>().saveSwitch(event.onOff==1);
     });
 
     // ۴. مدیریت خطای سوکت

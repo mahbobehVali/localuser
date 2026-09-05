@@ -45,3 +45,13 @@ class ReportFlowMeter extends StatusSummaryEvent{
 
 }
 
+class FirstSwitchSummary extends StatusSummaryEvent {
+  final bool isSwitch;
+
+  const FirstSwitchSummary(this.isSwitch);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [isSwitch];
+}
+

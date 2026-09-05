@@ -610,6 +610,7 @@ class VolumeSlot {
   final String? status;
   final String? amount;
   final String? capacity;
+  final String? disCapacity;
 
-  VolumeSlot({this.name, this.status, this.amount, this.capacity});
+  VolumeSlot({this.name, this.status, this.amount, this.capacity,this.disCapacity});
 }
