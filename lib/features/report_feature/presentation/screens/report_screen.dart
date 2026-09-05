@@ -38,6 +38,18 @@ import '../widgets/volume_report_widget.dart';
 
 class ReportScreen extends StatelessWidget {
    const ReportScreen({super.key});
+   int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
+     // جدا کردن سال، ماه و روز
+     final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
+     final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
+
+     // تبدیل تاریخ‌های شمسی به DateTime
+     final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
+     final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
+
+     // محاسبه اختلاف به روز
+     return date2.difference(date1).inDays;
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -180,6 +192,8 @@ class ReportScreen extends StatelessWidget {
                       return TimePickerField(
                         title: "ساعت شروع",
                         displayText: displayStart,
+                        ignoring: !(state.oneWell.length == 1 && getDaysBetweenShamsiDates(state.startDate, state.endDate) == 1),
+
                         onTap: () async {
                           final picked = await Constants().showCustomTimePicker(context);
                           if (picked != null && context.mounted) {
@@ -201,7 +215,7 @@ class ReportScreen extends StatelessWidget {
                     prev.endHour != curr.endHour || prev.startHour != curr.startHour,
                     builder: (context, state) {
                       final isStartEmpty = state.startHour.isEmpty;
-                      final displayEnd = (state.endHour.isNotEmpty == true) ? state.endHour : "00:00";
+                      final displayEnd = (state.endHour.isNotEmpty == true) ? state.endHour : "23:59";
 
                       return TimePickerField(
                         title: "ساعت پایان",
@@ -250,8 +264,8 @@ class ReportScreen extends StatelessWidget {
                         ..add(ReportFlowMeter(FlowMeterParams(
                         page: 1,
                         type: 5,
-                        endDate: state.endDate,
-                        startDate: state.startDate,
+                            endDate: state.endDate.isEmpty?"23:59":state.endDate,
+                            startDate: state.startDate.isEmpty?"23:59":state.startDate,
                         ids: state.oneWell
                       )))
                         // ..add(ReportDetailFlowMeter(FlowMeterParams(
@@ -265,20 +279,20 @@ class ReportScreen extends StatelessWidget {
                           page: 1,
                           time: -1,
                           type: 5,
-                          endDate: state.endDate,
-                          startDate: state.startDate,
+                            endDate: state.endDate.isEmpty?"23:59":state.endDate,
+                            startDate: state.startDate.isEmpty?"23:59":state.startDate,
                           ids: state.oneWell
                       ))) ..add(ReportCommand(FlowMeterParams(
                           page: 1,
                           type: 5,
-                          endDate: state.endDate,
-                          startDate: state.startDate,
+                          endDate: state.endDate.isEmpty?"23:59":state.endDate,
+                          startDate: state.startDate.isEmpty?"23:59":state.startDate,
                           ids: state.oneWell
                       )))..add(UserActivityReportStart(FlowMeterParams(
                           page: 1,
                           type: 5,
-                          endDate: state.endDate,
-                          startDate: state.startDate,
+                          endDate: state.endDate.isEmpty?"23:59":state.endDate,
+                          startDate: state.startDate.isEmpty?"23:59":state.startDate,
                           ids: state.oneWell
                       )));
 
