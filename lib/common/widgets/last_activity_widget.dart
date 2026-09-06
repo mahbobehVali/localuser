@@ -8,7 +8,7 @@ import '../../config/texts_style.dart';
 import '../../features/status_summary_feature/domain/entity/last_activity_entity.dart';
 import '../utils/constants.dart';
 
-class LastActivityWidget extends StatelessWidget {
+class LastActivityWidget extends StatefulWidget {
   const LastActivityWidget({
     super.key,
     required this.lastActivityEntity,
@@ -19,9 +19,14 @@ class LastActivityWidget extends StatelessWidget {
   final bool report;
 
   @override
+  State<LastActivityWidget> createState() => _LastActivityWidgetState();
+}
+
+class _LastActivityWidgetState extends State<LastActivityWidget> {
+  @override
   Widget build(BuildContext context) {
     List<LastActivitySlot> flatList = [];
-    for (var park in lastActivityEntity.data!) {
+    for (var park in widget.lastActivityEntity.data!) {
       // چک کردن اینکه آیا لیست تاریخ‌ها وجود دارد و خالی نیست
       if (park.dates == null || (park.dates as List).isEmpty) continue;
       for (var dateItem in park.dates!) {
@@ -39,7 +44,7 @@ class LastActivityWidget extends StatelessWidget {
     }
     return Column(
       children: [
-       if(report)
+       if(widget.report)
          Row(
            mainAxisAlignment: MainAxisAlignment.spaceBetween,
            children: [

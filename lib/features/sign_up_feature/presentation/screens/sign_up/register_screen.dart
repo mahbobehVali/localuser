@@ -186,6 +186,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                             builder: (context, state) {
                                               if(state.areaStatus is AreaSuccess){
                                                 AreaSuccess areaSuccess=state.areaStatus as AreaSuccess;
+                                                if (areaSuccess.areaEntity.isEmpty) {
+                                                  return const Center(
+                                                    child: Text(
+                                                      "ناحیه ای برای این انتخاب وجود ندارد",
+                                                      style: TextStyle(color: Colors.grey),
+                                                    ),
+                                                  );
+                                                }
                                                 var areaIndex = 0;
                                                 if (state.oneAreaEntity != null) {
                                                   areaIndex = areaSuccess.areaEntity.indexWhere(

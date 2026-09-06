@@ -11,16 +11,48 @@ import '../../../../common/utils/constants.dart';
 import '../../../../common/widgets/global_elevated_button.dart';
 import '../../../../common/widgets/shimmer_class.dart';
 import '../../../../config/texts_style.dart';
+import '../../../../main.dart';
 import '../bloc/status_summary_bloc/report_flowmeter_status.dart';
 import '../bloc/status_summary_bloc/status_summary_bloc.dart';
 
-class SummaryFlowMeterChart extends StatelessWidget {
+class SummaryFlowMeterChart extends StatefulWidget {
   const SummaryFlowMeterChart({
     super.key,
     required this.info,
   });
 
   final List<dynamic> info;
+
+  @override
+  State<SummaryFlowMeterChart> createState() => _SummaryFlowMeterChartState();
+}
+
+class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with RouteAware{
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // ثبت نام صفحه در ناوبری
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    // حذف ثبت نام هنگام نابود شدن صفحه
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  // این متد دقیقا مثل onResume اندروید عمل می‌کند!
+  @override
+  void didPopNext() {
+    super.didPopNext();
+    // هر بار که کاربر از صفحه جزئیات برمی‌گردد اینجا اجرا می‌شود
+    BlocProvider.of<StatusSummaryBloc>(context).add(
+      ReportFlowMeter(
+        FlowMeterParams(type: 1, ids: int.parse(widget.info[6])),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +76,6 @@ class SummaryFlowMeterChart extends StatelessWidget {
                     buildWhen: (previous, current) => current.selectedChartTab!=previous.selectedChartTab ||
                      current.reportFlowMeterStatus!=previous.reportFlowMeterStatus,
                     builder: (context, state) {
-                      print("dfksldfklsd");
-                      print(state.reportFlowMeterStatus);
                       return Row(
                         children: [
                           GlobalElevatedButton(
@@ -55,10 +85,9 @@ class SummaryFlowMeterChart extends StatelessWidget {
                             widget: Text("امروز",style: TextStyle(color: ColorPalette.black),),
                             onTap:(state.reportFlowMeterStatus is ReportFlowMeterLoading ||
                                 state.selectedChartTab == 1)?null: () {
-                              print("11111111111");
                               BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                                 type: 1,
-                                ids:int.parse(info[6]),
+                                ids:int.parse(widget.info[6]),
                               )));
                             },),
 
@@ -69,10 +98,9 @@ class SummaryFlowMeterChart extends StatelessWidget {
                               widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
                               onTap:(state.reportFlowMeterStatus is ReportFlowMeterLoading ||
                                   state.selectedChartTab == 6)?null: () {
-                                print("66666");
                                 BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                                   type: 6,
-                                  ids:int.parse(info[6]),
+                                  ids:int.parse(widget.info[6]),
                                 )));
                               }),
                         ],
@@ -257,8 +285,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                     width: chartWidth,
                                     child: Padding(
                                       padding: const EdgeInsets.all(12),
-                                      child: state.selectedChartTab == 1
-                                          ? LineChart(
+                                      child:LineChart(
 
                                         LineChartData(
                                           extraLinesData: ExtraLinesData(
@@ -453,160 +480,7 @@ class SummaryFlowMeterChart extends StatelessWidget {
                                           minY: chartMinY,
                                         ),
                                       )
-                                          : BarChart(
-                                        BarChartData(
-                                          extraLinesData: ExtraLinesData(
-                                            horizontalLines: Constants().generateHorizontalLines(
-                                              (scale['step'] as num).toDouble(),
-                                              chartMaxY,
-                                              chartMinY,
-                                            ),
-                                          ),
-                                          maxY: chartMaxY,
-                                          minY: chartMinY,
-                                          alignment: BarChartAlignment.spaceAround,
-                                          gridData: FlGridData(
-                                            show: false,
-                                            verticalInterval: (scale['step'] as num?)?.toDouble() ?? 1,
-                                            getDrawingHorizontalLine: (value) {
-                                              return const FlLine(
-                                                strokeWidth: 1,
-                                                color: Colors.grey,
-                                              );
-                                            },
-                                          ),
-                                          borderData: FlBorderData(
-                                            border: Border(
-                                              bottom: BorderSide(color: ColorPalette.lightGrey),
-                                            ),
-                                          ),
-                                          barTouchData: BarTouchData(
-                                            handleBuiltInTouches: true,
-                                            touchTooltipData: BarTouchTooltipData(
-                                              getTooltipColor: (group) => Color(0xFFF7F9FA),
-                                              fitInsideHorizontally: true,
-                                              fitInsideVertically: true,
-                                              maxContentWidth: 250.w,
-                                              // tooltipBorder: BorderSide(color: ColorPalette.grey),
-                                              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                                final int xIndex = group.x.toInt();
-                                                if (xIndex < 0 || xIndex >= xLabels.length) return null;
 
-                                                final String currentDate = xLabels[xIndex];
-
-                                                List<TextSpan> spans = [];
-                                                double totalSum = 0;
-
-                                                // ۱. محاسبه مجموع کل مقادیر واقعی
-                                                for (var series in seriesList) {
-                                                  final yValues = series.yAxis;
-                                                  final xValues = series.xAxis;
-                                                  if (yValues != null && xValues != null) {
-                                                    final sIndex = xValues.indexOf(currentDate);
-                                                    if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
-                                                      totalSum += (yValues[sIndex] as num).toDouble();
-                                                    }
-                                                  }
-                                                }
-
-                                                final String weekDayName = Constants().weekDayNames[xIndex].name;
-
-                                                spans.add(
-                                                  TextSpan(
-                                                    text: " $weekDayName\n",
-                                                    style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                );
-
-                                                // ۳. حلقه برای جزئیات هر سری با مقادیر واقعی
-                                                for (int i = 0; i < seriesList.length; i++) {
-                                                  final series = seriesList[i];
-                                                  final name = series.name ?? "بدون نام";
-                                                  final yValues = series.yAxis;
-                                                  final xValues = series.xAxis;
-
-                                                  if (yValues != null && xValues != null) {
-                                                    final sIndex = xValues.indexOf(currentDate);
-                                                    if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
-                                                      final double val = (yValues[sIndex] as num).toDouble();
-                                                      final color = Constants().lineColors[i % Constants().lineColors.length];
-
-                                                      spans.add(
-                                                        TextSpan(
-                                                          text: "$name: ${val.toStringAsFixed(1).toString().toPersianDigit()}  ",
-                                                          style: const TextStyle(
-                                                            color: Colors.black87,
-                                                            fontWeight: FontWeight.w500,
-                                                            fontSize: 11,
-                                                          ),
-                                                        ),
-                                                      );
-
-                                                      spans.add(
-                                                        TextSpan(
-                                                          text: "●\n",
-                                                          style: TextStyle(
-                                                            color: color,
-                                                            fontWeight: FontWeight.bold,
-                                                            fontSize: 11,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }
-                                                  }
-                                                }
-
-                                                // ۴. اضافه کردن خط مجموع کل در انتها
-                                                spans.add(
-                                                  const TextSpan(
-                                                    text: "------------------------------\n",
-                                                    style: TextStyle(
-                                                      color: Colors.black87,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                );
-                                                spans.add(
-                                                  TextSpan(
-                                                    text: "مجموع کل: ${totalSum.toStringAsFixed(1).toString().toPersianDigit()}",
-                                                    style: const TextStyle(
-                                                      color: Colors.black87,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                );
-
-                                                return BarTooltipItem(
-                                                  textAlign: TextAlign.right,
-                                                  "",
-                                                  const TextStyle(),
-                                                  children: spans,
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                          titlesData: FlTitlesData(
-                                            bottomTitles: Constants().axisBottomTitles(xLabels, "week"),
-                                            rightTitles: const AxisTitles(
-                                              sideTitles: SideTitles(showTitles: false),
-                                            ),
-                                            topTitles: const AxisTitles(
-                                              sideTitles: SideTitles(showTitles: false),
-                                            ),
-                                            leftTitles: Constants().leftTitles(
-                                              interval: chartMaxY > 1000 ? 65.w : 40.w,
-                                              scale: scale['step'] == 0 ? 10 : (scale['step'] as num).toDouble(),
-                                            ),
-                                          ),
-                                          barGroups: chartGroups,
-                                        ),
-                                      ),
                                     ),
                                   ),
                                 ),

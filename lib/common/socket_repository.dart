@@ -79,6 +79,7 @@ class SocketRepository {
       _socket!.emit("join/room", {'room': pin});
 
       isConnecting = false;
+      print(isConnecting);
     });
 
     _socket!.onDisconnect((data) {

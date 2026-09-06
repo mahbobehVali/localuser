@@ -1020,6 +1020,14 @@ class ShowDialogs {
                                 if(state.alertWellListStatus is AlertWellListSuccess){
                                   AlertWellListSuccess alertWellListSuccess=
                                   state.alertWellListStatus as AlertWellListSuccess;
+                                  if (alertWellListSuccess.wellsEntity.isEmpty) {
+                                    return const Center(
+                                      child: Text(
+                                        "چاهی برای این انتخاب وجود ندارد",
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    );
+                                  }
                                   var areaIndex = 0;
                                   if (state.oneWell != null) {
                                     areaIndex = alertWellListSuccess.wellsEntity.indexWhere(

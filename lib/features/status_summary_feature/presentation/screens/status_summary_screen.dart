@@ -15,6 +15,7 @@ import '../../../../common/widgets/last_activity_widget.dart';
 import '../../../../common/widgets/pagination_widget.dart';
 import '../../../../common/widgets/water_amount_container.dart';
 import '../../../../locator.dart';
+import '../../../../main.dart';
 import '../../domain/usecase/last_activity_usecase.dart';
 import '../../domain/usecase/report_flowmeter_usecase.dart';
 import '../../domain/usecase/wells_list_usecase.dart';
@@ -32,7 +33,7 @@ class StatusSummaryScreen extends StatefulWidget {
   State<StatusSummaryScreen> createState() => _StatusSummaryScreenState();
 }
 
-class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
+class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAware{
   List<dynamic> info=[];
 
   void loadUserData() async {
@@ -46,10 +47,61 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // ثبت نام صفحه در ناوبری
+    routeObserver.subscribe(this, ModalRoute.of(context)!);
+  }
+
+  @override
+  void dispose() {
+    // حذف ثبت نام هنگام نابود شدن صفحه
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  // ۱. تعریف متغیر برای نگهداری بلوک
+  late StatusSummaryBloc _statusSummaryBloc;
+
+  @override
   void initState() {
     super.initState();
     loadUserData();
+
+    // ۲. مقداردهی اولیه بلوک در initState
+    _statusSummaryBloc = StatusSummaryBloc(
+      locator<WellsListUseCase>(),
+      locator<LastActivityUseCase>(),
+      locator<StatusSummaryRepository>(),
+      locator<ReportFlowMeterUseCase>(),
+      locator<SocketRepository>(),
+    );
+
+    // ۳. صدا زدن ایونت‌های اولیه اینجا (دیگر نیازی به نوشتن داخل BlocProvider نیست)
+    // (فقط توجه کنید اگر info خالی باشد باید مدیریت شود، یا مثل قبل داخل ایجادکننده بگذارید)
   }
+
+  @override
+  void didPopNext() {
+    super.didPopNext();
+
+    // ۴. حالا به راحتی هر دو ایونت را هنگام بازگشت کاربر صدا بزنید:
+    if (info.isNotEmpty) {
+      _statusSummaryBloc.add(
+        ReportFlowMeter(
+          FlowMeterParams(type: 1, ids: int.parse(info[6])),
+        ),
+      );
+
+      _statusSummaryBloc.add(
+        LastActivityStart(
+          FlowMeterParams(type: 0, page: 1),
+        ),
+      );
+    }
+  }
+  
+
 
   @override
   Widget build(BuildContext context) {
@@ -63,28 +115,8 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> {
     return SafeArea(
       child: Scaffold(
 
-        body: BlocProvider<StatusSummaryBloc>(
-          create: (context) {
-            StatusSummaryBloc statusSummaryBloc= StatusSummaryBloc(
-              locator<WellsListUseCase>(),
-              locator<LastActivityUseCase>(),
-              locator<StatusSummaryRepository>(),
-              locator<ReportFlowMeterUseCase>(),
-              locator<SocketRepository>(),
-            );
-            statusSummaryBloc
-              ..add(WellsListStart())
-              ..add(SocketEvent("area",int.parse(info[6])))
-              ..add(ReportFlowMeter(FlowMeterParams(
-                  type: 1,
-                  ids:int.parse(info[6]),
-              )))
-              ..add(LastActivityStart(FlowMeterParams(
-                type: 0,
-                  page:1,
-                  )));
-            return statusSummaryBloc;
-          },
+        body: BlocProvider<StatusSummaryBloc>.value(
+          value: _statusSummaryBloc..add(WellsListStart())..add(SocketEvent("area", int.parse(info[6])))..add(ReportFlowMeter(FlowMeterParams(type: 1, ids: int.parse(info[6]))))..add(LastActivityStart(FlowMeterParams(type: 0, page: 1))),
           child: Padding(
             padding:  EdgeInsets.only(left: 12.w,right: 12.w,top: 30.h),
             child: SingleChildScrollView(

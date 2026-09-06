@@ -19,18 +19,6 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
    VolumeDetailReportChartWidget({super.key});
 
   List<VolumeSlot> flatList = [];
-   int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
-     // جدا کردن سال، ماه و روز
-     final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
-     final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
-
-     // تبدیل تاریخ‌های شمسی به DateTime
-     final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
-     final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
-
-     // محاسبه اختلاف به روز
-     return date2.difference(date1).inDays;
-   }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +56,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                 ? status.capacityEntity.capacityListEntity![i]
                 : null;
 
-            final days = getDaysBetweenShamsiDates(state.startDate, state.endDate);
+            final days = Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate);
             final disconnectCap = (capacityItem?.disconnectCapacity ?? 0) * days;
             final cap = (capacityItem?.capacity ?? 0) * days;
             print("val${val}");
@@ -140,9 +128,9 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
             // final disconnectCap = (capacityItem?.disconnectCapacity ?? 0) *
             //     getDaysBetweenShamsiDates(state.startDate, state.endDate);
             final cap = (capacityItem?.capacity ?? 0) *
-                getDaysBetweenShamsiDates(state.startDate, state.endDate);
+                Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate);
             final dis = (capacityItem?.disconnectCapacity ?? 0) *
-                getDaysBetweenShamsiDates(state.startDate, state.endDate);
+                Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate);
             List<BarChartRodStackItem> stackItems = [];
 
             final double currentVal = yValues[index].toDouble();

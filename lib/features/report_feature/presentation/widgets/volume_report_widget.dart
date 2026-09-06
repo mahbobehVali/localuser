@@ -18,18 +18,7 @@ class VolumeReportChartWidget extends StatelessWidget {
    VolumeReportChartWidget({super.key});
 
   List<VolumeSlot> flatList = [];
-   int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
-     // جدا کردن سال، ماه و روز
-     final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
-     final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
 
-     // تبدیل تاریخ‌های شمسی به DateTime
-     final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
-     final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
-
-     // محاسبه اختلاف به روز
-     return date2.difference(date1).inDays;
-   }
 
   @override
   Widget build(BuildContext context) {
@@ -63,17 +52,17 @@ class VolumeReportChartWidget extends StatelessWidget {
              final parts = xLabels[i].split('/');
              final monthNum = int.tryParse(parts[1]) ?? 0;
 
-            String name =  getDaysBetweenShamsiDates(state.startDate, state.endDate)<31?
+            String name =  Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)<31?
              xLabels[i].toString().toPersianDigit():Constants().monthNames[monthNum - 1];
 
             final amount = val.toString();
 
             String statusMessage = "نرمال";
 
-              if (val > (status.capacityEntity.totalDisconnectCapacity??0)*getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
+              if (val > (status.capacityEntity.totalDisconnectCapacity??0)*Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
                 statusMessage = "اخطار";
               }
-              else if (val > (status.capacityEntity.totalCapacity??0)*getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
+              else if (val > (status.capacityEntity.totalCapacity??0)*Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
                 statusMessage = "بیش از حد مجاز";
               }
 
@@ -113,7 +102,7 @@ class VolumeReportChartWidget extends StatelessWidget {
                               xLabels,
 
                               state.startDate==state.endDate ? "day" :  "date",
-                              leng: getDaysBetweenShamsiDates(state.startDate, state.endDate)
+                              leng: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)
                             ),
                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),

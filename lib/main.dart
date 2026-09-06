@@ -24,7 +24,7 @@ import 'locator.dart';
 
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
                           },
                           child: MaterialApp(
               scaffoldMessengerKey: rootScaffoldMessengerKey, // این خط را اضافه کنید
-
+                            navigatorObservers: [routeObserver],
               debugShowCheckedModeBanner: false,
 
               theme: ThemeData(

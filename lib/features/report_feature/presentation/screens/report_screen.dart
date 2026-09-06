@@ -38,18 +38,6 @@ import '../widgets/volume_report_widget.dart';
 
 class ReportScreen extends StatelessWidget {
    const ReportScreen({super.key});
-   int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
-     // جدا کردن سال، ماه و روز
-     final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
-     final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
-
-     // تبدیل تاریخ‌های شمسی به DateTime
-     final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
-     final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
-
-     // محاسبه اختلاف به روز
-     return date2.difference(date1).inDays;
-   }
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +180,7 @@ class ReportScreen extends StatelessWidget {
                       return TimePickerField(
                         title: "ساعت شروع",
                         displayText: displayStart,
-                        ignoring: !(state.oneWell.length == 1 && getDaysBetweenShamsiDates(state.startDate, state.endDate) == 1),
+                        ignoring: !(state.oneWell.length == 1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate) == 1),
 
                         onTap: () async {
                           final picked = await Constants().showCustomTimePicker(context);

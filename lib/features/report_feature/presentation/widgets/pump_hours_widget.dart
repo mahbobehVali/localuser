@@ -16,18 +16,7 @@ import '../bloc/report_command_status.dart';
 class PumpHoursChartWidget extends StatelessWidget {
    PumpHoursChartWidget({super.key});
   List<VolumeSlot> flatList = [];
-   int getDaysBetweenShamsiDates(String startDateStr, String endDateStr) {
-     // جدا کردن سال، ماه و روز
-     final p1 = startDateStr.split('/').map((e) => int.parse(e.trim())).toList();
-     final p2 = endDateStr.split('/').map((e) => int.parse(e.trim())).toList();
 
-     // تبدیل تاریخ‌های شمسی به DateTime
-     final date1 = Jalali(p1[0], p1[1], p1[2]).toDateTime();
-     final date2 = Jalali(p2[0], p2[1], p2[2]).toDateTime();
-
-     // محاسبه اختلاف به روز
-     return date2.difference(date1).inDays;
-   }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ReportBloc, ReportState>(
@@ -49,7 +38,7 @@ class PumpHoursChartWidget extends StatelessWidget {
               final parts = xLabels[i].split('/');
               final monthNum = int.tryParse(parts[1]) ?? 0;
 
-              String name =  getDaysBetweenShamsiDates(state.startDate, state.endDate)<31?
+              String name =  Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)<31?
               xLabels[i].toString().toPersianDigit():Constants().monthNames[monthNum - 1];
 
               final amount= val.toString().toPersianDigit()  ;
@@ -194,7 +183,7 @@ class PumpHoursChartWidget extends StatelessWidget {
                               topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                               bottomTitles: Constants().axisBottomTitles(xLabels,
                                   flowMeter.type=="all-well"?"nothing":flowMeter.type=="one-well"?"clock":"date",
-                              leng: getDaysBetweenShamsiDates(state.startDate, state.endDate)),
+                              leng: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)),
 
                               leftTitles: Constants().leftTitles(
                                 interval: scale["maxY"]! > 1000 ? 65.w : 40.w,

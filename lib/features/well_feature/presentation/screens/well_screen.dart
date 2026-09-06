@@ -68,16 +68,25 @@ class _WellScreenState extends State<WellScreen> {
                         itemBuilder: (context, index) {
                           return GestureDetector(
                               onTap: () async {
-                                await locator<SharedPrefOperator>().saveSwitch(statusSummarySuccess.wellsEntity[index].data!.statusWell == 1);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => WellDetailScreen(
-                                      wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!,
 
+                                  // منتظر ماندن برای دریافت نتیجه خروج از صفحه دوم
+                                  final updatedSwitchStatus = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => WellDetailScreen(
+                                        wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!,
+                                      ),
                                     ),
-                                  ),
-                                );
+                                  );
+
+                                  // اگر کاربر تغییری داده بود و مقداری برگشت داده شد
+                                  if (updatedSwitchStatus != null && updatedSwitchStatus is bool) {
+                                    setState(() {
+                                      // آپدیت کردن فیلد statusWell در همان آیتم خاص بدون نیاز به رفرش کل لیست
+                                      statusSummarySuccess.wellsEntity[index].data!.statusWell = updatedSwitchStatus ? 1 : 0;
+                                    });
+                                  }
+
                               },
                             child: Container(
                               height: 40.h,

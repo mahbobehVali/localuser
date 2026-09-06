@@ -13,10 +13,16 @@ import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../bloc/status_summary_bloc/status_summary_bloc.dart';
 import '../bloc/status_summary_bloc/status_summary_status.dart';
 
-class ManagementWellsWidget extends StatelessWidget {
+class ManagementWellsWidget extends StatefulWidget {
   const ManagementWellsWidget({
     super.key,
   });
+
+  @override
+  State<ManagementWellsWidget> createState() => _ManagementWellsWidgetState();
+}
+
+class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +56,7 @@ class ManagementWellsWidget extends StatelessWidget {
               builder: (context, state) {
                 if(state.statusSummaryStatus is StatusSummarySuccess){
                   StatusSummarySuccess statusSummarySuccess=state.statusSummaryStatus as StatusSummarySuccess;
-                  
+
                   return ListView.builder(
                     physics: NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
@@ -63,10 +69,26 @@ class ManagementWellsWidget extends StatelessWidget {
                       final alertCount = wellData?.alert ?? 0;
 
                       return GestureDetector(
-                        onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                              return WellDetailScreen(wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!);
-                            },));
+                        onTap: () async {
+
+
+                            // منتظر ماندن برای دریافت نتیجه خروج از صفحه دوم
+                            final updatedSwitchStatus = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => WellDetailScreen(
+                                  wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!,
+                                ),
+                              ),
+                            );
+
+                            // اگر کاربر تغییری داده بود و مقداری برگشت داده شد
+                            if (updatedSwitchStatus != null && updatedSwitchStatus is bool) {
+                              setState(() {
+                                // آپدیت کردن فیلد statusWell در همان آیتم خاص بدون نیاز به رفرش کل لیست
+                                statusSummarySuccess.wellsEntity[index].data!.statusWell = updatedSwitchStatus ? 1 : 0;
+                              });
+                            }
                         },
                         child: Container(
                           padding: EdgeInsets.all(10),
