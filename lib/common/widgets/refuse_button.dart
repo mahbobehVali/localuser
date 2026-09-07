@@ -29,7 +29,7 @@ class RefuseButton extends StatelessWidget {
 
         widget: Text(text??"انصراف",
             style: TextStyle(
-                color: Colors.white)),
+                color: Colors.white,fontSize: 14)),
         backColor: Colors.grey,
         width: width??130.w,);
   }

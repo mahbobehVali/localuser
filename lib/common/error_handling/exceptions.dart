@@ -34,6 +34,12 @@ class UnauthenticatedException extends AppException {
             message: message ?? "چنین کاربری یافت نشد");
 }
 
+class UnaverificatedException extends AppException {
+  UnaverificatedException({String? message, super.response})
+      : super(
+            message: message ?? "چنین کاربری یافت نشد");
+}
+
 
 class AlreadyRegisteredException extends AppException {
   AlreadyRegisteredException({String? message, super.response,bool? password})

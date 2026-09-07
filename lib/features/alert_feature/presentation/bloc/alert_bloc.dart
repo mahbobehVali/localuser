@@ -161,6 +161,7 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
             emit(state.copyWith(
               newAlertCreateStatus: AlertCreateSuccess(),
               newAlertDetailStatus: AlertDetailSuccess(detailDataState.data),
+              newAlert: null
             ));
           } else {
             // مدیریت خطای جزئیات

@@ -90,6 +90,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
                           key: signUpFormKey,
                           child: TextFormField(
                             controller: codeController,
+                            keyboardType: TextInputType.number,
                           ),
                         ),
 

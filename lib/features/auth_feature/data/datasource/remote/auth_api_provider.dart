@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:mahaliii/common/params/forget_password_params.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../../common/error_handling/check_exceptions.dart';
 import '../../../../../common/params/login_params.dart';
@@ -33,18 +34,21 @@ class AuthApiProvider {
   }
 
   Future<dynamic> getCode(String mobile) async {
+    print("sfsdf${mobile.toString().toEnglishDigit()}");
 
     try {
       var response = await dio.post(
         "user/validate",
         data: {
-          "mobile": mobile,
+          "mobile": mobile.toString().toEnglishDigit(),
 
         },
       );
 
       return response;
     } on DioException catch (e) {
+      print(e.response?.statusCode);
+      print(e.response);
       if (e.type == DioExceptionType.connectionError) {
         print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");
       }
@@ -67,6 +71,8 @@ class AuthApiProvider {
 
       return response;
     } on DioException catch (e) {
+      print(e.response);
+      print(e.response?.statusCode);
       if (e.type == DioExceptionType.connectionError) {
         print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");
       }

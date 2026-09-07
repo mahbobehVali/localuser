@@ -41,6 +41,17 @@ class RegisterClicked extends SignUpEvent {
   // TODO: implement props
   List<Object?> get props => [];
 }
+
+class ChangeParams extends SignUpEvent {
+  final ChangeAlertParams changeAlertParams;
+
+
+  const ChangeParams(this.changeAlertParams);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
 class SaveServerId extends SignUpEvent {
   final SignUpParams signUpParams;
 

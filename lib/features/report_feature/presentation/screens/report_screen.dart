@@ -241,6 +241,7 @@ class ReportScreen extends StatelessWidget {
 
 
                   return GlobalElevatedButton(
+                    borderRadius: 5,
                     height: 50,
                     width: double.infinity,
                     backColor: isFormValid ? ColorPalette.darkBlue : ColorPalette.inverseGrey,
@@ -320,27 +321,52 @@ class ReportScreen extends StatelessWidget {
                       ),
                       child: DropdownButton<AlertTypeEntity>(
                         iconEnabledColor: ColorPalette.black,
+                        iconDisabledColor: ColorPalette.black,
                         underline: const SizedBox(),
                         isExpanded: true,
                         padding: EdgeInsets.only(right: 15.w, left: 5.w),
                         value: selectedItem,
+                        // ۱. ظاهر آیتم انتخاب‌شده وقتی منو بسته است
+                        selectedItemBuilder: (BuildContext context) {
+                          return state.reportIndexList.map((alert) {
+                            return Container(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                alert.name,
+                                style:  TextStyle(color: ColorPalette.black),
+                              ),
+                            );
+                          }).toList();
+                        },
                         items: state.reportIndexList.map((alert) {
                           // ۱. تعریف دقیق و یکپارچه شرط غیرفعال بودن (هم منطقی هم آیتم انتخابی)
-                          final bool isSpecificDisabled =
-                              ((state.flowMeterParams?.ids?.length ?? 1) == 1) && (alert.id == 1);
+                          final bool isSpecificDisabled = (Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)==0 && (alert.id == 1)) ||
+                              ((state.oneWell.length == 1) && (alert.id == 1)) ;
+                          // (state.flowMeterParams?.ids?.length ?? 1)
                           final bool isAlreadySelected = alert.id == selectedItem?.id;
 
                           final bool isDisabled = isSpecificDisabled || isAlreadySelected;
 
                           return DropdownMenuItem<AlertTypeEntity>(
 
+
                             value: alert,
                             enabled: !isDisabled, //  روش استاندارد فلاتر برای غیرفعال کردن واقعی آیتم
-                            child: Text(
-                              alert.name,
-                              style: TextStyle(
-                                //  تغییر رنگ متن برای تمام حالت‌های غیرفعال
-                                color: ColorPalette.black
+                            child: Container(
+                              width: MediaQuery.sizeOf(context).width,
+                              decoration: BoxDecoration(
+                                color: isAlreadySelected ? ColorPalette.lightBlue : Colors.transparent,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  alert.name,
+                                  style: TextStyle(
+                                    //  تغییر رنگ متن برای تمام حالت‌های غیرفعال
+                                    color: isSpecificDisabled?Colors.grey:  Colors.black,
+                                  ),
+                                ),
                               ),
                             ),
                           );
@@ -349,8 +375,8 @@ class ReportScreen extends StatelessWidget {
                             ? null
                             : (value) {
                           if (value != null) {
-                            final bool isSpecificDisabled =
-                                ((state.flowMeterParams?.ids?.length ?? 1) == 1) && (value.id == 1);
+                            final bool isSpecificDisabled = (Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)==0 && (value.id == 1)) ||
+                                ((state.oneWell.length == 1) && (value.id == 1)) ;
                             final bool isAlreadySelected = value.id == selectedItem?.id;
 
                             //  جلوگیری از ارسال ایونت در صورت انتخاب مجدد یا غیرفعال بودن

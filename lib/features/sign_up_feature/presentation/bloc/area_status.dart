@@ -12,6 +12,10 @@ class AreaLoading extends AreaStatus {
   @override
   List<Object> get props => [];
 }
+class AreaInitial extends AreaStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class AreaError extends AreaStatus {
   final String error;

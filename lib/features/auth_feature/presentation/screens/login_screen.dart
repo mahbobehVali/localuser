@@ -180,6 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         buildWhen: (previous, current) => current.loginStatus != previous.loginStatus,
                         builder: (context, state) {
                           return GlobalElevatedButton(
+                            borderRadius: 5,
                             width: double.infinity,
                             onTap: () {
                               if (loginKey.currentState!.validate()) {

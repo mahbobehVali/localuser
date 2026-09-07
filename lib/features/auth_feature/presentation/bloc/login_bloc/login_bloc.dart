@@ -54,6 +54,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
     });
     on<ForgetClicked>((event, emit) async {
+
       emit(state.copyWith(newForgetClickedStatus: ForgetClickedLoading()));
 
       DataState dataState = await getCodeUseCase(event.mobile);
@@ -65,7 +66,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newForgetClickedStatus: ForgetClickedError(dataState.error!)));
+        print("dsfffffffffffffff");
+        emit(state.copyWith(newForgetClickedStatus: ForgetClickedError(dataState.error??"")));
       }
     });
     on<ForgetPassword>((event, emit) async {
@@ -80,7 +82,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newForgetResetStatus: ForgetPasswordError(dataState.error!)));
+        emit(state.copyWith(newForgetResetStatus: ForgetPasswordError(dataState.error??"کداعتبار سنجی یافت نشد")));
       }
     });
     on<ObscureClicked>((event, emit) async {

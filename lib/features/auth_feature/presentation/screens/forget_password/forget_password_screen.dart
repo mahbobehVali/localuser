@@ -72,8 +72,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     // mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("فراموشی رمز عبور",style: TextStyleP.f14Bold.copyWith(color: ColorPalette.primaryTextGreen),),
-                      SizedBox(height: 64.h),
+                      Text("فراموشی رمز عبور",style: TextStyleP.f14Bold),
+                      SizedBox(height: 22.h),
 
                       Text("رمز عبور جدید خود را وارد کنید.",style: TextStyleP.f16Medium,),
                       SizedBox(height: 40.h),
@@ -131,6 +131,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                         buildWhen: (previous, current) => current.forgetPasswordStatus != previous.forgetPasswordStatus,
                         builder: (context, state) {
                           return GlobalElevatedButton(
+                            borderRadius: 5,
                             width: double.infinity,
                             onTap: () {
                               if (forgetKey.currentState!.validate()) {
@@ -140,7 +141,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                                       mobile: widget.mobile,
                                       code: int.parse(codeController.text),
                                       password: passController.text,
-                                      serverId: widget.serverId
+                                      serverId: 22
                                     )
                                   )
                                 );
@@ -148,7 +149,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                             },
                             widget: (state.forgetPasswordStatus is ForgetPasswordLoading)
                                 ? const CircularProgressIndicator(color: Colors.white)
-                                : Text(ConstantTexts.entrance,style: TextStyle(color: Colors.black),),
+                                : Text(ConstantTexts.entrance,style: TextStyle(color: Colors.white),),
                             backColor: ColorPalette.darkBlue,
                           );
                         },

@@ -39,13 +39,13 @@ class SignUpScreen extends StatelessWidget {
       },
       child: Scaffold(
         body: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 30.w),
+          padding:  EdgeInsets.symmetric(horizontal: 30.w,vertical: 50.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Image.asset("assets/images/logo.png",width: 28,),
+                  Image.asset("assets/images/blackLogo.png",width: 28.w),
                   SizedBox(
                     width: 14.w,
                   ),

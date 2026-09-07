@@ -38,14 +38,15 @@ class AlertDetailScreen extends StatelessWidget {
           locator<AlertDetailUseCase>(),
           locator<AlertCreateUseCase>(),
         );
-        alertBloc.add(AlertDetailEvent(alertDataEntity.id!,alertDataEntity.status!));
+        print(alertDataEntity.status!);
+        alertBloc.add(AlertDetailEvent(alertDataEntity.id!, alertDataEntity.status!));
         return alertBloc;
       },
   child: Scaffold(
       body: SizedBox(
         width: double.infinity,
         child: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 16.w,vertical: 50.h),
+          padding:  EdgeInsets.only(left: 16.w,right: 16.w,top: 50.h,bottom: 20.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -108,10 +109,10 @@ class AlertDetailScreen extends StatelessWidget {
                     ],
                   ),
 
-                  SizedBox(height: 12.w),
+                  SizedBox(height: 6.h),
 
                   Padding(
-                    padding: EdgeInsets.only(right: 12.w,bottom: 32.h),
+                    padding: EdgeInsets.only(right: 12.w,bottom: 15.h),
                     child: IntrinsicHeight( // <--- حل مشکل نمایش ندادن VerticalDivider
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -164,14 +165,14 @@ class AlertDetailScreen extends StatelessWidget {
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 17.h),
+                                      SizedBox(height: 12.h),
                                       Text(alertDataEntity.message!),
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  padding: EdgeInsets.all(12),
-                                  margin: EdgeInsets.only(top: 12),
+                                  padding: EdgeInsets.symmetric(horizontal: 12.w,vertical: 6.h),
+                                  margin: EdgeInsets.only(top: 6.h),
                                   decoration: BoxDecoration(
                                     color: ColorPalette.lightGrey.withValues(alpha: 0.3),
                                     border: BoxBorder.all(
@@ -368,7 +369,9 @@ class AlertDetailScreen extends StatelessWidget {
                           child: ValueListenableBuilder<TextEditingValue>(
                             valueListenable: createController,
                             builder: (context, value, child) {
-                              return GlobalElevatedButton(widget:
+                              return GlobalElevatedButton(
+                                  borderRadius: 2.5,
+                                  widget:
                               state.alertCreateStatus is AlertCreateLoading
                                   ?
                               Center(child: CircularProgressIndicator(),)
@@ -378,7 +381,7 @@ class AlertDetailScreen extends StatelessWidget {
                                 backColor: ColorPalette.darkBlue,
                                 onTap:
                                 createController.text.isEmpty ||
-                                    state.alert ==  null?(){
+                                    (state.alert ==  null || state.alert==0)?(){
                                       GlobalSnackBar.show(context, message: "متن پیام و وضعیت هشدار را مشخص کنید");
 
                                     }  :
@@ -390,6 +393,8 @@ class AlertDetailScreen extends StatelessWidget {
                                               description: createController.text,
                                             id: alertDataEntity.id
                                           )));
+
+                                      createController.clear();
                                     }
 
                               );

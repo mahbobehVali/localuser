@@ -1261,62 +1261,69 @@ class ShowDialogs {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              RefuseButton(
-                                width: 100.w,
+                              Expanded(
+                                child: RefuseButton(
+
+                                  borderRadius: 2.5,
+                                ),
                               ),
                               SizedBox(
                                 width: 10.w,
                               ),
-                              BlocConsumer<SupportBloc, SupportState>(
+                              Expanded(
+                                flex: 2,
+                                child: BlocConsumer<SupportBloc, SupportState>(
 
-                                listenWhen: (previous, current) =>
-                                current.sendSupportStatus != previous.sendSupportStatus,
-                                listener: (context, state) {
-                                  if (state.sendSupportStatus is SendSupportSuccess) {
-                                    ShowSnacksBars.snack(sendContext, ConstantTexts.beRegisteredRequest,color: Colors.green,duration: 2);
-                                    Navigator.of(context).pop();
+                                  listenWhen: (previous, current) =>
+                                  current.sendSupportStatus != previous.sendSupportStatus,
+                                  listener: (context, state) {
+                                    if (state.sendSupportStatus is SendSupportSuccess) {
+                                      ShowSnacksBars.snack(sendContext, ConstantTexts.beRegisteredRequest,color: Colors.green,duration: 2);
+                                      Navigator.of(context).pop();
 
-                                  }
-                                  if (state.sendSupportStatus is SendSupportError) {
-                                    SendSupportError sendRequestError =
-                                    state.sendSupportStatus
-                                    as SendSupportError;
-                                    ShowSnacksBars.snack(sendContext, sendRequestError.error,duration: 2);
+                                    }
+                                    if (state.sendSupportStatus is SendSupportError) {
+                                      SendSupportError sendRequestError =
+                                      state.sendSupportStatus
+                                      as SendSupportError;
+                                      ShowSnacksBars.snack(sendContext, sendRequestError.error,duration: 2);
 
-                                    Navigator.of(context).pop();
+                                      Navigator.of(context).pop();
 
-                                  }
-                                },
-                                builder: (context, state) {
-                                  return GlobalElevatedButton(
-                                    width: 100.w,
-                                    onTap:() async {
-                                      if (newSupportKey.currentState!.validate()) {
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    return GlobalElevatedButton(
+                                      borderRadius: 2.5,
 
-                                        dynamic file = await ImageConverter.getMultiPart(
-                                            state.supportFile,
-                                            state.supportFile.split("/").last);
+                                      onTap:() async {
+                                        if (newSupportKey.currentState!.validate()) {
 
-                                        supportBloc.add(
-                                            SendNewSupportClicked(
-                                                SendNewSupportParams(
-                                                    part:alertTypeEntity.id,
-                                                    subject:
-                                                    subjectController.text,
-                                                    status: 0,
-                                                    description:
-                                                    descriptionController.text,
-                                                    payVast: file)));
-                                      }
-                                    },
-                                    widget: state.sendSupportStatus is SendSupportLoading?
-                                    CircularProgressIndicator(): Text(
-                                      "ارسال",
-                                      style:  TextStyle(color: Colors.white,fontSize: 18),
-                                    ),
-                                    backColor: ColorPalette.darkBlue
-                                  );
-                                },
+                                          dynamic file = await ImageConverter.getMultiPart(
+                                              state.supportFile,
+                                              state.supportFile.split("/").last);
+
+                                          supportBloc.add(
+                                              SendNewSupportClicked(
+                                                  SendNewSupportParams(
+                                                      part:alertTypeEntity.id,
+                                                      subject:
+                                                      subjectController.text,
+                                                      status: 0,
+                                                      description:
+                                                      descriptionController.text,
+                                                      payVast: file)));
+                                        }
+                                      },
+                                      widget: state.sendSupportStatus is SendSupportLoading?
+                                      CircularProgressIndicator(): Text(
+                                        "ثبت درخواست",
+                                        style:  TextStyle(color: Colors.white),
+                                      ),
+                                      backColor: ColorPalette.darkBlue
+                                    );
+                                  },
+                                ),
                               ),
                             ],
                           ),

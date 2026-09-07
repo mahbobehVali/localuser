@@ -11,6 +11,10 @@ class RegionLoading extends RegionStatus {
   @override
   List<Object> get props => [];
 }
+class RegionInitial extends RegionStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class RegionError extends RegionStatus {
   final String error;

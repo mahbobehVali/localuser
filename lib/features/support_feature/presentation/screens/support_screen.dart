@@ -11,6 +11,7 @@ import 'package:mahaliii/features/support_feature/domain/usecase/send_support_us
 import 'package:mahaliii/features/support_feature/domain/usecase/support_answers_usecase.dart';
 import 'package:mahaliii/features/support_feature/domain/usecase/support_usecase.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_bloc.dart';
+import 'package:mahaliii/features/support_feature/presentation/bloc/support_close_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/screens/support_answer_screen.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
@@ -166,6 +167,7 @@ class SupportScreen extends StatelessWidget {
                               padding: const EdgeInsets.all(8.0),
                               child: BlocConsumer<SupportBloc, SupportState>(
                                 listener: (context, state) {
+
                                   if(state.supportStatus is SupportExit){
                                     Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
                                       return LoginScreen();
@@ -209,17 +211,17 @@ class SupportScreen extends StatelessWidget {
                                                     ),
                                                   )
                                                       : GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
+                                                    onTap: () async {
+                                                      // در صفحه والد هنگام باز کردن این صفحه/دیالوگ:
+                                                      final result = await Navigator.push(
                                                         context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) {
-                                                            return SupportAnswerScreen(
-                                                              supportDataEntity: data[index - 1],
-                                                            );
-                                                          },
-                                                        ),
+                                                        MaterialPageRoute(builder: (context) => SupportAnswerScreen(supportDataEntity: data[index - 1],)),
                                                       );
+
+                                                            // اگر عملیات موفق بود، ایونت را در صفحه والد صدا بزنید
+                                                      if (result == true) {
+                                                        BlocProvider.of<SupportBloc>(context).add(GetSupportMessage(FlowMeterParams(page: 1)));
+                                                      }
                                                     },
                                                     child: Container(
                                                       padding: const EdgeInsets.all(12),
@@ -241,11 +243,14 @@ class SupportScreen extends StatelessWidget {
                                                             child: Container(
                                                               padding: const EdgeInsets.all(5),
                                                               decoration: BoxDecoration(
-                                                                color: data[index - 1].status == 0
+                                                                color:
+                                                                    data[index - 1].status == 0
                                                                     ? ColorPalette.lightBlue
                                                                     : data[index - 1].status == 1
                                                                     ? Colors.yellow
-                                                                    : ColorPalette.lightGreen,
+                                                                    : data[index - 1].status == 2
+                                                                    ? ColorPalette.lightGreen
+                                                                    : ColorPalette.lightGrey,
                                                                 borderRadius: BorderRadius.circular(5),
                                                               ),
                                                               child: Text(
@@ -253,7 +258,9 @@ class SupportScreen extends StatelessWidget {
                                                                     ? "جدید"
                                                                     : data[index - 1].status == 1
                                                                     ? "در حال بررسی"
-                                                                    : "پاسخ داده شده",
+                                                                    : data[index - 1].status == 2
+                                                                    ? "پاسخ داده شده"
+                                                                    : "بسته شده",
                                                                 textAlign: TextAlign.center,
                                                               ),
                                                             ),

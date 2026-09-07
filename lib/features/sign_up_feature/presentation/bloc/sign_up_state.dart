@@ -30,6 +30,10 @@ class SignUpState {
   final AgainSendValidationStatus? againSendValidationStatus;
   final int userValidationId;
   final SendValidationStatus sendValidationStatus;
+  // final bool responsibility;
+  // final bool region;
+  // final bool area;
+  final ChangeAlertParams changeAlertParams;
 
 
 
@@ -51,6 +55,10 @@ class SignUpState {
     required this.againSendValidationStatus,
     required this.userValidationId,
     required this.sendValidationStatus,
+    // required this.responsibility,
+    // required this.region,
+    // required this.area,
+    required this.changeAlertParams,
   });
 
   SignUpState copyWith(
@@ -74,7 +82,11 @@ class SignUpState {
         int? newSelectedResponsibility,
         AgainSendValidationStatus? newAgainSendValidationStatus,
         int? newUserValidationId,
-        SendValidationStatus? newSendValidationStatus
+        SendValidationStatus? newSendValidationStatus,
+         // bool? newResponsibility,
+         // bool? newRegion,
+         // bool? newArea,
+        ChangeAlertParams? newChangeAlertParams
 
 
 
@@ -101,8 +113,11 @@ class SignUpState {
       selectedResponsibility: newSelectedResponsibility??selectedResponsibility,
       againSendValidationStatus: newAgainSendValidationStatus??againSendValidationStatus,
       userValidationId: newUserValidationId??userValidationId,
-      sendValidationStatus: newSendValidationStatus??sendValidationStatus
-
+      sendValidationStatus: newSendValidationStatus??sendValidationStatus,
+      // responsibility: newResponsibility??responsibility,
+      // region: newRegion??region,
+      // area: newArea??area,
+      changeAlertParams: newChangeAlertParams ?? this.changeAlertParams,
     );
   }
 }

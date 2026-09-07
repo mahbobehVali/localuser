@@ -20,6 +20,7 @@ import 'package:mahaliii/features/support_feature/presentation/bloc/support_bloc
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_close_status.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
+import '../../../../common/params/flowmeter_params.dart';
 import '../../../../common/params/send_new_request_to_support_params.dart';
 import '../../../../common/widgets/bottom_sheets.dart';
 import '../../../../common/widgets/global_snackbar.dart';
@@ -83,287 +84,295 @@ class SupportAnswerScreen extends StatelessWidget {
                child: Container(
                  color: Colors.white,
                  padding: EdgeInsets.all(20.sp),
-                 child: Column(
-                   children: [
-                     Expanded(
-                       child: BlocBuilder<SupportBloc,SupportState>(builder: (context, state) {
-                         if(state.supportAnswersStatus is SupportAnswersLoading){
-                           return ShimmerClass.shimmerListviewVerticalAbdRow(height: 40);
-                         } if(state.supportAnswersStatus is SupportAnswersError){
-                           SupportAnswersError supportAnswersError=state.supportAnswersStatus as SupportAnswersError;
-                           return Center(child: Text(supportAnswersError.error));
-                         } if(state.supportAnswersStatus is SupportAnswersSuccess){
-                           SupportAnswersSuccess supportAnswersSuccess=state.supportAnswersStatus as SupportAnswersSuccess;
-                           return  SingleChildScrollView(
-                             scrollDirection: Axis.vertical,
-                             child: Column(
-                               children: [
-                                 ListView.builder(
-                                   physics: NeverScrollableScrollPhysics(),
-                                   shrinkWrap: true,
-                                   itemCount: supportAnswersSuccess.supportAnswerEntity.support?.length,
-                                   itemBuilder: (context, index) {
-                                     SupportDataEntity supportDataEntity=supportAnswersSuccess.supportAnswerEntity.support![index];
-                                     return Column(
-                                       children: [
-                                         Row(
-                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                 child: BlocBuilder<SupportBloc,SupportState>(builder: (context, state) {
+                   if(state.supportAnswersStatus is SupportAnswersLoading){
+                     return ShimmerClass.shimmerListviewVerticalAbdRow(height: 40);
+                   } if(state.supportAnswersStatus is SupportAnswersError){
+                     SupportAnswersError supportAnswersError=state.supportAnswersStatus as SupportAnswersError;
+                     return Center(child: Text(supportAnswersError.error));
+                   } if(state.supportAnswersStatus is SupportAnswersSuccess){
+                     SupportAnswersSuccess supportAnswersSuccess=state.supportAnswersStatus as SupportAnswersSuccess;
+                     return  SingleChildScrollView(
+                       scrollDirection: Axis.vertical,
+                       child: Column(
+                         children: [
+                           ListView.builder(
+                             physics: NeverScrollableScrollPhysics(),
+                             shrinkWrap: true,
+                             itemCount: supportAnswersSuccess.supportAnswerEntity.support?.length,
+                             itemBuilder: (context, index) {
+                               SupportDataEntity supportDataEntity=supportAnswersSuccess.supportAnswerEntity.support![index];
+                               return Column(
+                                 children: [
+                                   Row(
+                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
-                                           children: [
-                                             Row(
-                                               children: [
-                                                 IconContainer(icon: Icon(Icons.person_2_outlined), color: ColorPalette.lightBlue,),
-                                                 SizedBox(width: 5.w,),
-                                                 Text(supportAnswersSuccess.supportAnswerEntity.user!),
-                                               ],
-                                             ),
-                                             Text("${supportDataEntity.clock!.toString().toPersianDigit()}     ${supportDataEntity.date!.toString().toPersianDigit()}"),
-                                             // Expanded(child: Text(supportDataEntity.date!)),
-                                           ],
-                                         ),
-                                         SizedBox(height: 8,),
-                                         // Container(
-                                         //   width: double.infinity,
-                                         //
-                                         //   padding: EdgeInsets.all(8),
-                                         //   decoration: BoxDecoration(
-                                         //     borderRadius: BorderRadius.circular(4),
-                                         //     border: BoxBorder.all(color: ColorPalette.inverseGrey)
-                                         //   ),
-                                         //   child: Text(supportDataEntity.description??""),
-                                         //
-                                         // ),
-                                         // ReadMoreText(
-                                         //   supportDataEntity.description??"",
-                                         // trimLines: 2, // یا می‌توانید تعداد خطوط را مشخص کنید
-                                         // trimLength: 100, // یا بر اساس تعداد کاراکتر (مثلاً ۱۰۰ کاراکتر)
-                                         // trimMode: TrimMode.Length, // حالت محدودسازی بر اساس تعداد کاراکتر
-                                         // trimCollapsedText: ' بیشتر',
-                                         // trimExpandedText: ' بستن',
-                                         // moreStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
-                                         // lessStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
-                                         // style: TextStyle(fontSize: 16, color: Colors.black),
-                                         // ),
-                                         ExpandableText(
-                                           text: supportDataEntity.description??"",
-                                           maxChars: 200,
-                                         ),
-                                         SizedBox(height: 8,),
-
-                                        supportDataEntity.payvast==null?SizedBox():
-                                        PayvastSupportFile(url: "${Constants.baseUrl}uploads/support/${supportDataEntity.payvast}")
-                                       ],
-                                     );
-
-                                   },),
-                                 if(supportAnswersSuccess.supportAnswerEntity.list!=null)
-                                   ListView.builder(
-                                     physics: NeverScrollableScrollPhysics(),
-                                     shrinkWrap: true,
-                                     itemCount: supportAnswersSuccess.supportAnswerEntity.list?.length,
-                                     itemBuilder: (context, index) {
-                                       SupportAnswerListEntity supportAnswerListEntity=supportAnswersSuccess.supportAnswerEntity.list![index];
-                                       return Padding(
-                                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                         child: Column(
-                                           children: [
-                                             Row(
-                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                               children: [
-                                                 Row(
-                                                   children: [
-                                                     IconContainer(icon: Icon(Icons.contact_support_outlined), color: ColorPalette.lightBlue,),
-                                                     SizedBox(width: 5.w,),
-                                                     Text(supportAnswerListEntity.name??"نامشخص"),
-                                                   ],
-                                                 ),
-                                                 Text("${supportAnswerListEntity.clock!.toString().toPersianDigit()}     ${supportAnswerListEntity.date!.toString().toPersianDigit()}"),
-                                                 // Expanded(child: Text(supportDataEntity.date!)),
-                                               ],
-                                             ),
-                                             SizedBox(height: 8,),
-                                             ExpandableText(
-                                               text: supportDataEntity.description??"",
-                                               maxChars: 200,
-                                             ),
-                                             SizedBox(height: 8,),
-
-                                             supportAnswerListEntity.payvast==null?SizedBox():
-                                             PayvastSupportFile(url: "${Constants.baseUrl}uploads/support/${supportDataEntity.payvast}")
-
-                                           ],
-                                         ),
-                                       );
-
-                                     },),
-                                 BlocBuilder<SupportBloc, SupportState>(builder: (context, state) {
-                                   return state.answer
-                                       ? BlocConsumer<SupportBloc, SupportState>(builder: (context, state) {
-                                     return Row(
-                                       children: [
-                                         Expanded(
-                                           child: SizedBox(
-                                             height: 40.h,
-
-                                             child: TextFormField(
-                                               maxLines: 2,
-                                               controller: answerController,
-                                               decoration: InputDecoration(
-                                                 prefixIcon:  BlocConsumer<SupportBloc, SupportState>(
-                                                   listener: (context, state) {
-                                                     if(state.overImage==true) {
-                                                       GlobalSnackBar.show(context, message: "حجم فایل بیشتر از یک مگابایت نباشد.");
-                                                     }
-                                                   },
-                                                   listenWhen: (previous, current) => state.overImage==true,
-                                                   buildWhen: (previous, current) =>
-                                                   previous.supportFile != current.supportFile ||
-                                                       previous.overImage != current.overImage,
-                                                   builder: (context, state) {
-                                                     // print("file${state.supportFile}");
-                                                     // print("state.overImage${state.overImage}");
-                                                     return GestureDetector(onTap: () {
-                                                       BottomSheets().imageSupport(context, BlocProvider.of<SupportBloc>(context));
-                                                     }, child: _buildImageContent(state.supportFile,state.overImage));
-                                                   },
-                                                 ),
-
-
-                                                 suffixIcon: SizedBox(
-                                                   width: 90.w,
-                                                   height: double.infinity,
-                                                   child: ValueListenableBuilder<TextEditingValue>(
-                                                     valueListenable: answerController,
-                                                     builder: (context, value, child) {
-                                                       final isTextEmpty = value.text.trim().isEmpty;
-
-
-                                                       return  GlobalElevatedButton(
-                                                         widget:state.sendAnswerStatus is SendAnswerLoading?
-                                                         Center(child: CircularProgressIndicator(),): Text(
-                                                           "ارسال",
-                                                           style: TextStyle(color: ColorPalette.white),
-                                                         ),
-                                                         backColor: ColorPalette.darkBlue,
-                                                         onTap: isTextEmpty
-                                                             ? null
-                                                             : () async {
-                                                           dynamic file = await ImageConverter.getMultiPart(
-                                                               state.supportFile,
-                                                               state.supportFile.split("/").last);
-
-
-                                                           BlocProvider.of<SupportBloc>(context).add(
-                                                             SendAnswer(
-                                                                 SendNewSupportParams(
-                                                                     description: answerController.text,
-                                                                     id: supportDataEntity.id,
-                                                                     payVast:file
-                                                                 )
-                                                             ),
-                                                           );
-                                                         },
-                                                       );
-                                                     },
-                                                   ),
-                                                 ),
-                                                 hintText: "پیام خود را بنویسید",
-
-                                                 errorBorder: InputBorder.none,
-                                                 disabledBorder: InputBorder.none,
-                                               ),
-                                             ),
-                                           ),
-                                         ),
-                                       ],
-                                     );
-                                   },
-                                     listenWhen: (previous, current) => previous.sendAnswerStatus!=current.sendAnswerStatus,
-
-                                     listener: (context, state) {
-                                       if(state.sendAnswerStatus is SendAnswerSuccess){
-                                         GlobalSnackBar.show(context, message: "ارسال شد");
-                                       }
-                                       if(state.sendAnswerStatus is SendAnswerError){
-                                         GlobalSnackBar.show(context, message: "خطایی رخ داده");
-                                       }
-
-                                     },
-                                   )
-                                       : Row(
-                                     mainAxisAlignment: MainAxisAlignment.end,
                                      children: [
-                                       BlocConsumer<SupportBloc, SupportState>(
-                                         listenWhen: (previous, current) => previous.supportCloseStatus!=current.supportCloseStatus,
-
-                                         listener: (context, state) {
-                                           if(state.supportCloseStatus is SupportCloseSuccess){
-                                             GlobalSnackBar.show(context, message: "بسته شد");
-                                           }
-                                           if(state.supportCloseStatus is SupportCloseError){
-                                             GlobalSnackBar.show(context, message: "خطایی رخ داده");
-                                           }
-                                         },
-                                         buildWhen: (previous, current) => previous.supportCloseStatus!=current.supportCloseStatus,
-                                         builder: (context, state) {
-                                           return GlobalElevatedButton(backColor: Colors.transparent,
-                                             borderColor: ColorPalette.inverseGrey,
-                                             widget: Row(
-                                               children: [
-                                                 state.supportCloseStatus is SupportCloseLoading?
-                                                 Center(child: CircularProgressIndicator(),):
-                                                 Text("بستن",style: TextStyle(color: ColorPalette.black),),
-                                                 SizedBox(width: 3.w,),
-                                                 Icon(Icons.cancel_outlined,color: ColorPalette.black),
-
-                                               ],
-                                             ),onTap: () {
-                                               BlocProvider.of<SupportBloc>(context).add(SupportClose(supportDataEntity.id!));
-
-                                             },);
-                                         },
+                                       Row(
+                                         children: [
+                                           IconContainer(icon: Icon(Icons.person_2_outlined), color: ColorPalette.lightBlue,),
+                                           SizedBox(width: 5.w,),
+                                           Text(supportAnswersSuccess.supportAnswerEntity.user!),
+                                         ],
                                        ),
-                                       SizedBox(
-                                         width: 10.w,
-                                       ),
-                                       BlocBuilder<SupportBloc, SupportState>(
-                                         buildWhen: (previous, current) => previous.answer!=current.answer,
-                                         builder: (context, state) {
-                                           return GlobalElevatedButton(backColor: Colors.transparent,
-                                             borderColor: ColorPalette.inverseGrey,
-                                             widget: Row(
-                                               children: [
-                                                 Text("پاسخ",style: TextStyle(color: ColorPalette.black),),
-                                                 SizedBox(width: 3.w,),
-                                                 Icon(Icons.arrow_circle_left_outlined,color: ColorPalette.black),
+                                       Text("${supportDataEntity.clock!.toString().toPersianDigit()}     ${supportDataEntity.date!.toString().toPersianDigit()}"),
+                                       // Expanded(child: Text(supportDataEntity.date!)),
+                                     ],
+                                   ),
+                                   SizedBox(height: 8,),
+                                   // Container(
+                                   //   width: double.infinity,
+                                   //
+                                   //   padding: EdgeInsets.all(8),
+                                   //   decoration: BoxDecoration(
+                                   //     borderRadius: BorderRadius.circular(4),
+                                   //     border: BoxBorder.all(color: ColorPalette.inverseGrey)
+                                   //   ),
+                                   //   child: Text(supportDataEntity.description??""),
+                                   //
+                                   // ),
+                                   // ReadMoreText(
+                                   //   supportDataEntity.description??"",
+                                   // trimLines: 2, // یا می‌توانید تعداد خطوط را مشخص کنید
+                                   // trimLength: 100, // یا بر اساس تعداد کاراکتر (مثلاً ۱۰۰ کاراکتر)
+                                   // trimMode: TrimMode.Length, // حالت محدودسازی بر اساس تعداد کاراکتر
+                                   // trimCollapsedText: ' بیشتر',
+                                   // trimExpandedText: ' بستن',
+                                   // moreStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
+                                   // lessStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
+                                   // style: TextStyle(fontSize: 16, color: Colors.black),
+                                   // ),
+                                   ExpandableText(
+                                     text: supportDataEntity.description??"",
+                                     maxChars: 200,
+                                   ),
+                                   SizedBox(height: 8,),
 
-                                               ],
-                                             ),onTap: () {
-                                               BlocProvider.of<SupportBloc>(context).add(ChangeAnswer(!state.answer));
+                                  supportDataEntity.payvast==null?SizedBox():
+                                  PayvastSupportFile(url: "${Constants.baseUrl}uploads/support/${supportDataEntity.payvast}")
+                                 ],
+                               );
 
-                                             },);
-                                         },
+                             },),
+                           if(supportAnswersSuccess.supportAnswerEntity.list!=null)
+                             ListView.builder(
+                               physics: NeverScrollableScrollPhysics(),
+                               shrinkWrap: true,
+                               itemCount: supportAnswersSuccess.supportAnswerEntity.list?.length,
+                               itemBuilder: (context, index) {
+                                 SupportAnswerListEntity supportAnswerListEntity=supportAnswersSuccess.supportAnswerEntity.list![index];
+                                 return Padding(
+                                   padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                   child: Column(
+                                     children: [
+                                       Row(
+                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                         children: [
+                                           Row(
+                                             children: [
+                                               IconContainer(icon: Icon(Icons.contact_support_outlined), color: ColorPalette.lightBlue,),
+                                               SizedBox(width: 5.w,),
+                                               Text(supportAnswerListEntity.name??"نامشخص"),
+                                             ],
+                                           ),
+                                           Text("${supportAnswerListEntity.clock!.toString().toPersianDigit()}     ${supportAnswerListEntity.date!.toString().toPersianDigit()}"),
+                                           // Expanded(child: Text(supportDataEntity.date!)),
+                                         ],
                                        ),
+                                       SizedBox(height: 8,),
+                                       ExpandableText(
+                                         text: supportAnswerListEntity.description??"",
+                                         maxChars: 200,
+                                       ),
+                                       SizedBox(height: 8,),
+
+                                       supportAnswerListEntity.payvast==null?SizedBox():
+                                       PayvastSupportFile(url: "${Constants.baseUrl}uploads/support/${supportAnswerListEntity.payvast}")
 
                                      ],
-                                   );
+                                   ),
+                                 );
 
-                                 },),
+                               },),
+                         if(supportDataEntity.status!=3)  BlocBuilder<SupportBloc, SupportState>(builder: (context, state) {
+                             return state.answer
+                                 ? BlocConsumer<SupportBloc, SupportState>(builder: (context, state) {
+                               return Row(
+                                 children: [
+                                   Expanded(
+                                     child: SizedBox(
+                                       height: 40.h,
 
+                                       child: TextFormField(
+                                         maxLines: 2,
+                                         controller: answerController,
+                                         decoration: InputDecoration(
+                                           prefixIcon:  BlocConsumer<SupportBloc, SupportState>(
+                                             listener: (context, state) {
+                                               if(state.overImage==true) {
+                                                 GlobalSnackBar.show(context, message: "حجم فایل بیشتر از یک مگابایت نباشد.");
+                                               }
+                                             },
+                                             listenWhen: (previous, current) => state.overImage==true,
+                                             buildWhen: (previous, current) =>
+                                             previous.supportFile != current.supportFile ||
+                                                 previous.overImage != current.overImage,
+                                             builder: (context, state) {
+                                               // print("file${state.supportFile}");
+                                               // print("state.overImage${state.overImage}");
+                                               return GestureDetector(onTap: () {
+                                                 BottomSheets().imageSupport(context, BlocProvider.of<SupportBloc>(context));
+                                               }, child: _buildImageContent(state.supportFile,state.overImage));
+                                             },
+                                           ),
+
+
+                                           suffixIcon: SizedBox(
+                                             width: 90.w,
+                                             height: double.infinity,
+                                             child: ValueListenableBuilder<TextEditingValue>(
+                                               valueListenable: answerController,
+                                               builder: (context, value, child) {
+                                                 final isTextEmpty = value.text.trim().isEmpty;
+
+
+                                                 return  GlobalElevatedButton(
+                                                   borderRadius: 2.5,
+                                                   widget:state.sendAnswerStatus is SendAnswerLoading?
+                                                   Center(child: CircularProgressIndicator(),): Text(
+                                                     "ارسال",
+                                                     style: TextStyle(color: ColorPalette.white),
+                                                   ),
+                                                   backColor: ColorPalette.darkBlue,
+                                                   onTap: isTextEmpty
+                                                       ? null
+                                                       : () async {
+                                                     dynamic file = await ImageConverter.getMultiPart(
+                                                         state.supportFile,
+                                                         state.supportFile.split("/").last);
+
+
+                                                     BlocProvider.of<SupportBloc>(context).add(
+                                                       SendAnswer(
+                                                           SendNewSupportParams(
+                                                               description: answerController.text,
+                                                               id: supportDataEntity.id,
+                                                               payVast:file
+                                                           )
+                                                       ),
+                                                     );
+                                                   },
+                                                 );
+                                               },
+                                             ),
+                                           ),
+                                           hintText: "پیام خود را بنویسید",
+
+                                           errorBorder: InputBorder.none,
+                                           disabledBorder: InputBorder.none,
+                                         ),
+                                       ),
+                                     ),
+                                   ),
+                                 ],
+                               );
+                             },
+                               listenWhen: (previous, current) => previous.sendAnswerStatus!=current.sendAnswerStatus,
+
+                               listener: (context, state) {
+                                 if(state.sendAnswerStatus is SendAnswerSuccess){
+                                   GlobalSnackBar.show(context, message: "ارسال شد");
+                                 }
+                                 if(state.sendAnswerStatus is SendAnswerError){
+                                   GlobalSnackBar.show(context, message: "خطایی رخ داده");
+                                 }
+
+                               },
+                             )
+                                 : Row(
+                               mainAxisAlignment: MainAxisAlignment.end,
+                               children: [
+                                 BlocConsumer<SupportBloc, SupportState>(
+                                   listenWhen: (previous, current) => previous.supportCloseStatus != current.supportCloseStatus,
+                                   listener: (context, state) {
+                                     if (state.supportCloseStatus is SupportCloseSuccess) {
+                                       print("Status is success");
+
+                                       // ۱. ابتدا رویداد جدید را برای دریافت لیست جدید اضافه کنید
+                                       // BlocProvider.of<SupportBloc>(context).add(GetSupportMessage(FlowMeterParams(page: 1)));
+
+                                       // ۲. اسنک‌بار را نمایش دهید
+                                       GlobalSnackBar.show(context, message: "بسته شد");
+
+                                       // ۳. در صورت نیاز صفحه را ببندید (اگر این ویجت صفحه جزئی است یا باید پاپ شود)
+                                       if (Navigator.canPop(context)) {
+                                         Navigator.of(context).pop(true);
+                                       }
+                                     }
+                                     if (state.supportCloseStatus is SupportCloseError) {
+                                       GlobalSnackBar.show(context, message: "خطایی رخ داده");
+                                     }
+
+                                   },
+                                   buildWhen: (previous, current) => current.supportStatus != previous.supportStatus || current.supportCloseStatus != previous.supportCloseStatus,
+                                   builder: (context, state) {
+                                     return GlobalElevatedButton(
+                                       borderRadius: 2.5,
+                                       backColor: Colors.transparent,
+                                       borderColor: ColorPalette.inverseGrey,
+                                       widget: Row(
+                                         children: [
+                                           state.supportCloseStatus is SupportCloseLoading?
+                                           Center(child: CircularProgressIndicator(),):
+                                           Text("بستن",style: TextStyle(color: ColorPalette.black),),
+                                           SizedBox(width: 3.w,),
+                                           Icon(Icons.cancel_outlined,color: ColorPalette.black),
+
+                                         ],
+                                       ),onTap: () {
+                                         BlocProvider.of<SupportBloc>(context).add(SupportClose(supportDataEntity.id!));
+
+                                       },);
+                                   },
+                                 ),
+                                 SizedBox(
+                                   width: 10.w,
+                                 ),
+                                 BlocBuilder<SupportBloc, SupportState>(
+                                   buildWhen: (previous, current) => previous.answer!=current.answer,
+                                   builder: (context, state) {
+                                     return GlobalElevatedButton(
+                                       borderRadius: 2.5,
+                                       backColor: Colors.transparent,
+                                       borderColor: ColorPalette.inverseGrey,
+                                       widget: Row(
+                                         children: [
+                                           Text("پاسخ",style: TextStyle(color: ColorPalette.black),),
+                                           SizedBox(width: 3.w,),
+                                           Icon(Icons.arrow_circle_left_outlined,color: ColorPalette.black),
+
+                                         ],
+                                       ),onTap: () {
+                                         BlocProvider.of<SupportBloc>(context).add(ChangeAnswer(!state.answer));
+
+                                       },);
+                                   },
+                                 ),
 
                                ],
-                             ),
-                           );
-                         }else{
-                           return SizedBox();
-                         }
-                       },),
-                     ),
-                     SizedBox(height: 20.h),
+                             );
 
-                   ],
-                 ),
+                           },),
+
+
+                         ],
+                       ),
+                     );
+                   }else{
+                     return SizedBox();
+                   }
+                 },),
                ),
              ),
 

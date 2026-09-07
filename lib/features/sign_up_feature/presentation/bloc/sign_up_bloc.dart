@@ -7,6 +7,7 @@ import 'package:mahaliii/features/sign_up_feature/presentation/bloc/region_statu
 import 'package:mahaliii/features/sign_up_feature/presentation/bloc/register_status.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/bloc/validation_status.dart';
 
+import '../../../../common/params/change_alert_params.dart';
 import '../../../../common/params/validation_params.dart';
 import '../../../../common/utils/data_state.dart';
 import '../../../../common/utils/use_case.dart';
@@ -44,18 +45,22 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       registerStatus: RegisterInitial(),
       signUpParams: SignUpParams(),
       mobile: "" ,
-    areaStatus: AreaLoading(),
-    regionStatus: RegionLoading(),
+    areaStatus: AreaInitial(),
+    regionStatus: RegionInitial(),
     oneRegionEntity: null,
     oneAreaEntity: null,
     ignoreArea: true,
     step: 0,
     serverId: 0,
       responsibilityList: Constants().responsibilityList,
-    selectedResponsibility: 0,
+    selectedResponsibility: null,
     againSendValidationStatus: AgainSendValidationInitial(),
     userValidationId: 0,
-    sendValidationStatus: SendValidationInitial()
+    sendValidationStatus: SendValidationInitial(),
+    // responsibility: false,
+    // region: false,
+    // area: false,
+    changeAlertParams: ChangeAlertParams()
 
   )) {
 
@@ -86,7 +91,11 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
 
     on<RegisterClicked>((event, emit) async {
-      emit(state.copyWith(newRegisterStatus: RegisterLoading()));
+      emit(state.copyWith(newRegisterStatus: RegisterLoading(),
+
+      ));
+
+
       DataState dataState = await registerUseCase(event.signUpParams);
 
       if (dataState is DataSuccess) {
@@ -107,7 +116,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
     on<SendValidation>((event, emit) async {
       emit(state.copyWith(newSendValidationStatus: SendValidationLoading(),
-        newStep: event.signUpParams.step,
+
       ));
       DataState dataState = await sendValidationCodeUseCase(event.signUpParams);
 
@@ -115,7 +124,8 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
         emit(state.copyWith(
             newSignUpParams: event.signUpParams,
-            newSendValidationStatus: SendValidationSuccess()));
+            newSendValidationStatus: SendValidationSuccess(),
+          newStep: event.signUpParams.step,));
       }
       if (dataState is DataFailed) {
         emit(
@@ -144,6 +154,11 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
 
     });
+  on<ChangeParams>((event, emit) async {
+      emit(state.copyWith(newChangeAlertParams: event.changeAlertParams));
+
+
+    });
 
     on<GetRegion>((event, emit) async {
       emit(state.copyWith(newRegionStatus: RegionLoading()));
@@ -154,13 +169,14 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       if (dataState is DataSuccess) {
         RegionEntity regionEntity=dataState.data[0];
         emit(state.copyWith(newRegionStatus: RegionSuccess(dataState.data),
-            newOneRegionEntity: regionEntity));
+            // newOneRegionEntity: regionEntity
+        ));
         // ۲. خط ۱۰۹ را با این شرط بپوشانید
-        if (!isClosed) {
-          add(GetArea(dataState.data[0].id!));
-        }
-
-        add(GetArea(1));
+        // if (!isClosed) {
+        //   add(GetArea(dataState.data[0].id!));
+        // }
+        //
+        // add(GetArea(1));
       }
       if (dataState is DataFailed) {
         // ۳. اینجا هم چک کنید چون ممکن است در لحظه خطا هم بلاک بسته شده باشد
@@ -170,7 +186,8 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       }    });
 
     on<OneRegionClicked>((event, emit) async {
-      emit(state.copyWith(newOneRegionEntity: event.regionEntity));
+      emit(state.copyWith(newOneRegionEntity: event.regionEntity,
+          newChangeAlertParams: state.changeAlertParams.copyWith(newRegion: false)));
       add(GetArea(event.regionEntity.id!));
     });
 
@@ -178,19 +195,27 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       emit(state.copyWith(newAreaStatus: AreaLoading()));
       DataState dataState = await areaUseCase(event.id);
       if (dataState is DataSuccess) {
-        emit(state.copyWith(newAreaStatus:  AreaSuccess(dataState.data), newOneAreaEntity: dataState.data[0]));
-
+        emit(state.copyWith(
+          newAreaStatus: AreaSuccess(dataState.data),
+          // newOneAreaEntity: dataState.data[0],
+          // چون به طور خودکار ناحیه اول انتخاب شد، خطای ناحیه را false می‌کنیم
+          // newChangeAlertParams: state.changeAlertParams.copyWith(newArea: false),
+        ));
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newAreaStatus: AreaError(dataState.error!)));}});
+        emit(state.copyWith(newAreaStatus: AreaError(dataState.error!)));
+      }
+    });
 
     on<OneAreaClicked>((event, emit) async {
-      emit(state.copyWith(newOneAreaEntity: event.areaEntity));
+      emit(state.copyWith(newOneAreaEntity: event.areaEntity,
+          newChangeAlertParams: state.changeAlertParams.copyWith(newArea: false)));
 
     });
 
     on<ResponsibilityChanged>((event, emit) async {
-      emit(state.copyWith(newSelectedResponsibility: event.responsibilityEntity.id));
+      emit(state.copyWith(newSelectedResponsibility: event.responsibilityEntity.id,
+          newChangeAlertParams: state.changeAlertParams.copyWith(newRes: false)));
     });
 
     on<FillUserValidationId>((event, emit) async {

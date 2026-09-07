@@ -25,8 +25,8 @@ class CheckExceptions {
 
           //شماره شما در سامانه ثبت نشده(فراموشی رمز)
       //نظر خود را ثبت کرده اید(نظر در مورد مشاوره)
-      //   case 404:
-      //     throw UnauthenticatedException();
+        case 404:
+          throw UnaverificatedException(response: response);
 
         //کد اعتبارسنجی منقضی
       case 408:
@@ -66,7 +66,10 @@ class CheckExceptions {
       ///The user is not registered in the system
 
       case UnauthenticatedException:
-        return DataFailed(error: appException.response!.data["message"]);
+        return DataFailed(error: appException.response?.data["mobile"]);
+
+ case UnaverificatedException:
+        return DataFailed(error: appException.response?.data["mobile"]);
 
       ///The verification code has expired
 
