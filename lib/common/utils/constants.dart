@@ -62,6 +62,12 @@ class Constants {
         child: Center(child: Text("داده ای وجود ندارد")));
   }
 
+  static Widget noAlert(){
+    return SizedBox(
+        height: 250.h,
+        child: Center(child: Text("هشداری وجود ندارد")));
+  }
+
 
   // static bool isValidEmail(String email) {
   //   if(email.isEmpty) {

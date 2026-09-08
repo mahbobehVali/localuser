@@ -103,7 +103,7 @@ class AlertScreen extends StatelessWidget {
                                 AlertSuccess alertSuccess=state.alertStatus as AlertSuccess;
 
                                 return (alertSuccess.alertsEntity.data?.isEmpty ?? true)?
-                                Center(child: Text("هشداری وجود ندارد")):
+                                Constants.noAlert():
                                 Column(
                                   children: [
                                     Expanded(
@@ -223,9 +223,7 @@ class AlertScreen extends StatelessWidget {
                                 return ShimmerClass.shimmerListviewVertical(height: 50);
 
                               }else if(state.alertStatus is AlertEmpty){
-                                return SizedBox(
-                                    height: 200,
-                                    child: Center(child: Text("هشداری وجود ندارد")));
+                                return Constants.noAlert();
 
                               }else if(state.alertStatus is AlertError){
                                 AlertError alertError=state.alertStatus as AlertError;

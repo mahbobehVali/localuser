@@ -141,6 +141,8 @@ class SupportScreen extends StatelessWidget {
                                 child: DropdownButton<AlertTypeEntity>(
                                   underline: const SizedBox(),
                                   isExpanded: true,
+                                  iconEnabledColor: ColorPalette.black,
+                                  iconDisabledColor: ColorPalette.black,
                                   padding: EdgeInsets.only(right: 15.w),
                                   value: state.supportStatusList[state.selectedSupportStatus],
                                   items: state.supportStatusList
