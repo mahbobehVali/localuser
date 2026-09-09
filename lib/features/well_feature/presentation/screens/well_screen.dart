@@ -69,23 +69,28 @@ class _WellScreenState extends State<WellScreen> {
                           return GestureDetector(
                               onTap: () async {
 
-                                  // منتظر ماندن برای دریافت نتیجه خروج از صفحه دوم
-                                  final updatedSwitchStatus = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => WellDetailScreen(
-                                        wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!,
-                                      ),
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => WellDetailScreen(
+                                      wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!,
                                     ),
-                                  );
+                                  ),
+                                );
 
-                                  // اگر کاربر تغییری داده بود و مقداری برگشت داده شد
-                                  if (updatedSwitchStatus != null && updatedSwitchStatus is bool) {
-                                    setState(() {
-                                      // آپدیت کردن فیلد statusWell در همان آیتم خاص بدون نیاز به رفرش کل لیست
-                                      statusSummarySuccess.wellsEntity[index].data!.statusWell = updatedSwitchStatus ? 1 : 0;
-                                    });
-                                  }
+                                // بررسی اینکه آیا مقداری برگشته است یا خیر
+                                if (result != null && result is Map) {
+                                  final bool updatedSwitchStatus = result['isSwitched'];
+                                  final dynamic updatedUserLocalId = result['userLocalId'];
+                                  print("updatedSwitchStatus${updatedSwitchStatus}");
+                                  print("updatedUserLocalId${updatedUserLocalId}");
+
+                                  setState(() {
+                                    statusSummarySuccess.wellsEntity[index].data!.statusWell = updatedSwitchStatus ? 1 : 0;
+                                    //  استفاده از مقدار واقعی و درستی که از صفحه دوم برگشته است
+                                    statusSummarySuccess.wellsEntity[index].data!.userLocalId = updatedUserLocalId;
+                                  });
+                                }
 
                               },
                             child: Container(

@@ -147,7 +147,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
           onData: (response) {
             if (response.source == FingerprintSource.requestResponse) {
               if (response.status == 1) {
-                print("FingerRequestAccepted");
+                print("FingerbLOCRequestAccepted");
                 return state.copyWith(
                   newFingerStatus: FingerRequestAccepted(response.status),
                 );
@@ -158,6 +158,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
                 );
               }
             } else if (response.source == FingerprintSource.statusListener) {
+              print("response.status${response.status}");
               if (response.status == 1 || response.status == "1") {
                 print("FingerSuccess");
                 return state.copyWith(
@@ -267,7 +268,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     });
 
     on<WellWorkHourStart>((event, emit) async {
-      print("event.flowMeterParams.type${event.flowMeterParams.type}");
+      // print("event.flowMeterParams.type${event.flowMeterParams.type}");
       emit(state.copyWith(newWeekWellWorkStatus: WeekWellWorkLoading(),
           newSelectedChartTab: event.flowMeterParams.type));
       if(event.flowMeterParams.type==0){
@@ -375,7 +376,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
         // socketRepository.onAndOffTimeStream,
         socketRepository.todayStream,
         onData: (today) {
-          print("today$today");
+          // print("today$today");
           // دیتای دریافتی را به وضعیت موفقیت می‌بریم
           return state.copyWith(
               newFlowMeterTodayStatus: FlowMeterTodaySuccess(wellFlowMeterTodayOneEntity: today));

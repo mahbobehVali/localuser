@@ -31,18 +31,18 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
            element["xAxis"].length > 1,
        orElse: () => null,
      );
-     print("totalElementall-well${allElement}");
+     // print("totalElementall-well${allElement}");
 
      if (allElement != null) return allElement;
    }
-  print("tttttttttttttttttttttttttttt");
+  // print("tttttttttttttttttttttttttttt");
 
     // اول تلاش می‌کنه total رو پیدا کنه
     final totalElement = list.firstWhere(
       (element) => element["type"] == "total",
       orElse: () => null,
     );
-   print("totalElementtotal${totalElement}");
+   // print("totalElementtotal${totalElement}");
 
     if (totalElement != null) return totalElement;
 
@@ -52,7 +52,7 @@ class WellFlowMeterModel extends WellFlowMeterEntity {
       (element) => element["type"] == "one-well",
       orElse: () => null,
     );
-   print("oneElementone-well${oneElement}");
+   // print("oneElementone-well${oneElement}");
 
     if (oneElement != null) return oneElement;
 

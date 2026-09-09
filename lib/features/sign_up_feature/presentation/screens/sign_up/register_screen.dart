@@ -128,67 +128,64 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                         ),
                                         width: double.infinity,
                                         alignment: Alignment.center,
-                                        child: Column(
-                                          children: [
-                                            BlocBuilder<SignUpBloc, SignUpState>(
-                                              builder: (context, state) {
-                                                if (state.regionStatus is RegionSuccess) {
-                                                  RegionSuccess regionSuccess = state.regionStatus as RegionSuccess;
+                                        child: BlocBuilder<SignUpBloc, SignUpState>(
+                                          builder: (context, state) {
+                                            if (state.regionStatus is RegionSuccess) {
+                                              RegionSuccess regionSuccess = state.regionStatus as RegionSuccess;
 
-                                                  // ۱. در ابتدا مقدار پیش‌فرض را روی null قرار می‌دهیم
-                                                  int? regionIndex;
+                                              // ۱. در ابتدا مقدار پیش‌فرض را روی null قرار می‌دهیم
+                                              int? regionIndex;
 
-                                                  if (state.oneRegionEntity != null) {
-                                                    final foundIndex = regionSuccess.regionEntity.indexWhere(
-                                                            (element) => element.id == state.oneRegionEntity!.id);
-                                                    // اگر آیتم مورد نظر پیدا شد، ایندکس آن را ست می‌کنیم، در غیر این صورت همان null می‌ماند
-                                                    if (foundIndex != -1) {
-                                                      regionIndex = foundIndex;
-                                                    }
-                                                  }
-
-                                                  return DropdownButton<RegionEntity>(
-                                                    underline: const SizedBox(),
-                                                    isExpanded: true,
-                                                    padding: EdgeInsets.only(right: 15.w),
-
-                                                    // متن راهنما وقتی هنوز چیزی انتخاب نشده است
-                                                    // hint: const Text("یک منطقه را انتخاب کنید"),
-
-                                                    // ۲. اگر ایندکس null بود، value هم null می‌شود و چیزی انتخاب نخواهد شد
-                                                    value: regionIndex != null ? regionSuccess.regionEntity[regionIndex] : null,
-
-                                                    items: regionSuccess.regionEntity
-                                                        .map((region) => DropdownMenuItem<RegionEntity>(
-                                                      value: region,
-                                                      child: Text(region.name!.toString()),
-                                                    ))
-                                                        .toList(),
-                                                    onChanged: (value) {
-                                                      BlocProvider.of<SignUpBloc>(context)
-                                                          .add(OneRegionClicked(value!));
-                                                    },
-                                                  );
-                                                } else if (state.regionStatus is RegionLoading) {
-                                                  return const Center(child: CircularProgressIndicator());
-                                                } else if (state.regionStatus is RegionError) {
-                                                  RegionError regionError = state.regionStatus as RegionError;
-                                                  return Center(child: Text(regionError.error));
-                                                } else {
-                                                  return const SizedBox();
+                                              if (state.oneRegionEntity != null) {
+                                                final foundIndex = regionSuccess.regionEntity.indexWhere(
+                                                        (element) => element.id == state.oneRegionEntity!.id);
+                                                // اگر آیتم مورد نظر پیدا شد، ایندکس آن را ست می‌کنیم، در غیر این صورت همان null می‌ماند
+                                                if (foundIndex != -1) {
+                                                  regionIndex = foundIndex;
                                                 }
-                                              },
-                                            ),
+                                              }
 
-                                          ],
+                                              return DropdownButton<RegionEntity>(
+                                                underline: const SizedBox(),
+                                                isExpanded: true,
+                                                padding: EdgeInsets.only(right: 15.w),
+
+                                                // متن راهنما وقتی هنوز چیزی انتخاب نشده است
+                                                // hint: const Text("یک منطقه را انتخاب کنید"),
+
+                                                // ۲. اگر ایندکس null بود، value هم null می‌شود و چیزی انتخاب نخواهد شد
+                                                value: regionIndex != null ? regionSuccess.regionEntity[regionIndex] : null,
+
+                                                items: regionSuccess.regionEntity
+                                                    .map((region) => DropdownMenuItem<RegionEntity>(
+                                                  value: region,
+                                                  child: Text(region.name!.toString()),
+                                                ))
+                                                    .toList(),
+                                                onChanged: (value) {
+                                                  BlocProvider.of<SignUpBloc>(context)
+                                                      .add(OneRegionClicked(value!));
+                                                },
+                                              );
+                                            } else if (state.regionStatus is RegionLoading) {
+                                              return const Center(child: CircularProgressIndicator());
+                                            } else if (state.regionStatus is RegionError) {
+                                              RegionError regionError = state.regionStatus as RegionError;
+                                              return Center(child: Text(regionError.error));
+                                            } else {
+                                              return const SizedBox();
+                                            }
+                                          },
                                         ),
                                       ),
-                                      BlocBuilder<SignUpBloc, SignUpState>(builder: (context, state) {
-                                        return Visibility(
-                                            visible: state.changeAlertParams.region,
+                                      SizedBox(
+                                        height: 20.h,
+                                        child: BlocBuilder<SignUpBloc, SignUpState>(builder: (context, state) {
+                                          return state.changeAlertParams.region?Text("لطفا منطقه را انتخاب کنید"):
+                                          SizedBox();
+                                        },),
+                                      )
 
-                                            child: Text("لطفاً منطقه را انتخاب کنید"));
-                                      },)
 
 
                                     ],
@@ -265,12 +262,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                           },
                                         ),
                                       ),
-                                      BlocBuilder<SignUpBloc, SignUpState>(builder: (context, state) {
-                                        return Visibility(
-                                            visible: state.changeAlertParams.area,
-
-                                            child: Text("لطفاً ناحیه را انتخاب کنید"));
-                                      },)
+                                      SizedBox(
+                                        height: 20.h,
+                                        child: BlocBuilder<SignUpBloc, SignUpState>(builder: (context, state) {
+                                         return state.changeAlertParams.area?Text("لطفا ناحیه را انتخاب کنید"):
+                                          SizedBox();
+                                        },),
+                                      )
                                     ],
                                   ),
                                 )
@@ -319,6 +317,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                               builder: (context, state) {
                                 return GlobalElevatedButton(
+                                  borderRadius: 5,
                                   width: double.infinity,
                                   backColor: ColorPalette.darkBlue,
                                   onTap: () async {
@@ -377,6 +376,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             RefuseButton(
                               width: double.infinity,
+                              borderRadius: 5,
                               onTap: () {
                               widget.pageController.previousPage(
 

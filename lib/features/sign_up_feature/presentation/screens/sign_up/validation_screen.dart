@@ -170,6 +170,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
 
                           builder: (context, state) {
                             return GlobalElevatedButton(
+                              borderRadius: 5,
                               width: double.infinity,
                               backColor: ColorPalette.darkBlue,
                               onTap: () async {
@@ -195,7 +196,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
                         ),
                         RefuseButton(
                           text: "برگشت",
-
+                          borderRadius: 5,
                           width: double.infinity,
                           onTap: () {
                             widget.pageController.previousPage(

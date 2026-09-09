@@ -136,7 +136,7 @@ Future<void> setup() async {
   locator.registerFactory<WellsListUseCase>(() =>WellsListUseCase(locator()));
   locator.registerFactory<LastActivityUseCase>(() =>LastActivityUseCase(locator()));
   locator.registerFactory<ReportFlowMeterUseCase>(() =>ReportFlowMeterUseCase(locator()));
-  locator.registerFactory<SocketRepository>(() =>SocketRepository());
+  locator.registerLazySingleton<SocketRepository>(() => SocketRepository());
 
   ///panel
   locator.registerFactory<PanelApiProvider>(() =>PanelApiProvider(dio));

@@ -136,9 +136,10 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
     _bloc = locator<WellDetailBloc>();
 
-    final socketRepository = locator<SocketRepository>();
-    socketRepository.initAndConnect(widget.wellsDataEntity.pin ?? "");
-
+    // final socketRepository = locator<SocketRepository>();
+    // socketRepository.initAndConnect(widget.wellsDataEntity.pin ?? "");
+    final wellPin = widget.wellsDataEntity.pin ?? ""; // پین همان چاه خاص
+    locator<SocketRepository>().joinWellRoom(wellPin);
 
     // _bloc = WellDetailBloc(
     //   locator<WellsRepository>(),
@@ -269,7 +270,13 @@ class _WellDetailScreenState extends State<WellDetailScreen>
           onPopInvokedWithResult: (didPop, result) {
             if (didPop) return;
             // برگرداندن وضعیت فعلی سوئیچ هنگام خروج
-            Navigator.of(context).pop(_bloc.state.isSwitched);
+            Navigator.of(context).pop({
+                'isSwitched': _bloc.state.isSwitched,
+                'userLocalId': _bloc.state.userLocalId, //  برگرداندن userLocalId واقعی که ثبت شده است
+
+            });
+            // Navigator.of(context).pop( _bloc.state.userLocalId);
+
           },
           child: Scaffold(
               appBar: PreferredSize(
@@ -312,8 +319,12 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                           ),
                           icon: const Icon(Icons.navigate_next),
                           onPressed: () {
-                            Navigator.of(context).pop(_bloc.state.isSwitched);
-                          },
+                            Navigator.of(context).pop({
+                              'isSwitched': _bloc.state.isSwitched,
+                              'userLocalId': _bloc.state.userLocalId, //  برگرداندن userLocalId واقعی که ثبت شده است
+
+                            });
+                            },
                         ),
                       ],
                     ),
@@ -1443,7 +1454,20 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   _controller.forward();
                                                 }
                                               }
-                                              else if (status is FingerSuccess || status is FingerError || status is FingerRequestFailed) {
+                                          if (status is FingerRequestAccepted) {
+                                                print("FingerRequestAccepted");
+
+                                              }
+
+                                              if (status is FingerSuccess) {
+                                                // print("status.userLocalID${status.userLocalID}");
+                                                BlocProvider.of<WellDetailBloc>(context).add(
+                                                  ChangeUserLocalId(
+                                                    status.userLocalID,
+                                                  ),
+                                                );
+                                              }
+                                               if (status is FingerSuccess || status is FingerError || status is FingerRequestFailed) {
                                                 _controller.stop();
                                               }
 

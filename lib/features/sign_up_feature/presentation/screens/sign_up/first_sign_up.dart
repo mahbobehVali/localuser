@@ -149,6 +149,7 @@ class _FirstSignUpState extends State<FirstSignUp> {
                       previous.firstLevelSendStatus != current.firstLevelSendStatus,
                       builder: (context, state) {
                         return GlobalElevatedButton(
+                          borderRadius: 5,
                           width: double.infinity,
                           backColor: ColorPalette.darkBlue,
                           onTap: () async {

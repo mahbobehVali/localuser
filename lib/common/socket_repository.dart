@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:mahaliii/common/params/create_time_params.dart';
 import 'package:mahaliii/common/utils/sharedpreference.dart';
@@ -30,7 +31,8 @@ class FingerprintResponse {
 class SocketRepository {
   i_o.Socket? _socket;
   bool isConnecting = false; // جلوگیری از درخواست‌های همزمان اتصال
-
+  String? _managerPin;       // پین مدیر (همیشه ثابت)
+  String? _currentWellPin;   // پین چاهی که در حال حاضر داخل آن هستیم
   // استریم کنترلرها برای صفحات مختلف
   final _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
   final _waterController = StreamController<dynamic>.broadcast();
@@ -47,21 +49,25 @@ class SocketRepository {
   Stream<dynamic> get onAndOffTimeStream => _onAndOffTimeController.stream;
   Stream<dynamic> get todayStream => _todayController.stream;
 
-  /// ۱. این متد را فقط یک‌بار در ابتدای برنامه یا ورود کاربر صدا می‌زنید
-  Future<void> initAndConnect(String pin) async {
-    print("initAndConnectCalled---pin:$pin");
-
-// اگر سوکت ساخته شده و وصل است، فقط اتاق را عوض کن یا خارج شو
+  Future<void> initAndConnect(String managerPin) async {
+    print("agaiiiin");
+    print("initAndConnectCalled---managerPin:$managerPin");
+    _managerPin = managerPin;
+print("zfcsdfggg${_currentWellPin}");
     if (_socket != null && _socket!.connected) {
-      print("Socket already connected. Joining room: $pin");
-      _socket!.emit("join/room", {'room': pin});
+      print("Socket already connected. Ensuring rooms are joined.");
+      _socket!.emit("join/room", {'room': _managerPin});
+      if (_currentWellPin != null) {
+        print("sadcmsldmnkfv");
+        _socket!.emit("join/room", {'room': _currentWellPin});
+      }
       return;
     }
-    if (isConnecting) return; // اگر در حال اتصال است، منتظر بمان
+
+    if (isConnecting) return;
     isConnecting = true;
 
     String token = await getToken();
-    print(token);
 
     _socket = i_o.io('https://www.abyarinovin.ir',
         i_o.OptionBuilder()
@@ -75,19 +81,48 @@ class SocketRepository {
     setupGlobalListeners();
     _socket!.onConnect((_) async {
       print(' Socket Connected globally!');
-      // یک‌بار برای همیشه وارد اتاق می‌شویم
-      _socket!.emit("join/room", {'room': pin});
+
+      // ۱. همیشه اتاق مدیر جوین می‌شود
+      if (_managerPin != null) {
+        print("Joining manager room: $_managerPin");
+        _socket!.emit("join/room", {'room': _managerPin});
+      }
+
+      // ۲. 👈 اگر کاربر وارد چاهی شده بود، اینجا حتماً اتاق چاه هم جوین می‌شود
+      if (_currentWellPin != null) {
+        print("Joining well room (from onConnect): $_currentWellPin");
+        _socket!.emit("join/room", {'room': _currentWellPin});
+      }
 
       isConnecting = false;
-      print(isConnecting);
     });
 
     _socket!.onDisconnect((data) {
       print('Socket Disconnected');
       isConnecting = false;
     });
+
     _socket!.onConnectError((data) => print(' Connect Error: $data'));
     _socket!.connect();
+  }
+
+  /// متد مخصوص ورود به صفحه یک چاه جدید
+  void joinWellRoom(String wellPin) {
+    if (_currentWellPin == wellPin) return;
+
+    print("Switching well room from $_currentWellPin to: $wellPin");
+    _currentWellPin = wellPin;
+
+    if (_socket != null && _socket!.connected) {
+      print("Socket is connected, emitting room: $wellPin");
+      _socket!.emit("join/room", {'room': wellPin});
+    } else {
+      print("Socket not connected yet. Initializing connection...");
+      // اگر سوکت وصل نیست، متد اتصال را صدا می‌زنیم.
+      // چون بالا متغیر _currentWellPin پر شده است، به محض اینکه onConnect اجرا شود،
+      // خودکار هم مدیر و هم این چاه جدید جوین خواهند شد.
+      initAndConnect(_managerPin ?? "manger");
+    }
   }
 
   /// ۲. گوش دادن دائمی به رویدادها (گوش‌ها همیشه باز هستند، اما تا درخواستی فرستاده نشود، دیتایی نمی‌آید)
@@ -191,7 +226,7 @@ class SocketRepository {
     }
 
     _socket!.on("fingerprint/request_response", (data) {
-
+      print(' fingerprint/request_response listener...');
       if (data == null || _statusControllerCheckFinger.isClosed) return;
 
         try {
@@ -200,6 +235,7 @@ class SocketRepository {
           var status = data["status"];
 
           if (status == 1 || status == "1") {
+            print("status == 1");
             _statusControllerCheckFinger.add(
               FingerprintResponse(
                 status: status,
@@ -246,7 +282,9 @@ class SocketRepository {
         await initAndConnect(data["pin"]);
 
         int attempts = 0;
-        while ((_socket == null || !_socket!.connected) && attempts < 40) {
+        while ((_socket == null || !_socket!.connected)
+            // && attempts < 40
+        ) {
           print("attempts");
           await Future.delayed(const Duration(milliseconds: 100));
           attempts++;
