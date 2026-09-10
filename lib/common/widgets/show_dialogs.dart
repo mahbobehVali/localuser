@@ -854,235 +854,233 @@ class ShowDialogs {
             child: Directionality(
               textDirection: TextDirection.rtl,
               child: AlertDialog(
-                content: SizedBox(
-                  height: 500.h,
-                  child: SingleChildScrollView(
-                    child: BlocBuilder<AlertBloc, AlertState>(
-                      builder: (context, state) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("افزودن فیلتر",style: TextStyleP.f16Medium,),
-                            SizedBox(
-                                height: 16.h
-                            ),
-                            Text("نوع هشدار"),
-                            SizedBox(
-                                height: 6.h
-                            ),
-                            BlocBuilder<AlertBloc, AlertState>(
-                              // buildWhen: (previous, current) =>
-                              // current.selectedAlertType!=previous.selectedAlertType,
-                    
+                content: SingleChildScrollView(
+                  child: BlocBuilder<AlertBloc, AlertState>(
+                    builder: (context, state) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("افزودن فیلتر",style: TextStyleP.f16Medium,),
+                          SizedBox(
+                              height: 16.h
+                          ),
+                          Text("نوع هشدار"),
+                          SizedBox(
+                              height: 6.h
+                          ),
+                          BlocBuilder<AlertBloc, AlertState>(
+                            // buildWhen: (previous, current) =>
+                            // current.selectedAlertType!=previous.selectedAlertType,
+
+                          builder: (context, state) {
+
+                            return Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(color: Colors.grey)),
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            child:
+                            DropdownButton<AlertTypeEntity>(
+                                underline: const SizedBox(),
+                                isExpanded: true,
+                                padding: EdgeInsets.only(right: 15.w),
+                                value:  (state.selectedAlertType != null &&
+                                    state.selectedAlertType! < state.alertTypeList.length)
+                                    ? state.alertTypeList[state.selectedAlertType!]
+                                    : null,
+                                items: state.alertTypeList
+                                    .map((alertType) =>
+                                    DropdownMenuItem<AlertTypeEntity>(
+                                      value: alertType,
+                                      child: Text(alertType.name),
+                                    ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  alertBloc
+                                      .add(OneAlertTypeClicked(value!,state.alertFilterModel!.copyWith(
+                                    newFilterType: true,
+                                    newType: value.name
+                                  )));
+                                }),
+                          );
+                        },
+                          ),
+                          SizedBox(
+                              height: 12.h
+                          ),
+                          Text("وضعیت هشدار"),
+                          SizedBox(
+                              height: 6.h
+                          ),
+                          BlocBuilder<AlertBloc, AlertState>(
+                      // buildWhen: (previous, current) =>
+                      // current.selectedAlertStatus!=previous.selectedAlertStatus,
+
                             builder: (context, state) {
-                    
+
                               return Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(color: Colors.grey)),
-                              width: double.infinity,
-                              alignment: Alignment.center,
-                              child:
-                              DropdownButton<AlertTypeEntity>(
-                                  underline: const SizedBox(),
-                                  isExpanded: true,
-                                  padding: EdgeInsets.only(right: 15.w),
-                                  value:  (state.selectedAlertType != null &&
-                                      state.selectedAlertType! < state.alertTypeList.length)
-                                      ? state.alertTypeList[state.selectedAlertType!]
-                                      : null,
-                                  items: state.alertTypeList
-                                      .map((alertType) =>
-                                      DropdownMenuItem<AlertTypeEntity>(
-                                        value: alertType,
-                                        child: Text(alertType.name),
-                                      ))
-                                      .toList(),
-                                  onChanged: (value) {
-                                    alertBloc
-                                        .add(OneAlertTypeClicked(value!,state.alertFilterModel!.copyWith(
-                                      newFilterType: true,
-                                      newType: value.name
-                                    )));
-                                  }),
-                            );
-                          },
-                            ),
-                            SizedBox(
-                                height: 12.h
-                            ),
-                            Text("وضعیت هشدار"),
-                            SizedBox(
-                                height: 6.h
-                            ),
-                            BlocBuilder<AlertBloc, AlertState>(
-                        // buildWhen: (previous, current) =>
-                        // current.selectedAlertStatus!=previous.selectedAlertStatus,
-                    
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(color: Colors.grey)),
+                                width: double.infinity,
+                                alignment: Alignment.center,
+                                child:
+                                DropdownButton<AlertTypeEntity>(
+                                    underline: const SizedBox(),
+                                    isExpanded: true,
+                                    padding: EdgeInsets.only(right: 15.w),
+                                    value: (state.selectedAlertStatus != null &&
+                                        state.selectedAlertStatus! < state.alertStatusList.length)
+                                        ? state.alertStatusList[state.selectedAlertStatus!]
+                                        : null,
+                                    items: state.alertStatusList
+                                        .map((alertType) =>
+                                        DropdownMenuItem<AlertTypeEntity>(
+                                          value: alertType,
+                                          child: Text(alertType.name),
+                                        ))
+                                        .toList(),
+                                    onChanged: (value) {
+
+                                      alertBloc
+                                          .add(OneAlertStatusClicked(value!,state.alertFilterModel!.copyWith(
+                                          newFilterStatus: true,
+                                          newStatus: value.name
+                                      )));
+                                    }),
+                              );
+                            },
+                          ),
+                          SizedBox(
+                              height: 12.h
+                          ),
+                          Text("تاریخ"),
+                          SizedBox(
+                              height: 6.h
+                          ),
+                          Container(
+
+                            child: BlocBuilder<AlertBloc, AlertState>(
+                              // buildWhen: (previous, current) => previous.alertStartDate!=current.alertStartDate || previous.alertEndDate!=current.alertEndDate,
+
                               builder: (context, state) {
-                    
-                                return Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      border: Border.all(color: Colors.grey)),
-                                  width: double.infinity,
-                                  alignment: Alignment.center,
-                                  child:
-                                  DropdownButton<AlertTypeEntity>(
-                                      underline: const SizedBox(),
-                                      isExpanded: true,
-                                      padding: EdgeInsets.only(right: 15.w),
-                                      value: (state.selectedAlertStatus != null &&
-                                          state.selectedAlertStatus! < state.alertStatusList.length)
-                                          ? state.alertStatusList[state.selectedAlertStatus!]
-                                          : null,
-                                      items: state.alertStatusList
-                                          .map((alertType) =>
-                                          DropdownMenuItem<AlertTypeEntity>(
-                                            value: alertType,
-                                            child: Text(alertType.name),
-                                          ))
-                                          .toList(),
-                                      onChanged: (value) {
-                    
-                                        alertBloc
-                                            .add(OneAlertStatusClicked(value!,state.alertFilterModel!.copyWith(
-                                            newFilterStatus: true,
-                                            newStatus: value.name
-                                        )));
-                                      }),
+                                return GestureDetector(
+                                  onTap: () async{
+                                    var picked = await showPersianDateRangePicker(
+                                        context: context,
+
+                                        firstDate: Jalali(1385, 8),
+                                        lastDate: Jalali.now(),
+                                        initialDate: Jalali.now(),
+                                        cancelText: "انصراف"
+                                    );
+
+                                    String  start = picked==null?"": "${picked.start.year}/${picked.start.month.toString().padLeft(2, '0')}/${picked.start.day.toString().padLeft(2, '0')}";
+                                    String  end = picked==null?"": "${picked.end.year}/${picked.end.month.toString().padLeft(2, '0')}/${picked.end.day.toString().padLeft(2, '0')}";
+                                    // var label = picked.formatFullDate();
+                                    if(picked!=null) {
+                                      alertBloc.add(AlertChangeDate(start, end,state.alertFilterModel!.copyWith(
+                                        newFilterDate: true,
+                                        newStartDate: start,
+                                        newEndDate: end
+                                    )));
+                                    }
+
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 50,
+                                    decoration:  BoxDecoration(border: Border.all(color: Colors.grey)),
+
+                                    child: Center(child: Text(
+                                        "${state.alertEndDate!} - ${state.alertStartDate}")),
+                                  ),
                                 );
                               },
                             ),
-                            SizedBox(
-                                height: 12.h
+                          ),
+
+                          SizedBox(
+                              height: 12.h
+                          ),
+                          Text("چاه"),
+                          SizedBox(
+                              height: 6.h
+                          ),
+                          Container(
+                            height: 50.h,
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(color: Colors.grey),
                             ),
-                            Text("تاریخ"),
-                            SizedBox(
-                                height: 6.h
-                            ),
-                            Container(
-                    
-                              child: BlocBuilder<AlertBloc, AlertState>(
-                                // buildWhen: (previous, current) => previous.alertStartDate!=current.alertStartDate || previous.alertEndDate!=current.alertEndDate,
-                    
-                                builder: (context, state) {
-                                  return GestureDetector(
-                                    onTap: () async{
-                                      var picked = await showPersianDateRangePicker(
-                                          context: context,
-                    
-                                          firstDate: Jalali(1385, 8),
-                                          lastDate: Jalali.now(),
-                                          initialDate: Jalali.now(),
-                                          cancelText: "انصراف"
-                                      );
-                    
-                                      String  start = picked==null?"": "${picked.start.year}/${picked.start.month.toString().padLeft(2, '0')}/${picked.start.day.toString().padLeft(2, '0')}";
-                                      String  end = picked==null?"": "${picked.end.year}/${picked.end.month.toString().padLeft(2, '0')}/${picked.end.day.toString().padLeft(2, '0')}";
-                                      // var label = picked.formatFullDate();
-                                      if(picked!=null) {
-                                        alertBloc.add(AlertChangeDate(start, end,state.alertFilterModel!.copyWith(
-                                          newFilterDate: true,
-                                          newStartDate: start,
-                                          newEndDate: end
-                                      )));
-                                      }
-                    
-                                    },
-                                    child: Container(
-                                      width: double.infinity,
-                                      height: 50,
-                                      decoration:  BoxDecoration(border: Border.all(color: Colors.grey)),
-                    
-                                      child: Center(child: Text(
-                                          "${state.alertEndDate!} - ${state.alertStartDate}")),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                    
-                            SizedBox(
-                                height: 12.h
-                            ),
-                            Text("چاه"),
-                            SizedBox(
-                                height: 6.h
-                            ),
-                            Container(
-                              height: 50.h,
-                              padding: const EdgeInsets.symmetric(horizontal: 5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                border: Border.all(color: Colors.grey),
-                              ),
-                              width: double.infinity,
-                              alignment: Alignment.center,
-                              child: BlocBuilder<AlertBloc, AlertState>(
-                                // buildWhen: (previous, current) => current.oneWell!=previous.oneWell,
-                    
-                                builder: (context, state) {
-                                  if(state.alertWellListStatus is AlertWellListSuccess){
-                                    AlertWellListSuccess alertWellListSuccess=
-                                    state.alertWellListStatus as AlertWellListSuccess;
-                                    if (alertWellListSuccess.wellsEntity.isEmpty) {
-                                      return const Center(
-                                        child: Text(
-                                          "چاهی برای این انتخاب وجود ندارد",
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                      );
-                                    }
-                                    int? wellIndex;
-                    
-                                    if (state.oneWell != null) {
-                                      final foundIndex = alertWellListSuccess.wellsEntity.indexWhere(
-                                              (element) => element.data!.id == state.oneWell!.data!.id);
-                                      // اگر آیتم مورد نظر پیدا شد، ایندکس آن را ست می‌کنیم، در غیر این صورت همان null می‌ماند
-                                      if (foundIndex != -1) {
-                                        wellIndex = foundIndex;
-                                      }
-                                    }
-                                    return DropdownButton<WellsEntity>(
-                                        underline: const SizedBox(),
-                                        isExpanded: true,
-                                        padding: EdgeInsets.only(right: 15.w),
-                                        value: wellIndex != null ? alertWellListSuccess.wellsEntity[wellIndex] : null,
-                    
-                                        items:  alertWellListSuccess.wellsEntity
-                                            .map((well) =>
-                                            DropdownMenuItem<WellsEntity>(
-                                              value: well,
-                                              child: Text(well.data!.wellName.toString()),
-                                            ))
-                                            .toList(),
-                                            onChanged: (value) {
-                    
-                                            BlocProvider.of<AlertBloc>(context)
-                                              .add(OneWellClicked(value!,state.alertFilterModel!.copyWith(
-                                              newFilterWellName: true,
-                                              newWellName: value.data!.wellName
-                                          )));
-                                        });
+                            width: double.infinity,
+                            alignment: Alignment.center,
+                            child: BlocBuilder<AlertBloc, AlertState>(
+                              // buildWhen: (previous, current) => current.oneWell!=previous.oneWell,
+
+                              builder: (context, state) {
+                                if(state.alertWellListStatus is AlertWellListSuccess){
+                                  AlertWellListSuccess alertWellListSuccess=
+                                  state.alertWellListStatus as AlertWellListSuccess;
+                                  if (alertWellListSuccess.wellsEntity.isEmpty) {
+                                    return const Center(
+                                      child: Text(
+                                        "چاهی برای این انتخاب وجود ندارد",
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    );
                                   }
-                                  else if (state.alertWellListStatus is AlertWellListLoading){
-                                    return Center(child: CircularProgressIndicator(),);
-                                  }else if (state.alertWellListStatus is AlertWellListError){
-                                    AlertWellListError alertWellListError=state.alertWellListStatus as AlertWellListError;
-                                    return Center(child: Text(alertWellListError.error));
-                                  }else {
-                                    return SizedBox();
+                                  int? wellIndex;
+
+                                  if (state.oneWell != null) {
+                                    final foundIndex = alertWellListSuccess.wellsEntity.indexWhere(
+                                            (element) => element.data!.id == state.oneWell!.data!.id);
+                                    // اگر آیتم مورد نظر پیدا شد، ایندکس آن را ست می‌کنیم، در غیر این صورت همان null می‌ماند
+                                    if (foundIndex != -1) {
+                                      wellIndex = foundIndex;
+                                    }
                                   }
-                                },
-                              ),
+                                  return DropdownButton<WellsEntity>(
+                                      underline: const SizedBox(),
+                                      isExpanded: true,
+                                      padding: EdgeInsets.only(right: 15.w),
+                                      value: wellIndex != null ? alertWellListSuccess.wellsEntity[wellIndex] : null,
+
+                                      items:  alertWellListSuccess.wellsEntity
+                                          .map((well) =>
+                                          DropdownMenuItem<WellsEntity>(
+                                            value: well,
+                                            child: Text(well.data!.wellName.toString()),
+                                          ))
+                                          .toList(),
+                                          onChanged: (value) {
+
+                                          BlocProvider.of<AlertBloc>(context)
+                                            .add(OneWellClicked(value!,state.alertFilterModel!.copyWith(
+                                            newFilterWellName: true,
+                                            newWellName: value.data!.wellName
+                                        )));
+                                      });
+                                }
+                                else if (state.alertWellListStatus is AlertWellListLoading){
+                                  return Center(child: CircularProgressIndicator(),);
+                                }else if (state.alertWellListStatus is AlertWellListError){
+                                  AlertWellListError alertWellListError=state.alertWellListStatus as AlertWellListError;
+                                  return Center(child: Text(alertWellListError.error));
+                                }else {
+                                  return SizedBox();
+                                }
+                              },
                             ),
-                    
-                          ],
-                        );
-                      },
-                    ),
+                          ),
+
+                        ],
+                      );
+                    },
                   ),
                 ),
                 actions: [

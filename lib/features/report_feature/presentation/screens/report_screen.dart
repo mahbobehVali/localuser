@@ -180,7 +180,7 @@ class ReportScreen extends StatelessWidget {
                       return TimePickerField(
                         title: "ساعت شروع",
                         displayText: displayStart,
-                        ignoring: !(state.oneWell.length == 1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate) == 1),
+                        ignoring: !(state.oneWell.length == 1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1 == 1),
 
                         onTap: () async {
                           final picked = await Constants().showCustomTimePicker(context);

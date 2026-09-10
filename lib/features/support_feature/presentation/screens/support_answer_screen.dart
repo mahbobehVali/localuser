@@ -269,6 +269,7 @@ class SupportAnswerScreen extends StatelessWidget {
                                            ),
                                            hintText: "پیام خود را بنویسید",
 
+
                                            errorBorder: InputBorder.none,
                                            disabledBorder: InputBorder.none,
                                          ),

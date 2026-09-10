@@ -31,14 +31,14 @@ class PumpHoursChartWidget extends StatelessWidget {
             return Constants.noData();
           }
 
-          if(state.oneWell.length==1 ){
+          if(state.oneWell.length == 1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)!=0 ){
 
             for (int i = 0; i < yValues.length; i++) {
               final val = yValues[i];
               final parts = xLabels[i].split('/');
               final monthNum = int.tryParse(parts[1]) ?? 0;
 
-              String name =  Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)<31?
+              String name =  Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1<31?
               xLabels[i].toString().toPersianDigit():Constants().monthNames[monthNum - 1];
 
               final amount= val.toString().toPersianDigit()  ;
@@ -87,7 +87,85 @@ class PumpHoursChartWidget extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              state.oneWell.length==1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)==0?
               SizedBox(
+                height: 250.h,
+                child: AspectRatio(
+                  aspectRatio: 2,
+                  child: Padding(
+                    padding:  EdgeInsets.only(right: 20.0.w, left: 12.w,top: 10.h),
+                    child: LineChart(
+                      LineChartData(
+                        lineBarsData: [
+                          LineChartBarData(
+                            isStepLineChart: true,
+                            spots: yValues.asMap().entries.map((e) {
+                              return FlSpot(e.key.toDouble(), (e.value as int).toDouble());
+                            }).toList(),
+                            isCurved: false,
+                            dotData: const FlDotData(show: false),
+                            color: ColorPalette.darkGreen,
+                          ),
+                        ],
+                        minY: 0,
+                        gridData: FlGridData(
+                          show: false,
+                          verticalInterval: scale['step'],
+                          getDrawingHorizontalLine: (value) {
+                            return FlLine(
+                              strokeWidth: 1,
+                              color: Colors.grey,
+                            );
+                          },
+                        ),
+                        lineTouchData: LineTouchData(
+                          handleBuiltInTouches: false,
+
+                        ),
+
+                        borderData: FlBorderData(
+                          border: Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
+                        ),
+                        titlesData: FlTitlesData(
+                          show: true,
+                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                          bottomTitles: Constants().axisBottomTitles(xLabels, "clock"),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              interval: 1, // فاصله ۱ برای نمایش دقیق ۰ و ۱
+                              reservedSize: 55.w, // فضای کافی برای کلمات
+                              getTitlesWidget: (value, meta) {
+                                String text = "";
+                                if (value == 0) {
+                                  text = "خاموش";
+                                } else if (value == 1) {
+                                  text = "روشن";
+                                } else {
+                                  return const SizedBox.shrink();
+                                }
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 4),
+                                  child: Text(
+                                    text,
+                                    style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ): SizedBox(
                 height: 300,
                 child: Directionality(
                   textDirection: TextDirection.ltr,
@@ -183,7 +261,7 @@ class PumpHoursChartWidget extends StatelessWidget {
                               topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                               bottomTitles: Constants().axisBottomTitles(xLabels,
                                   flowMeter.type=="all-well"?"nothing":flowMeter.type=="one-well"?"clock":"date",
-                              leng: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)),
+                              leng: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1),
 
                               leftTitles: Constants().leftTitles(
                                 interval: scale["maxY"]! > 1000 ? 65.w : 40.w,

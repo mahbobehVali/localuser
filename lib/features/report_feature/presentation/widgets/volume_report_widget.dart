@@ -52,18 +52,18 @@ class VolumeReportChartWidget extends StatelessWidget {
              final parts = xLabels[i].split('/');
              final monthNum = int.tryParse(parts[1]) ?? 0;
 
-            String name =  Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)<31?
+            String name =  Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1<31?
              xLabels[i].toString().toPersianDigit():Constants().monthNames[monthNum - 1];
 
             final amount = val.toString();
 
             String statusMessage = "نرمال";
 
-              if (val > (status.capacityEntity.totalDisconnectCapacity??0)*Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
-                statusMessage = "اخطار";
+              if (val > (status.capacityEntity.totalDisconnectCapacity??0)*Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1) {
+                statusMessage = "قطع";
               }
-              else if (val > (status.capacityEntity.totalCapacity??0)*Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)) {
-                statusMessage = "بیش از حد مجاز";
+              else if (val > (status.capacityEntity.totalCapacity??0)*Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1) {
+                statusMessage = "هشدار";
               }
 
               flatList.add(VolumeSlot(
@@ -102,7 +102,7 @@ class VolumeReportChartWidget extends StatelessWidget {
                               xLabels,
 
                               state.startDate==state.endDate ? "day" :  "date",
-                              leng: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)
+                              leng: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1
                             ),
                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
