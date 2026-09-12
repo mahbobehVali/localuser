@@ -241,7 +241,6 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                       //
                                       // }
                                       return BarTooltipItem(
-
                                           '',
                                           TextStyle(
                                             color: ColorPalette.black,
