@@ -98,6 +98,7 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                               widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
                               onTap:(state.reportFlowMeterStatus is ReportFlowMeterLoading ||
                                   state.selectedChartTab == 6)?null: () {
+                                print("zczfc${int.parse(widget.info[6])}");
                                 BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                                   type: 6,
                                   ids:int.parse(widget.info[6]),
@@ -134,23 +135,46 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                         for (var series in seriesList) {
                           if (series.xAxis != null) {
                             allDatesSet.addAll(series.xAxis!.map((e) => e.toString()));
+                            print("allDatesSet${allDatesSet.toList()..sort()}");
                           }
                         }
+
                         final List<String> xLabels = allDatesSet.toList()..sort();
 
                         if (xLabels.isEmpty) {
                           return Constants.noData();
                         }
 
-                        // ترکیب تمام yAxisها در یک لیست واحد برای محاسبه اسکیل دقیق (بدون تغییر مقادیر)
+                        // استخراج تمام مقادیر برای محاسبه اسکیل بر اساس نوع چارت (خطی یا ستونی)
                         final List<dynamic> allYValues = [];
-                        for (var series in seriesList) {
-                          if (series.yAxis != null) {
-                            for (var val in series.yAxis!) {
-                              if (val != null) {
-                                allYValues.add((val as num).toDouble());
+
+                        if (state.selectedChartTab == 1) {
+                          // حالت LineChart: مقادیر تکی
+                          for (var series in seriesList) {
+                            if (series.yAxis != null) {
+                              for (var val in series.yAxis!) {
+                                if (val != null) {
+                                  allYValues.add((val as num).toDouble());
+                                }
                               }
                             }
+                          }
+                        } else {
+                          // حالت BarChart (هفته): مجموع مقادیر هر ستون (انباشته)
+                          for (int j = 0; j < xLabels.length; j++) {
+                            final currentDate = xLabels[j];
+                            double columnSum = 0;
+                            for (var series in seriesList) {
+                              final yValues = series.yAxis;
+                              final xValues = series.xAxis;
+                              if (yValues != null && xValues != null) {
+                                final sIndex = xValues.indexOf(currentDate);
+                                if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
+                                  columnSum += (yValues[sIndex] as num).toDouble();
+                                }
+                              }
+                            }
+                            allYValues.add(columnSum);
                           }
                         }
 
@@ -212,23 +236,24 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
 
                                 if (yVal != 0) {
                                   if (yVal > 0) {
+
                                     stackItems.add(
                                       BarChartRodStackItem(
                                         positiveSum,
-                                        positiveSum + yVal,
+                                        positiveSum + yVal.toDouble().round(),
                                         color,
                                       ),
                                     );
-                                    positiveSum += yVal;
+                                    positiveSum += yVal.toDouble().round();
                                   } else {
                                     stackItems.add(
                                       BarChartRodStackItem(
                                         negativeSum,
-                                        negativeSum + yVal,
+                                        negativeSum + yVal.toDouble().round(),
                                         color,
                                       ),
                                     );
-                                    negativeSum += yVal;
+                                    negativeSum += yVal.toDouble().round();
                                   }
                                 }
                               }
@@ -242,7 +267,7 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                                 BarChartRodData(
                                   toY: 0,
                                   color: Colors.transparent,
-                                  width: 12,
+                                  width: 16.w,
                                 ),
                               ],
                             );
@@ -254,7 +279,7 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                               BarChartRodData(
                                 toY: positiveSum > 0 ? positiveSum : 0,
                                 rodStackItems: stackItems,
-                                width: 12,
+                                width: 16.w,
                                 borderRadius: BorderRadius.zero,
                               ),
                             ],
@@ -285,7 +310,8 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                                     width: chartWidth,
                                     child: Padding(
                                       padding: const EdgeInsets.all(12),
-                                      child:LineChart(
+                                      child: state.selectedChartTab==1?
+                                      LineChart(
 
                                         LineChartData(
                                           extraLinesData: ExtraLinesData(
@@ -304,7 +330,7 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                                           lineTouchData: LineTouchData(
                                             handleBuiltInTouches: true,
                                             touchTooltipData: LineTouchTooltipData(
-                                              getTooltipColor: (group) => const Color(0xFFF7F9FA),
+                                              getTooltipColor: (group) => ColorPalette.lightGrey,
                                               fitInsideHorizontally: true,
                                               fitInsideVertically: true,
                                               maxContentWidth: 250.w,
@@ -478,6 +504,193 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                                           lineBarsData: chartBars,
                                           maxY: chartMaxY,
                                           minY: chartMinY,
+                                        ),
+                                      ):
+                                      BarChart(
+                                        BarChartData(
+                                          extraLinesData: ExtraLinesData(
+                                            horizontalLines: Constants().generateHorizontalLines((scale['step'] as num).toDouble(), scale["maxY"]!,scale["minY"]!),
+                                          ),
+                                          maxY: scale['maxY'],
+                                          //  تنظیم هوشمند مبدأ روی صفر (در صورت نداشتن مقدار منفی)
+                                          minY: (scale['minY'] != null && scale['minY']! < 0) ? scale['minY'] : 0.0,
+
+                                          alignment: BarChartAlignment.spaceAround,
+                                          gridData: FlGridData(
+                                            show: false,
+                                            verticalInterval: scale['step'],
+                                            getDrawingHorizontalLine: (value) {
+                                              return const FlLine(
+                                                strokeWidth: 1,
+                                                color: Colors.grey,
+                                              );
+                                            },
+                                          ),
+                                          borderData: FlBorderData(
+                                            border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
+                                          ),
+                                          barTouchData: BarTouchData(
+                                            handleBuiltInTouches: true,
+                                            touchTooltipData: BarTouchTooltipData(
+                                              maxContentWidth: 200.w,
+                                              getTooltipColor: (group) => ColorPalette.lightGrey,
+                                              fitInsideHorizontally: true,
+                                              fitInsideVertically: true,
+
+                                                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                                  final int xIndex = group.x.toInt();
+                                                  if (xIndex < 0 || xIndex >= xLabels.length) return null;
+
+                                                  final String currentDate = xLabels[xIndex];
+                                                  List<TextSpan> spans = [];
+                                                  double totalSum = 0;
+
+                                                  for (var series in seriesList) {
+                                                    final yValues = series.yAxis;
+                                                    final xValues = series.xAxis;
+                                                    if (yValues != null && xValues != null) {
+                                                      final sIndex = xValues.indexOf(currentDate);
+                                                      if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
+                                                        totalSum += (yValues[sIndex] as num).toDouble();
+                                                      }
+                                                    }
+                                                  }
+
+                                                  final String dateLabel = currentDate.contains(" ")
+                                                      ? currentDate.split(" ")[0].toString().toPersianDigit()
+                                                      : currentDate.toString().toPersianDigit();
+
+                                                  spans.add(
+                                                    TextSpan(
+                                                      text: "تاریخ: $dateLabel\n",
+                                                      style: const TextStyle(
+                                                        color: Colors.black87,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  );
+                                                spans.add(
+                                                    TextSpan(
+                                                      text: "------------------------------------------\n",
+                                                      style: const TextStyle(
+                                                        color: Colors.black87,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  );
+
+                                                  for (int i = 0; i < seriesList.length; i++) {
+                                                    final series = seriesList[i];
+                                                    final name = series.name ?? "بدون نام";
+                                                    final yValues = series.yAxis;
+                                                    final xValues = series.xAxis;
+
+                                                    if (yValues != null && xValues != null) {
+                                                      final sIndex = xValues.indexOf(currentDate);
+                                                      if (sIndex != -1 && sIndex < yValues.length && yValues[sIndex] != null) {
+                                                        final double val = (yValues[sIndex] as num).toDouble();
+                                                        final color = Constants().lineColors[i % Constants().lineColors.length];
+
+                                                        final int roundedVal = val.round();
+                                                        final String formattedVal = roundedVal < 0
+                                                            ? "-${(-roundedVal).toString().toPersianDigit()}"
+                                                            : roundedVal.toString().toPersianDigit();
+
+                                                        spans.add(
+                                                          TextSpan(
+                                                            text: "\u200E$formattedVal  ",
+                                                            style: const TextStyle(
+                                                              color: Colors.black87,
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 11,
+                                                            ),
+                                                          ),
+                                                        );
+                                                        spans.add(
+                                                          TextSpan(
+                                                            text: "$name ",
+                                                            style: const TextStyle(
+                                                              color: Colors.black87,
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 11,
+                                                            ),
+                                                          ),
+                                                        );
+                                                        spans.add(
+                                                          TextSpan(
+                                                            text: "●\n",
+                                                            style: TextStyle(
+                                                              color: color,
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 11,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    }
+                                                  }
+
+                                                  final int roundedTotal = totalSum.round();
+                                                  final String formattedTotal = roundedTotal < 0
+                                                      ? "-${(-roundedTotal).toString().toPersianDigit()}"
+                                                      : roundedTotal.toString().toPersianDigit();
+
+                                                  spans.add(
+                                                    const TextSpan(
+                                                      text: "------------------------------\n",
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  );
+
+                                                  spans.add(
+                                                    TextSpan(
+                                                      text: "\u200E$formattedTotal",
+                                                      style: const TextStyle(
+                                                        color: Colors.black87,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  );
+
+                                                  spans.add(
+                                                    const TextSpan(
+                                                      text: " :مجموع کل",
+                                                      style: TextStyle(
+                                                        color: Colors.black87,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  );
+
+                                                  return BarTooltipItem(
+                                                    textAlign: TextAlign.right,
+                                                    '',
+                                                    const TextStyle(),
+                                                    children: spans,
+                                                  );
+                                                }
+                                            ),
+
+                                          ),
+                                          titlesData: FlTitlesData(
+                                            show: true,
+                                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                            bottomTitles: Constants().axisBottomTitles(xLabels,"week"),
+                                            leftTitles: Constants().leftTitles(
+                                              interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
+                                              scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                            ),
+                                          ),
+                                          barGroups: chartGroups,
                                         ),
                                       )
 

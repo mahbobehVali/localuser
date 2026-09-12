@@ -591,7 +591,7 @@ class Constants {
         HorizontalLine(
           y: yValue,
           strokeWidth: 1,
-          color: ColorPalette.inverseGrey.withValues(alpha: 0.1),
+          color: ColorPalette.inverseGrey.withValues(alpha: 0.2),
         ),
       );
     }

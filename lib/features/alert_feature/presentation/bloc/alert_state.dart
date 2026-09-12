@@ -1,8 +1,10 @@
 part of 'alert_bloc.dart';
 
 
-class AlertState {
+// یک شیء اختصاصی برای تشخیص مقدار پیش‌فرض
+const _undefined = Object();
 
+class AlertState {
   final AlertStatus? alertStatus;
   final int? selectedAlertPage;
   final String? wellName;
@@ -19,8 +21,6 @@ class AlertState {
   final AlertDetailStatus? alertDetailStatus;
   final AlertCreateStatus? alertCreateStatus;
   final int? alert;
-
-
 
   AlertState({
     required this.alertStatus,
@@ -41,46 +41,41 @@ class AlertState {
     required this.alert,
   });
 
-  AlertState copyWith(
-      {AlertStatus? newAlertStatus,
-        int? newSelectedAlertPage,
-
-        String? newWellName,
-        String? newDate,
-        AlertWellListStatus? newAlertWellListStatus,
-        WellsEntity? newOneWell,
-        List<AlertTypeEntity>? newAlertTypeList,
-        int? newSelectedAlertType,
-        List<AlertTypeEntity>? newAlertStatusList,
-        int? newSelectedAlertStatus,
-        String? newAlertStartDate,
-        String? newAlertEndDate,
-        AlertFilterModel? newAlertFilterModel,
-        AlertDetailStatus? newAlertDetailStatus,
-        AlertCreateStatus? newAlertCreateStatus,
-        int? newAlert
-
-      }) {
+  AlertState copyWith({
+    Object? newAlertStatus = _undefined,
+    Object? newSelectedAlertPage = _undefined,
+    Object? newWellName = _undefined,
+    Object? newDate = _undefined,
+    Object? newAlertWellListStatus = _undefined,
+    Object? newOneWell = _undefined,
+    Object? newAlertTypeList = _undefined,
+    Object? newSelectedAlertType = _undefined,
+    Object? newAlertStatusList = _undefined,
+    Object? newSelectedAlertStatus = _undefined,
+    Object? newAlertStartDate = _undefined,
+    Object? newAlertEndDate = _undefined,
+    Object? newAlertFilterModel = _undefined,
+    Object? newAlertDetailStatus = _undefined,
+    Object? newAlertCreateStatus = _undefined,
+    Object? newAlert = _undefined,
+  }) {
     return AlertState(
-        alertStatus: newAlertStatus ?? alertStatus,
-      selectedAlertPage: newSelectedAlertPage??selectedAlertPage,
-
-      wellName: newWellName??wellName,
-      date: newDate??date,
-
-      alertWellListStatus: newAlertWellListStatus??alertWellListStatus,
-      oneWell: newOneWell??oneWell,
-      alertTypeList: newAlertTypeList??alertTypeList,
-      selectedAlertType: newSelectedAlertType??selectedAlertType,
-      alertStatusList: newAlertStatusList??alertStatusList,
-      selectedAlertStatus: newSelectedAlertStatus??selectedAlertStatus,
-      alertStartDate: newAlertStartDate??alertStartDate,
-      alertEndDate: newAlertEndDate??alertEndDate,
-      alertFilterModel: newAlertFilterModel??alertFilterModel,
-      alertDetailStatus: newAlertDetailStatus?? alertDetailStatus,
-      alertCreateStatus: newAlertCreateStatus??alertCreateStatus,
-      alert: newAlert??alert
-
+      alertStatus: newAlertStatus == _undefined ? alertStatus : newAlertStatus as AlertStatus?,
+      selectedAlertPage: newSelectedAlertPage == _undefined ? selectedAlertPage : newSelectedAlertPage as int?,
+      wellName: newWellName == _undefined ? wellName : newWellName as String?,
+      date: newDate == _undefined ? date : newDate as String?,
+      alertWellListStatus: newAlertWellListStatus == _undefined ? alertWellListStatus : newAlertWellListStatus as AlertWellListStatus?,
+      oneWell: newOneWell == _undefined ? oneWell : newOneWell as WellsEntity?,
+      alertTypeList: newAlertTypeList == _undefined ? alertTypeList : newAlertTypeList as List<AlertTypeEntity>,
+      selectedAlertType: newSelectedAlertType == _undefined ? selectedAlertType : newSelectedAlertType as int?,
+      alertStatusList: newAlertStatusList == _undefined ? alertStatusList : newAlertStatusList as List<AlertTypeEntity>,
+      selectedAlertStatus: newSelectedAlertStatus == _undefined ? selectedAlertStatus : newSelectedAlertStatus as int?,
+      alertStartDate: newAlertStartDate == _undefined ? alertStartDate : newAlertStartDate as String?,
+      alertEndDate: newAlertEndDate == _undefined ? alertEndDate : newAlertEndDate as String?,
+      alertFilterModel: newAlertFilterModel == _undefined ? alertFilterModel : newAlertFilterModel as AlertFilterModel?,
+      alertDetailStatus: newAlertDetailStatus == _undefined ? alertDetailStatus : newAlertDetailStatus as AlertDetailStatus?,
+      alertCreateStatus: newAlertCreateStatus == _undefined ? alertCreateStatus : newAlertCreateStatus as AlertCreateStatus?,
+      alert: newAlert == _undefined ? alert : newAlert as int?,
     );
   }
 }

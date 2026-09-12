@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../../common/widgets/show_dialogs.dart';
 import '../../../../../config/color_palette.dart';
@@ -57,7 +58,7 @@ class FilterWidget extends StatelessWidget {
                         }
                         ),
                       if (state.alertFilterModel?.filterDate==true )
-                        FilterChipWidget(label:"${state.alertFilterModel!.startDate}-${state.alertFilterModel!.endDate}",onDeleted:
+                        FilterChipWidget(label:"${state.alertFilterModel!.startDate.toString().toPersianDigit()}-${state.alertFilterModel!.endDate.toString().toPersianDigit()}",onDeleted:
                           () {
                           BlocProvider.of<AlertBloc>(context).add(RemoveSingleFilterEvent(
                           state.alertFilterModel!.copyWith(

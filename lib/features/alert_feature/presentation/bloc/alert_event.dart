@@ -16,7 +16,15 @@ class AlertStart extends AlertEvent{
 
 }
 
+class ApplyFiltersEvent extends AlertEvent {
+  final AlertFilterModel filterModel;
 
+  ApplyFiltersEvent(this.filterModel);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
 
 class AlertWellList extends AlertEvent{
 
@@ -30,9 +38,9 @@ class AlertWellList extends AlertEvent{
 
 class OneWellClicked extends AlertEvent{
   final WellsEntity wellsEntity;
-  final AlertFilterModel alertFilterModel;
+  final AlertFilterModel? alertFilterModel;
 
-  const OneWellClicked(this.wellsEntity,this.alertFilterModel);
+  const OneWellClicked(this.wellsEntity,[this.alertFilterModel]);
 
   @override
   // TODO: implement props
@@ -43,9 +51,9 @@ class OneWellClicked extends AlertEvent{
 
 class OneAlertTypeClicked extends AlertEvent{
   final AlertTypeEntity alertTypeEntity;
-  final AlertFilterModel alertFilterModel;
+  final AlertFilterModel? alertFilterModel;
 
-  const OneAlertTypeClicked(this.alertTypeEntity,this.alertFilterModel);
+  const OneAlertTypeClicked(this.alertTypeEntity,[this.alertFilterModel]);
 
   @override
   // TODO: implement props
@@ -55,10 +63,10 @@ class OneAlertTypeClicked extends AlertEvent{
 
 class OneAlertStatusClicked extends AlertEvent{
   final AlertTypeEntity alertStatusEntity;
-  final AlertFilterModel alertFilterModel;
+  final AlertFilterModel? alertFilterModel;
 
 
-  const OneAlertStatusClicked(this.alertStatusEntity,this.alertFilterModel);
+  const OneAlertStatusClicked(this.alertStatusEntity,[this.alertFilterModel]);
 
   @override
   // TODO: implement props
@@ -69,9 +77,9 @@ class OneAlertStatusClicked extends AlertEvent{
 class AlertChangeDate extends AlertEvent{
   final String startDate;
   final String endDate;
-  final AlertFilterModel alertFilterModel;
+  final AlertFilterModel? alertFilterModel;
 
-  const AlertChangeDate(this.startDate,this.endDate,this.alertFilterModel);
+  const AlertChangeDate(this.startDate,this.endDate,[this.alertFilterModel]);
 
   @override
   // TODO: implement props

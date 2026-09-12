@@ -92,37 +92,62 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
 
     on<OneWellClicked>((event, emit) async {
       emit(state.copyWith(newOneWell: event.wellsEntity,
-          newAlertFilterModel: event.alertFilterModel));
+          // newAlertFilterModel: event.alertFilterModel
+      ));
 
     });
 
     on<OneAlertTypeClicked>((event, emit) async {
       emit(state.copyWith(newSelectedAlertType: event.alertTypeEntity.id,
-          newAlertFilterModel: event.alertFilterModel));
+          // newAlertFilterModel: event.alertFilterModel
+      ));
 
     });
     on<RemoveSingleFilterEvent>((event, emit) async {
       emit(state.copyWith(newAlertFilterModel: event.filter));
-      add(AlertStart(filter: true,alertFilterParams: AlertFilterParams(
+      add(AlertStart(filter: true,
+          alertFilterParams: AlertFilterParams(
           type: event.filter.filterType==true? state.selectedAlertType :null,
           status: event.filter.filterStatus==true? state.selectedAlertStatus :null,
-          wellName: event.filter.filterWellName==true? state.oneWell!.data!.wellName : null,
+          wellName: event.filter.filterWellName==true? state.oneWell?.data!.wellName : null,
           startDate: event.filter.filterDate==true? state.alertStartDate : null,
           endDate: event.filter.filterDate==true? state.alertEndDate : null,
 
-      )));
+      ),
+
+      ));
+
+      emit(state.copyWith(
+
+        newOneWell: event.filter.filterWellName==true? state.oneWell :null,
+        newSelectedAlertStatus: event.filter.filterStatus==true? state.selectedAlertStatus :null,
+        newSelectedAlertType: event.filter.filterType==true? state.selectedAlertType: null,
+        newAlertStartDate: event.filter.filterDate==true? state.alertStartDate : "",
+        newAlertEndDate: event.filter.filterDate==true? state.alertEndDate : "",
+      ));
 
     });
 
+
     on<OneAlertStatusClicked>((event, emit) async {
       emit(state.copyWith(newSelectedAlertStatus: event.alertStatusEntity.id,
-          newAlertFilterModel: event.alertFilterModel));
+          // newAlertFilterModel: event.alertFilterModel
+      ));
+
+    });
+
+
+    on<ApplyFiltersEvent>((event, emit) async {
+      emit(state.copyWith(
+        newAlertFilterModel: event.filterModel,
+      ));
 
     });
 
     on<AlertChangeDate>((event, emit) async {
       emit(state.copyWith(newAlertStartDate: event.startDate,newAlertEndDate: event.endDate,
-          newAlertFilterModel: event.alertFilterModel));
+          // newAlertFilterModel: event.alertFilterModel
+      ));
 
     });
 

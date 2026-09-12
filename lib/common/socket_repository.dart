@@ -285,7 +285,7 @@ print("zfcsdfggg${_currentWellPin}");
         while ((_socket == null || !_socket!.connected)
             // && attempts < 40
         ) {
-          print("attempts");
+          // print("attempts");
           await Future.delayed(const Duration(milliseconds: 100));
           attempts++;
         }
