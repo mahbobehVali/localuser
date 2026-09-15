@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:mahaliii/common/socket_repository.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:mahaliii/config/texts_style.dart';
@@ -9,15 +8,8 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/well_detail_screen.dart';
 
-import '../../../../common/utils/sharedpreference.dart';
 import '../../../../locator.dart';
 import '../../../auth_feature/presentation/screens/login_screen.dart';
-import '../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
-import '../../domain/repository/wells_repository.dart';
-import '../../domain/usecase/alert_count_usecase.dart';
-import '../../domain/usecase/flow_meter_usecase.dart';
-import '../../domain/usecase/get_program_usecase.dart';
-import '../../domain/usecase/well_work_usecase.dart';
 
 class WellScreen extends StatefulWidget {
   const WellScreen({super.key});

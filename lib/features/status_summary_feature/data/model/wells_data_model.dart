@@ -19,7 +19,8 @@ class WellsDataModel extends WellsDataEntity {
     int? flowMeter,
     int? id,
     int? alert,
-  }) : super(level,userLocalId,pin,lat,lon,statusDevice,statusWell, wellName, areaId,deviceId,code,flowMeter,id,alert);
+    int? signalLevel,
+  }) : super(level,userLocalId,pin,lat,lon,statusDevice,statusWell, wellName, areaId,deviceId,code,flowMeter,id,alert,signalLevel);
 
   factory WellsDataModel.fromJson(dynamic json) {
 
@@ -38,6 +39,7 @@ class WellsDataModel extends WellsDataEntity {
        flowMeter: json["flowmeter"],
        id: json["id"],
        alert: json["alert"],
+       signalLevel: json["signal_level"],
 
     );
   }

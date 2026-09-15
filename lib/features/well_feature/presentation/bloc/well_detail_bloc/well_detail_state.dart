@@ -4,7 +4,7 @@ class WellDetailState {
 
   final FingerStatus? fingerStatus;
   final int? status;
-  final bool? isSwitched;
+  final bool isSwitched;
   final AlertTypeEntity daySelected;
   final WeekWellWorkStatus? weekWellWorkStatus;
   final SectionWellWorkStatus? sectionWellWorkStatus;

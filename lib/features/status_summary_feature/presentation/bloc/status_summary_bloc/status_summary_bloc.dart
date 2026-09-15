@@ -1,5 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mahaliii/common/utils/use_case.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/repository/status_summary_repository.dart';
@@ -10,12 +9,14 @@ import 'package:mahaliii/features/status_summary_feature/presentation/bloc/statu
 import '../../../../../common/params/flowmeter_params.dart';
 import '../../../../../common/socket_repository.dart';
 import '../../../../../common/utils/data_state.dart';
+import '../../../../../common/widgets/stream_extension.dart';
+import '../../../../../locator.dart';
 import '../../../domain/entity/last_activity_data_entity.dart';
 import '../../../domain/usecase/report_flowmeter_usecase.dart';
 import '../../../domain/usecase/wells_list_usecase.dart';
 import 'last_activity_status.dart';
 import 'status_summary_status.dart';
-
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 part 'status_summary_event.dart';
 part 'status_summary_state.dart';
 
@@ -25,6 +26,7 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
   final StatusSummaryRepository statusSummaryRepository;
   ReportFlowMeterUseCase reportFlowMeterUseCase;
   SocketRepository socketRepository;
+
 
   StatusSummaryBloc(this.wellsListUseCase,
       this.lastActivityUseCase,this.statusSummaryRepository,
@@ -37,6 +39,7 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
     selectedChartTab: 0
 
   )) {
+
     on<WellsListStart>((event, emit) async {
       emit(state.copyWith(newStatusSummaryStatus: StatusSummaryLoading()));
 
@@ -95,33 +98,40 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
     });
 
     on<SocketEvent>((event, emit) async {
-      print("socketStart");
-      // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
-      if (state.waterStatus is! WaterSuccess) {
-        emit(state.copyWith(newWaterStatus: WaterLoading()));
+      // اگر از قبل دیتا داریم، دوباره صفحه را به حالت لودینگ نبر
+      // if (state.waterStatus is! WaterSuccess) {
+      //   emit(state.copyWith(newWaterStatus: WaterLoading()));
+      //   print("loading");
+      // }
+      emit(state.copyWith(newWaterStatus: WaterLoading()));
+      bool isConnected = await locator<SocketRepository>().initAndConnect("manger");
+
+      if (!isConnected) {
+        emit(state.copyWith(newWaterStatus: WaterError("اتصال به سرور برقرار نشد")));
+        return;
       }
-
-      // ۱. فرمان اتصال به ریپازیتوری
-      socketRepository.requestWaterData(event.level, event.areaId);
-      // socketRepository.connect(event.level, event.areaId);
-
-      // ۲. مدیریت استریم با emit.forEach
+      // socketRepository.requestWaterData(event.level,event.areaId);
+      Future.microtask(() {
+        socketRepository.requestWaterData(event.level, event.areaId);
+      });
+      // ببینید چقدر تمیز شد! مستقیماً روی خود استریم صدا می‌زنیم
       await emit.forEach<dynamic>(
         socketRepository.waterStream,
-        onData: (waterModel) {
+        // .timeoutFirst(const Duration(seconds: 10)),
+        onData: (water) {
+          print("waterData: $water");
           return state.copyWith(
-            newWaterStatus: WaterSuccess(waterData: waterModel),
+            newWaterStatus: WaterSuccess(waterData: water),
           );
         },
         onError: (error, stackTrace) {
-          print(" BLoC Stream Error: $error");
           return state.copyWith(
             newWaterStatus: WaterError(error.toString()),
           );
         },
       );
-    }
-    );
+    },
+      transformer: restartable());
   }
 
   //  این بخش حیاتی برای "خروج از صفحه" است

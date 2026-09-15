@@ -11,9 +11,6 @@ import 'package:mahaliii/features/report_feature/presentation/bloc/well_report_s
 import 'package:mahaliii/features/report_feature/presentation/widgets/volume_detail_report_widget.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/usecase/last_activity_usecase.dart';
 import 'package:mahaliii/features/well_feature/domain/usecase/flow_meter_usecase.dart';
-import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
-import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
-import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
@@ -24,7 +21,6 @@ import '../../../../config/texts_style.dart';
 import '../../../../locator.dart';
 import '../../../alert_feature/domain/entity/alert_type_entity.dart';
 import '../../../auth_feature/presentation/screens/login_screen.dart';
-import '../../../status_summary_feature/domain/entity/wells_data_entity.dart';
 import '../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
 import '../../../well_feature/domain/usecase/alert_count_usecase.dart';
 import '../../../well_feature/domain/usecase/well_work_usecase.dart';

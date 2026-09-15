@@ -110,7 +110,7 @@ Future<void> setup() async {
   locator.registerFactory<WellFlowMeterUseCase>(() =>WellFlowMeterUseCase(locator()));
   locator.registerFactory<GetProgramUseCase>(() =>GetProgramUseCase(locator()));
   locator.registerFactory<AlertCountUseCase>(() =>AlertCountUseCase(locator()));
-  locator.registerFactory<WellDetailBloc>(() =>WellDetailBloc(
+  locator.registerLazySingleton<WellDetailBloc>(() =>WellDetailBloc(
     locator<WellsRepository>(),
     locator<WellWorkHourUseCase>(),
     locator<WellFlowMeterUseCase>(),

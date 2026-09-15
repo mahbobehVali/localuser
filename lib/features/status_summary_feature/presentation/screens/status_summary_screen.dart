@@ -35,16 +35,24 @@ class StatusSummaryScreen extends StatefulWidget {
 
 class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAware{
   List<dynamic> info=[];
+// ۱. تعریف متغیر برای نگهداری بلوک
+  late StatusSummaryBloc _statusSummaryBloc;
 
   void loadUserData() async {
     List<dynamic> userInfo = await locator<SharedPrefOperator>().getUserInformationEntity();
 
-    if (userInfo.isNotEmpty) {
+    if (userInfo.isNotEmpty && mounted) {
       setState(() {
-        info= userInfo;
+        info = userInfo;
       });
+
+
+      // ۲. مقداردهی اولیه بلوک در initState
+      _statusSummaryBloc..add(WellsListStart())..add(SocketEvent("area", int.parse(info[6])))
+        ..add(ReportFlowMeter(FlowMeterParams(type: 1, ids: int.parse(info[6]))))..add(LastActivityStart(FlowMeterParams(type: 0, page: 1)));
     }
   }
+
 
   @override
   void didChangeDependencies() {
@@ -57,18 +65,15 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
   void dispose() {
     // حذف ثبت نام هنگام نابود شدن صفحه
     routeObserver.unsubscribe(this);
+    _statusSummaryBloc.close();
     super.dispose();
   }
-
-  // ۱. تعریف متغیر برای نگهداری بلوک
-  late StatusSummaryBloc _statusSummaryBloc;
 
   @override
   void initState() {
     super.initState();
-    loadUserData();
-
-    // ۲. مقداردهی اولیه بلوک در initState
+    locator<SocketRepository>().initAndConnect("manger");
+    // ۱. ساخت BLoC به صورت مستقیم و بدون await در initState
     _statusSummaryBloc = StatusSummaryBloc(
       locator<WellsListUseCase>(),
       locator<LastActivityUseCase>(),
@@ -76,9 +81,8 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
       locator<ReportFlowMeterUseCase>(),
       locator<SocketRepository>(),
     );
-
-    // ۳. صدا زدن ایونت‌های اولیه اینجا (دیگر نیازی به نوشتن داخل BlocProvider نیست)
-    // (فقط توجه کنید اگر info خالی باشد باید مدیریت شود، یا مثل قبل داخل ایجادکننده بگذارید)
+    loadUserData();
+    // SocketRepository().initAndConnect("manger");
   }
 
   @override
@@ -116,7 +120,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
       child: Scaffold(
 
         body: BlocProvider<StatusSummaryBloc>.value(
-          value: _statusSummaryBloc..add(WellsListStart())..add(SocketEvent("area", int.parse(info[6])))..add(ReportFlowMeter(FlowMeterParams(type: 1, ids: int.parse(info[6]))))..add(LastActivityStart(FlowMeterParams(type: 0, page: 1))),
+          value: _statusSummaryBloc,
           child: Padding(
             padding:  EdgeInsets.only(left: 12.w,right: 12.w,top: 30.h),
             child: SingleChildScrollView(
@@ -180,6 +184,8 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                       }
                       else if (state.waterStatus is WaterLoading) {
                         return ShimmerClass.shimmerListviewHor(height: 100);
+                      }else if (state.waterStatus is WaterError) {
+                        return Center(child: Text((state.waterStatus as WaterError).error),);
                       } else {
                         return const SizedBox();
                       }

@@ -135,7 +135,6 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                         for (var series in seriesList) {
                           if (series.xAxis != null) {
                             allDatesSet.addAll(series.xAxis!.map((e) => e.toString()));
-                            print("allDatesSet${allDatesSet.toList()..sort()}");
                           }
                         }
 

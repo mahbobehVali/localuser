@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../../config/color_palette.dart';
-import '../../../status_summary_feature/domain/entity/wells_data_entity.dart';
 import '../../../status_summary_feature/domain/entity/wells_entity.dart';
 
 

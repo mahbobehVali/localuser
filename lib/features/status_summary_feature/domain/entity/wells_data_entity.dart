@@ -13,6 +13,7 @@ class WellsDataEntity {
   int? flowMeter;
   int? id;
   int? alert;
+  int? signalLevel;
 
-  WellsDataEntity(this.level, this.userLocalId,this.pin,this.lat,this.lon,this.statusDevice,this.statusWell, this.wellName, this.areaId,this.deviceId,this.code,this.flowMeter,this.id,this.alert);
+  WellsDataEntity(this.level, this.userLocalId,this.pin,this.lat,this.lon,this.statusDevice,this.statusWell, this.wellName, this.areaId,this.deviceId,this.code,this.flowMeter,this.id,this.alert,this.signalLevel);
 }

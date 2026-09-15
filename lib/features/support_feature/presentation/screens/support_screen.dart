@@ -11,7 +11,6 @@ import 'package:mahaliii/features/support_feature/domain/usecase/send_support_us
 import 'package:mahaliii/features/support_feature/domain/usecase/support_answers_usecase.dart';
 import 'package:mahaliii/features/support_feature/domain/usecase/support_usecase.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_bloc.dart';
-import 'package:mahaliii/features/support_feature/presentation/bloc/support_close_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/bloc/support_status.dart';
 import 'package:mahaliii/features/support_feature/presentation/screens/support_answer_screen.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';

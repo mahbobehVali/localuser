@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -39,7 +40,6 @@ import 'bottom_sheets.dart';
 import 'clock_box.dart';
 import 'global_elevated_button.dart';
 import 'image_converter.dart';
-import 'package:collection/collection.dart';
 
 class ShowDialogs {
   int timeToMinutes(String timeStr) {
@@ -755,45 +755,75 @@ class ShowDialogs {
       bool value,
       WellsDataEntity wellsDataEntity,
       ) {
+    // ریست کردن استیت دیالوگ قبل از باز شدن
+    wellDetailBloc.add(ResetOnOffStatus());
+
     return showDialog(
       barrierDismissible: false,
       context: context,
       builder: (dialogContext) {
-        return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: BlocProvider.value(
-            value: wellDetailBloc,
-            child: Directionality(
-              textDirection: TextDirection.rtl,
-              child: BlocConsumer<WellDetailBloc, WellDetailState>(
-                listener: (context, state) {
-                  if (state.onOffStatus is OnOffSuccess) {
-                    Navigator.of(context).pop();
+        bool isPoped = false; // پرچم اطمینان از یک‌بار بسته شدن
+
+        return BlocProvider.value(
+          value: wellDetailBloc,
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: BlocConsumer<WellDetailBloc, WellDetailState>(
+              listenWhen: (previous, current) => previous.onOffStatus != current.onOffStatus,
+              listener: (blocContext, state) {
+                if (state.onOffStatus is OnOffSuccess) {
+                  if (!isPoped) {
+                    isPoped = true;
+
+                    // ۱. اول استیت عملیات دیالوگ ریست می‌شود
+                    wellDetailBloc.add(ResetOnOffStatus());
+
+                    // ۲. فقط دیالوگ بسته می‌شود
+                    if (Navigator.canPop(dialogContext)) {
+                      Navigator.of(dialogContext).pop();
+                    }
                   }
+                }
 
-                },
+                if (state.onOffStatus is OnOffError) {
+                  if (!isPoped) {
+                    isPoped = true;
+                    final errorMsg = (state.onOffStatus as OnOffError).error;
+                    wellDetailBloc.add(ResetOnOffStatus());
 
-                builder: (context, state) {
-                  final isLoading = state.onOffStatus is OnOffLoading;
+                    if (Navigator.canPop(dialogContext)) {
+                      Navigator.of(dialogContext).pop();
+                    }
 
-                  return AlertDialog(
-                    content: Text("آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟"),
-                    actions: [
-                      // اگر در حال دریافت پاسخ هستیم، تایمر ۶۰ ثانیه‌ای را نشان بده
-                      if (isLoading) ...[
-                        const CountdownTimerWidget(durationInSeconds: 60),
-                      ],
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: GlobalElevatedButton(
-                              borderRadius: 2.5,
-                              backColor: ColorPalette.darkBlue,
-                              onTap: isLoading
-                                  ? null
-                                  : () {
-                                wellDetailBloc.add(SwitchClicked(
+                    if (context.mounted) {
+                      GlobalSnackBar.show(context, message: errorMsg);
+                    }
+                  }
+                }
+              },
+              builder: (blocContext, state) {
+                final isLoading = state.onOffStatus is OnOffLoading;
+
+                return AlertDialog(
+                  content: Text(
+                    "آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟",
+                  ),
+                  actions: [
+                    if (isLoading) ...[
+                      const CountdownTimerWidget(durationInSeconds: 60),
+                    ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: GlobalElevatedButton(
+                            borderRadius: 2.5,
+                            backColor: ColorPalette.darkBlue,
+                            onTap: isLoading
+                                ? null
+                                : () {
+                              wellDetailBloc.add(
+                                SwitchClicked(
                                   value,
                                   CreateTimeParams(
                                     code: wellsDataEntity.code,
@@ -802,35 +832,38 @@ class ShowDialogs {
                                     userLocalID: wellsDataEntity.userLocalId,
                                     status: value ? 1 : 0,
                                   ),
-                                ));
-                              },
-                              widget: isLoading
-                                  ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                                  : const Text("تایید", style: TextStyle(color: Colors.black)),
-                            ),
+                                ),
+                              );
+                            },
+                            widget: isLoading
+                                ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                                : const Text("تایید", style: TextStyle(color: Colors.black)),
                           ),
-                          SizedBox(width: 10.w),
-                          Expanded(
-                            child: GlobalElevatedButton(
-                              borderRadius:2.5,
-                              backColor: Colors.grey[300]!,
-                              onTap: () {
-                                wellDetailBloc.add(ResetOnOffStatus());
+                        ),
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: GlobalElevatedButton(
+                            borderRadius: 2.5,
+                            backColor: Colors.grey[300]!,
+                            onTap: () {
+                              wellDetailBloc.add(ResetOnOffStatus());
+                              if (!isPoped && Navigator.canPop(dialogContext)) {
+                                isPoped = true;
                                 Navigator.of(dialogContext).pop();
-                              },
-                              widget: const Text("انصراف", style: TextStyle(color: Colors.black)),
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  );
-                },
-              ),
+                              }
+                            },
+                            widget: const Text("انصراف", style: TextStyle(color: Colors.black)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         );

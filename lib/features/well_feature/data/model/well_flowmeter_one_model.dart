@@ -8,9 +8,11 @@ class WellFlowMeterOneModel extends WellFlowMeterOneEntity {
     final dynamic total,
     final String? xAxis,
     final num? yAxis,
+    final int? deviceId,
+    final int? wellId,
 
 
-  }) : super(id,total,xAxis,yAxis);
+  }) : super(id,total,xAxis,yAxis,deviceId,wellId);
 
   factory WellFlowMeterOneModel.fromJson(dynamic json) {
 
@@ -19,6 +21,8 @@ class WellFlowMeterOneModel extends WellFlowMeterOneEntity {
       total: json["total"],
       xAxis: json["xAxis"],
       yAxis: json["yAxis"],
+      deviceId: json["device_id"],
+      wellId: json["well_id"],
 
     );
   }

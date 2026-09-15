@@ -199,7 +199,16 @@ class Constants {
 
 
   ];
+  final signalLevel = [
+    AlertTypeEntity( "نامشخص",0),
+    AlertTypeEntity( "بسیار ضعیف",1),
+    AlertTypeEntity( "ضعیف",2),
+    AlertTypeEntity( "متوسط",3),
+    AlertTypeEntity( "خوب",4),
+    AlertTypeEntity( "خیلی خوب",5),
+    AlertTypeEntity( "عالی",6),
 
+  ];
   List<String> waterVolume = [
     "حجم کل آب مصرف شده",
     "مجموع ساعات کارکرد پمپ ها",

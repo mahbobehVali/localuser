@@ -36,6 +36,16 @@ class SwitchClicked extends WellDetailEvent {
   // TODO: implement props
   List<Object?> get props => [isSwitch,createTimeParams];
 }
+
+class AutoSwitchChange extends WellDetailEvent {
+
+
+  const AutoSwitchChange();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
 class AutomaticSwitch extends WellDetailEvent {
 
   const AutomaticSwitch();

@@ -8,10 +8,6 @@ import 'package:mahaliii/common/socket_repository.dart';
 import 'package:mahaliii/common/widgets/global_elevated_button.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/entity/wells_data_entity.dart';
-import 'package:mahaliii/features/status_summary_feature/domain/usecase/wells_list_usecase.dart';
-import 'package:mahaliii/features/well_feature/domain/usecase/flow_meter_usecase.dart';
-import 'package:mahaliii/features/well_feature/domain/usecase/get_program_usecase.dart';
-import 'package:mahaliii/features/well_feature/domain/usecase/well_work_usecase.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/flowmeter_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/flowmeter_today_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/pump_performance_status.dart';
@@ -20,17 +16,15 @@ import 'package:mahaliii/features/well_feature/presentation/screens/widgets/prog
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../common/utils/constants.dart';
-import '../../../../common/utils/sharedpreference.dart';
 import '../../../../common/widgets/global_snackbar.dart';
 import '../../../../common/widgets/icon_container.dart';
 import '../../../../common/widgets/indicator_widget.dart';
 import '../../../../common/widgets/show_dialogs.dart';
+import '../../../../common/widgets/signal_chart.dart';
 import '../../../../config/color_palette.dart';
 import '../../../../config/texts_style.dart';
 import '../../../../locator.dart';
 import '../../../auth_feature/presentation/screens/login_screen.dart';
-import '../../domain/repository/wells_repository.dart';
-import '../../domain/usecase/alert_count_usecase.dart';
 import '../bloc/well_detail_bloc/finger_status.dart';
 import '../bloc/well_detail_bloc/on_off_status.dart';
 import '../bloc/well_detail_bloc/week_well_work_status.dart';
@@ -46,6 +40,9 @@ class WellDetailScreen extends StatefulWidget {
 
 class _WellDetailScreenState extends State<WellDetailScreen>
     with SingleTickerProviderStateMixin {
+  List<String> liveXLabels = [];
+  List<dynamic> liveYValues = [];
+  int currentTab = -1; // برای هندل کردن تغییر تب‌ها
   // late AnimationController _controller;
   List<PieChartSectionData> showingSections({dynamic on, dynamic off}) {
     return List.generate(2, (i) {
@@ -132,24 +129,12 @@ class _WellDetailScreenState extends State<WellDetailScreen>
   @override
   void initState()  {
     super.initState();
-
+        print("widget.wellsDataEntity.statusWell == 1${widget.wellsDataEntity.statusWell == 1}");
 
     _bloc = locator<WellDetailBloc>();
 
-    // final socketRepository = locator<SocketRepository>();
-    // socketRepository.initAndConnect(widget.wellsDataEntity.pin ?? "");
     final wellPin = widget.wellsDataEntity.pin ?? ""; // پین همان چاه خاص
     locator<SocketRepository>().joinWellRoom(wellPin);
-
-    // _bloc = WellDetailBloc(
-    //   locator<WellsRepository>(),
-    //   locator<WellWorkHourUseCase>(),
-    //   locator<WellFlowMeterUseCase>(),
-    //   locator<WellsListUseCase>(),
-    //   locator<GetProgramUseCase>(),
-    //   socketRepository,
-    //   locator<AlertCountUseCase>(),
-    // );
 
     _bloc
       ..add(
@@ -188,7 +173,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
         ChangeUserLocalId(
           widget.wellsDataEntity.userLocalId,
         ),
-      );
+      )..add(AutoSwitchChange());
 
     _controller = AnimationController(
       vsync: this,
@@ -335,52 +320,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Container(
-                  //   color: ColorPalette.white,
-                  //   padding:  EdgeInsets.only(left: 16.w,right: 16.w,top:8.h,bottom: 8.h),
-                  //
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       BlocBuilder<WellDetailBloc, WellDetailState>(
-                  //         builder: (context, state) {
-                  //           return SegmentedButton(
-                  //               style: SegmentedButton.styleFrom(
-                  //                 backgroundColor: ColorPalette.lightGrey,
-                  //               ),
-                  //
-                  //
-                  //               onSelectionChanged: (Set<int> newSelected) {
-                  //                 BlocProvider.of<WellDetailBloc>(context).add(ChangeWellTab(newSelected.first));
-                  //
-                  //               },
-                  //               segments: [
-                  //                 ButtonSegment(value: 0,label: Text("وضعیت کلی")),
-                  //                 ButtonSegment(value: 1,label: Text("کنترل چاه")),
-                  //
-                  //               ], selected:{state.selectedWellTab});
-                  //         },
-                  //       ),
-                  //       IconButton(
-                  //         style: ButtonStyle(
-                  //           shape: WidgetStatePropertyAll(
-                  //             RoundedRectangleBorder(
-                  //                 borderRadius: BorderRadius.circular(5)
-                  //             ),
-                  //           ),
-                  //           side: WidgetStatePropertyAll(
-                  //             BorderSide(),
-                  //           ),
-                  //         ),
-                  //         icon: const Icon(Icons.navigate_next),
-                  //         onPressed: () {
-                  //           Navigator.of(context).pop();
-                  //         },
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                  // SizedBox(height: 26.h),
                   Padding(
                     padding:  EdgeInsets.only(left: 16.w,right: 16.w,),
                     child: BlocSelector<WellDetailBloc, WellDetailState, int>(
@@ -461,11 +400,51 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                           ],
                                         ),
                                         BlocConsumer<WellDetailBloc, WellDetailState>(
+                                          buildWhen: (previous, current) {
+                                            return previous.flowMeterTodayStatus != current.flowMeterTodayStatus ||
+                                                previous.flowMeterStatus != current.flowMeterStatus ||
+                                                previous.selectedChartVolumeTab != current.selectedChartVolumeTab;
+                                          },
                                           listener: (context, state) {
-                                            if(state.flowMeterStatus is FlowMeterExit){
-                                              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
-                                                return LoginScreen();
-                                              },));
+                                            if (state.flowMeterStatus is FlowMeterExit) {
+                                              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
+                                            }
+
+                                            // تشخیص تغییر تب برای ریسِت کردن کشِ نمودار
+                                            if (currentTab != state.selectedChartVolumeTab) {
+                                              currentTab = state.selectedChartVolumeTab;
+                                              liveXLabels.clear();
+                                              liveYValues.clear();
+                                            }
+
+                                            // ۱. مقداردهی اولیه لیست‌ها از API (فقط وقتی لیست کش خالی است)
+                                            if (state.flowMeterStatus is FlowMeterSuccess && liveXLabels.isEmpty) {
+                                              final flowMeter = (state.flowMeterStatus as FlowMeterSuccess).wellFlowMeterEntity?.list;
+                                              if (flowMeter != null) {
+                                                liveXLabels = List<String>.from(flowMeter.xAxis ?? []);
+                                                liveYValues = (flowMeter.yAxis ?? []).map((e) => (e ?? 0).toDouble()).toList();
+                                              }
+                                            }
+
+                                            // ۲. اضافه کردن دیتای جدید سوکت به لیست کش شده (بدون پاک شدن قبلی‌ها)
+                                            if (state.selectedChartVolumeTab == 0 && state.flowMeterTodayStatus is FlowMeterTodaySuccess) {
+                                              final todayEntity = (state.flowMeterTodayStatus as FlowMeterTodaySuccess).wellFlowMeterTodayOneEntity;
+
+                                              if (todayEntity != null && todayEntity.deviceId == widget.wellsDataEntity.deviceId) {
+                                                final socketX = todayEntity.xAxis.toString();
+                                                final socketY = todayEntity.yAxis!.toDouble();
+
+                                                if (liveXLabels.isNotEmpty && liveXLabels.last == socketX) {
+                                                  final lastY = liveYValues.last;
+                                                  if (lastY != socketY) {
+                                                    liveYValues[liveYValues.length - 1] = (lastY + socketY) / 2;
+                                                  }
+                                                } else if (!liveXLabels.contains(socketX)) {
+                                                  // دیتای جدید سوکت به لیست اضافه می‌شود و ماندگار خواهد بود
+                                                  liveXLabels.add(socketX);
+                                                  liveYValues.add(socketY);
+                                                }
+                                              }
                                             }
                                           },
                                           builder: (context, state) {
@@ -473,73 +452,38 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
                                             if (status is FlowMeterLoading) {
                                               return state.selectedChartVolumeTab == 0
-                                                  ?  ShimmerClass.lineChartShimmer()
-                                                  :  ShimmerClass.barChartShimmer() ;
+                                                  ? ShimmerClass.lineChartShimmer()
+                                                  : ShimmerClass.barChartShimmer();
                                             }
 
                                             if (status is FlowMeterError) {
-
-                                              return Text("خطایی رخ داده");
+                                              return const Text("خطایی رخ داده");
                                             }
 
-                                            // بررسی صحت دریافت داده‌های API اولیه
                                             if (status is! FlowMeterSuccess) {
-                                              if (status is FlowMeterLoading) return const Center(child: CircularProgressIndicator());
                                               if (status is FlowMeterEmpty) return Constants.noData();
-                                              if (status is FlowMeterError) return Center(child: Text(status.error));
                                               return const SizedBox.shrink();
                                             }
 
-                                            final flowMeter = status.wellFlowMeterEntity?.list;
-                                            if (flowMeter == null || flowMeter.xAxis == null || flowMeter.yAxis == null) {
+                                            // بررسی اینکه لیست کش ما خالی نباشد
+                                            if (liveXLabels.isEmpty || liveYValues.isEmpty) {
                                               return Constants.noData();
                                             }
 
-                                            // ۱. ساخت کپی مجزا از داده‌های API برای جلوگیری از تغییر مستقیم State
-                                            final List<String> xLabels = List<String>.from(flowMeter.xAxis!);
-                                            final List<dynamic> yValues = flowMeter.yAxis!.map((e) => (e ?? 0).toDouble()).toList();
+                                            // ۳. استفاده از مقادیر لایو و آپدیت‌شده برای محاسبات نمودار
+                                            final scale = Constants().getScale(liveYValues);
 
-                                            // ۲. اعمال دیتای سوکت *فقط* اگر تب روی «امروز» (0) باشد
-                                            if (state.selectedChartVolumeTab == 0 && state.flowMeterTodayStatus is FlowMeterTodaySuccess) {
-                                              final flowMeterTodaySuccess = state.flowMeterTodayStatus as FlowMeterTodaySuccess;
-                                              final todayEntity = flowMeterTodaySuccess.wellFlowMeterTodayOneEntity;
-
-                                              if (todayEntity != null && todayEntity.xAxis != null && todayEntity.yAxis != null) {
-                                                final socketX = todayEntity.xAxis.toString();
-                                                final socketY = todayEntity.yAxis!.toDouble();
-
-                                                if (xLabels.isNotEmpty && xLabels.last == socketX) {
-                                                  final lastY = yValues.last;
-                                                  if (lastY != socketY) {
-                                                    yValues[yValues.length - 1] = (lastY + socketY) / 2;
-                                                  }
-                                                } else {
-                                                  xLabels.add(socketX);
-                                                  yValues.add(socketY);
-                                                }
-                                              }
-                                            }
-
-                                            if (xLabels.isEmpty || yValues.isEmpty) {
-                                              return Constants.noData();
-                                            }
-
-                                            // ۳. محاسبه مقیاس بر اساس داده‌های نهایی (شامل سوکت در صورت انتخاب تب امروز)
-                                            final scale = Constants().getScale(yValues);
-
-                                            // ۴. آماده‌سازی داده‌های نمودار خطی
                                             final List<FlSpot> spots = List.generate(
-                                              yValues.length,
-                                                  (j) => FlSpot(j.toDouble(), yValues[j]),
+                                              liveYValues.length,
+                                                  (j) => FlSpot(j.toDouble(), liveYValues[j]),
                                             );
 
-                                            // ۵. آماده‌سازی داده‌های نمودار میله‌ای
-                                            final List<BarChartGroupData> chartGroups = List.generate(yValues.length, (index) {
+                                            final List<BarChartGroupData> chartGroups = List.generate(liveYValues.length, (index) {
                                               return BarChartGroupData(
                                                 x: index,
                                                 barRods: [
                                                   BarChartRodData(
-                                                    toY: yValues[index],
+                                                    toY: liveYValues[index],
                                                     color: ColorPalette.darkBlue,
                                                     width: 12,
                                                     borderRadius: BorderRadius.circular(2),
@@ -549,7 +493,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                             });
 
                                             final double columnWidth = 80.0;
-                                            final double calculatedChartWidth = (xLabels.length * columnWidth).clamp(350.0, 2000.0);
+                                            final double calculatedChartWidth = (liveXLabels.length * columnWidth).clamp(350.0, 2000.0);
 
                                             return Column(
                                               children: [
@@ -573,10 +517,10 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                           ),
                                                           borderData: FlBorderData(
                                                             show: true,
-                                                            border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
+                                                            border: Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                                                           ),
                                                           titlesData: FlTitlesData(
-                                                            bottomTitles: Constants().axisBottomTitles(xLabels, "day"),
+                                                            bottomTitles: Constants().axisBottomTitles(liveXLabels, "day"),
                                                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                                             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                                             leftTitles: Constants().leftTitles(
@@ -593,31 +537,22 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                               fitInsideVertically: true,
                                                               getTooltipItems: (List<LineBarSpot> touchedSpots) {
                                                                 if (touchedSpots.isEmpty) return [];
-
-                                                                // فقط اولین نقطه را مبنا قرار می‌دهیم تا کل لیست یک بار ساخته شود و تکرار نشود
                                                                 final spot = touchedSpots.first;
                                                                 final int xIndex = spot.x.toInt();
-                                                                if (xIndex < 0 || xIndex >= xLabels.length) return [];
+                                                                if (xIndex < 0 || xIndex >= liveXLabels.length) return [];
 
-
-                                                                List<TextSpan> spans = [];
-
-                                                                // جدا کردن تاریخ و ساعت با فاصله و برداشتن بخش دوم (ساعت)
-                                                                final String values = yValues[xIndex].toString().toPersianDigit();
-
-                                                                spans.add(
+                                                                final String values = liveYValues[xIndex].toStringAsFixed(2).toString().toPersianDigit();
+                                                                List<TextSpan> spans = [
                                                                   TextSpan(
-                                                                    text: "حجم آب عبوری دبی سنج: $values\n",
+                                                                    text: "حجم آب عبوری دبی سنج: ${values}\n",
                                                                     style: const TextStyle(
                                                                       color: Colors.black87,
                                                                       fontWeight: FontWeight.bold,
                                                                       fontSize: 12,
                                                                     ),
                                                                   ),
-                                                                );
+                                                                ];
 
-
-                                                                // برگرداندن لیست با طول مساوی تعداد نقاط، اما با این ترفند که فقط یک تول‌تیپ واحد و تمیز رندر شود
                                                                 return touchedSpots.map((s) {
                                                                   if (s == spot) {
                                                                     return LineTooltipItem(
@@ -627,12 +562,11 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                       children: spans,
                                                                     );
                                                                   }
-                                                                  return null; // بقیه نقاط خالی برگردانده شوند تا تکرار نشوند
+                                                                  return null;
                                                                 }).toList();
                                                               },
                                                             ),
                                                             handleBuiltInTouches: true,
-
                                                           ),
                                                           lineBarsData: [
                                                             LineChartBarData(
@@ -640,17 +574,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                               preventCurveOvershootingThreshold: 0,
                                                               dotData: const FlDotData(show: false),
                                                               isCurved: true,
-                                                              // belowBarData: BarAreaData(
-                                                              //   show: true,
-                                                              //   gradient: LinearGradient(
-                                                              //     colors: [
-                                                              //       ColorPalette.darkBlue.withValues(alpha: 0.9),
-                                                              //       ColorPalette.darkBlue.withValues(alpha: 0.5),
-                                                              //     ],
-                                                              //     begin: Alignment.topCenter,
-                                                              //     end: Alignment.bottomCenter,
-                                                              //   ),
-                                                              // ),
                                                               color: ColorPalette.darkBlue,
                                                               barWidth: 2.5,
                                                               isStrokeCapRound: true,
@@ -693,14 +616,14 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                               fitInsideVertically: true,
                                                               getTooltipItem: (group, groupIndex, rod, rodIndex) {
                                                                 final int xIndex = group.x.toInt();
-                                                                if (xIndex < 0 || xIndex >= xLabels.length) return null;
+                                                                if (xIndex < 0 || xIndex >= liveXLabels.length) return null;
 
-                                                                final double currentDate = yValues[xIndex];
+                                                                final double currentDate = liveYValues[xIndex];
 
                                                                 List<TextSpan> spans = [];
 
                                                                 // ۲. استخراج ساعت یا تاریخ اصلی (جدا کردن ساعت اگر شامل فاصله باشد)
-                                                                final String timeLabel = currentDate.toString().toPersianDigit();
+                                                                final String timeLabel = currentDate.toStringAsFixed(2).toString().toPersianDigit();
 
                                                                 spans.add(
                                                                   TextSpan(
@@ -731,7 +654,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                             show: true,
                                                             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                                                             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                                            bottomTitles: Constants().axisBottomTitles(xLabels, "week"),
+                                                            bottomTitles: Constants().axisBottomTitles(liveXLabels, "week"),
                                                             leftTitles: Constants().leftTitles(
                                                               interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
                                                               scale: scale['step'] == 0 ? 10 : scale['step']!,
@@ -739,17 +662,15 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                           ),
                                                           barGroups: chartGroups,
                                                         ),
-                                                      ),
+                                                      )
                                                     ),
                                                   ),
                                                 ),
-
                                                 SizedBox(height: 16.h),
                                               ],
                                             );
-
                                           },
-                                        ),
+                                        )
                                       ],
                                     ),
                                   )
@@ -1584,7 +1505,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                     ///switch
                                     Container(
                                       height: 70.h,
-                                      padding: EdgeInsets.symmetric(horizontal: 18),
+                                      padding: EdgeInsets.symmetric(horizontal: 18.w),
                                       decoration: BoxDecoration(
                                         color: ColorPalette.white,
                                         borderRadius: BorderRadius.circular(8),
@@ -1608,30 +1529,21 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                             ],
                                           ),
                                           BlocListener<WellDetailBloc, WellDetailState>(
-                                            listenWhen: (previous, current) => previous.isSwitched!=current.isSwitched,
+                                            listenWhen: (previous, current) => previous.isSwitched != current.isSwitched,
                                             listener: (context, state) {
-                                              if (state.onOffStatus is OnOffSuccess) {
-                                                // ۱. ابتدا دیالوگ باز شده را می‌بندیم (چون روی صفحه اصلی باز شده بود با کانتکست اصلی pop می‌شود)
-                                                // Navigator.of(context).pop();
-
-                                                // ۲. نمایش موفقیت
-                                                GlobalSnackBar.show(context,
-                                                  message: state.isSwitched == true ? "با موفقیت روشن شد" : "با موفقیت خاموش شد",
-                                                  duration: 3
-
-                                                );
-                                              }
-
-                                              if (state.onOffStatus is OnOffError) {
-                                                GlobalSnackBar.show(context, message: "خطایی رخ داده است");
-                                              }
+                                              // 🟢 هر زمان پمپ از جای دیگر روشن/خاموش شود این بخش اجرا می‌شود (بدون بستن صفحه!)
+                                              GlobalSnackBar.show(
+                                                context,
+                                                message: state.isSwitched == true ? "پمپ روشن شد" : "پمپ خاموش شد",
+                                                duration: 2,
+                                              );
                                             },
 
                                             child: CupertinoSwitch(
                                               activeTrackColor: ColorPalette.lightBlue,
                                               thumbColor: ColorPalette.darkBlue,
                                               inactiveThumbColor: ColorPalette.black.withValues(alpha: 0.5),
-                                              value: state.isSwitched!,
+                                              value: state.isSwitched,
                                               onChanged: (value) {
                                                 // print(value);
                                                 ShowDialogs().turnPomp(context,
@@ -1643,7 +1555,48 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         ],
                                       ),
                                     ),
-                                    SizedBox(height: 32),
+                                    SizedBox(height: 32.h),
+                                      ///signal
+                                    Container(
+                                      height: 80.h,
+                                      padding: EdgeInsets.symmetric(horizontal: 18.w),
+                                      decoration: BoxDecoration(
+                                        color: ColorPalette.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  IconContainer(
+                                                    icon: Icon(Icons.signal_cellular_alt),
+                                                    color: ColorPalette.iconContainerColor,
+                                                    width: 24,
+                                                    height: 24,
+                                                  ),
+                                                  SizedBox(width: 9),
+
+                                                  Text("وضعیت آنتن دهی دستگاه"),
+                                                ],
+                                              ),
+                                              SizedBox(height: 4.h,),
+                                              Text(Constants().signalLevel[widget.wellsDataEntity.signalLevel??0].name)
+                                            ],
+                                          ),
+                                          // اگر عدد 3 پاس داده شود: 3 میله اول سبز و 2 میله بعدی طوسی می‌شوند
+                                          SignalBarChart(value: widget.wellsDataEntity.signalLevel??0,)
+
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 32.h),
 
                                     ///program
                                     Program(wellsDataEntity: widget.wellsDataEntity,),

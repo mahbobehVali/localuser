@@ -12,13 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'bottom_nav/bottom_nav_cubit.dart';
 import 'common/socket_repository.dart';
 import 'common/widgets/function_widgets.dart';
-import 'features/status_summary_feature/domain/usecase/wells_list_usecase.dart';
-import 'features/well_feature/domain/repository/wells_repository.dart';
-import 'features/well_feature/domain/usecase/alert_count_usecase.dart';
-import 'features/well_feature/domain/usecase/flow_meter_usecase.dart';
-import 'features/well_feature/domain/usecase/get_program_usecase.dart';
-import 'features/well_feature/domain/usecase/well_work_usecase.dart';
-import 'features/well_feature/presentation/bloc/well_detail_bloc/on_off_status.dart';
 import 'features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 import 'locator.dart';
 

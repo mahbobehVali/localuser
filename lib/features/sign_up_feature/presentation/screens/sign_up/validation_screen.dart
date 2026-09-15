@@ -1,10 +1,12 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/common/widgets/refuse_button.dart';
 import 'package:mahaliii/features/sign_up_feature/presentation/bloc/validation_status.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
+
 import '../../../../../common/widgets/global_elevated_button.dart';
 import '../../../../../common/widgets/show_snack_bar.dart';
 import '../../../../../config/color_palette.dart';

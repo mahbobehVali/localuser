@@ -20,6 +20,7 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import '../../../../../common/utils/data_state.dart';
 import '../../../../../common/utils/sharedpreference.dart';
 import '../../../../../common/utils/use_case.dart';
+import '../../../../../common/widgets/stream_extension.dart';
 import '../../../../../locator.dart';
 import '../../../../status_summary_feature/domain/usecase/wells_list_usecase.dart';
 import '../../../domain/repository/wells_repository.dart';
@@ -73,47 +74,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     flowMeterTodayStatus: FlowMeterTodayInitial()
   )) {
 
-    // ۱. گوش دادن دائمی به استریم در زمان ساخت BLoC (خارج از ایونت‌ها)
-    _socketSubscription = socketRepository.onAndOffTimeStream.timeout(
-      const Duration(seconds: 60),
-      onTimeout: (sink) {
-        sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
-      },
-    ).listen(
-          (onOff) {
-        // هر زمان دیتایی آمد، یک ایونت داخلی به بلاک اضافه می‌کنیم
-        add(InternalPumpDataReceived(onOff));
-      },
-      onError: (error) {
-        add(InternalPumpErrorOccurred(error.toString()));
-      },
-    );
-
-    on<SwitchClicked>((event, emit) async {
-      emit(state.copyWith(newOnOffStatus: OnOffLoading()));
-      socketRepository.onAndOff(event.createTimeParams);
-      // دیگر نیازی به emit.forEach در اینجا نیست!
-    });
-
-    // ۳. مدیریت دیتای دریافتی از سوکت
-    on<InternalPumpDataReceived>((event, emit) async {
-      print("onOfffgg: ${event.onOff}");
-
-      emit(state.copyWith(
-        newIsSwitched: event.onOff == 1,
-        newOnOffStatus: OnOffSuccess(event.onOff),
-      ));
-
-      await locator<SharedPrefOperator>().saveSwitch(event.onOff==1);
-    });
-
-    // ۴. مدیریت خطای سوکت
-    on<InternalPumpErrorOccurred>((event, emit) {
-      print("❌ BLoC Stream Error: ${event.error}");
-      emit(state.copyWith(
-        newOnOffStatus: OnOffError(event.error),
-      ));
-    });
     on<WellStart>((event, emit) async {
       emit(state.copyWith(newWellStatus: WellLoading()));
 
@@ -207,45 +167,88 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
     });
 
-    // on<SwitchClicked>((event, emit) async {
-    //   // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
-    //   // if (state.onOffStatus is! OnOffSuccess) {
-    //   //   emit(state.copyWith(newOnOffStatus: OnOffSuccess()));
-    //   // }
-    //   // ارسال درخواست مخصوص این صفحه
-    //   emit(state.copyWith(newOnOffStatus: OnOffLoading()));
-    //
-    //   socketRepository.onAndOff(event.createTimeParams);
-    //
-    //   // ۲. مدیریت استریم با emit.forEach
-    //   await emit.forEach<dynamic>(
-    //     // socketRepository.onAndOffTimeStream,
-    //     socketRepository.onAndOffTimeStream.timeout(
-    //       const Duration(seconds: 60),
-    //       onTimeout: (sink) {
-    //         // زمانی که ۶۰ ثانیه بگذرد و هیچ دیتایی نیاید، این بخش اجرا می‌شود
-    //         sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
-    //       },
-    //     ),
-    //     onData: (onOff) {
-    //       print("onOff$onOff");
-    //       // دیتای دریافتی را به وضعیت موفقیت می‌بریم
-    //       return state.copyWith(
-    //         newIsSwitched: onOff==1?true:false,
-    //         newOnOffStatus: OnOffSuccess(onOff)
-    //       );
-    //     },
-    //       onError: (error, stackTrace) {
-    //       print("❌ BLoC Stream Error: $error");
-    //       return state.copyWith(
-    //         newOnOffStatus: OnOffError(error.toString()),
-    //       );
-    //     },
-    //   );
-    //
-    // });
 
-    // در فایل well_detail_bloc.dart
+    on<SwitchClicked>((event, emit) async {
+      emit(state.copyWith(newOnOffStatus: OnOffLoading()));
+
+      bool isConnect = await locator<SocketRepository>().joinWellRoom(event.createTimeParams.pin!);
+      if (!isConnect) {
+        emit(state.copyWith(newOnOffStatus: OnOffError("اتصال به سرور برقرار نشد")));
+        return;
+      }
+
+      socketRepository.onAndOff(event.createTimeParams);
+
+      await emit.forEach<dynamic>(
+        socketRepository.onAndOffTimeStream.timeoutFirst(const Duration(seconds: 10)),
+        onData: (onOff) {
+          print("onOff == 1${onOff == 1}");
+          final isSwitched = onOff == 1;
+
+          // 🟢 اگر دیالوگ منتظر پاسخ است (در حالت Loading)، وضعیت Success فرستاده می‌شود
+          if (state.onOffStatus is OnOffLoading) {
+            return state.copyWith(
+              newIsSwitched: isSwitched,
+              newOnOffStatus: OnOffSuccess(onOff),
+            );
+          }
+
+          // 🟢 اگر دیالوگ بسته شده و فقط دیتا از سوکت می‌رسد، فقط switch آپدیت می‌شود و status دست‌نخورده می‌ماند
+          return state.copyWith(
+            newIsSwitched: isSwitched,
+          );
+        },
+        onError: (error, stackTrace) {
+          return state.copyWith(
+            newOnOffStatus: OnOffError(error.toString()),
+          );
+        },
+      );
+    });
+
+    on<AutoSwitchChange>((event, emit) async {
+      print("AutoSwitchChange");
+      // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
+      // if (state.onOffStatus is! OnOffSuccess) {
+      //   emit(state.copyWith(newOnOffStatus: OnOffSuccess()));
+      // }
+      // ارسال درخواست مخصوص این صفحه
+      // emit(state.copyWith(newOnOffStatus: OnOffLoading()));
+
+      // socketRepository.onAndOff(event.createTimeParams);
+
+      // ۲. مدیریت استریم با emit.forEach
+      await emit.forEach<dynamic>(
+        // socketRepository.onAndOffTimeStream,
+        socketRepository.onAndOffTimeStream,
+        onData: (onOff) {
+          print("onOff == 1${onOff == 1}");
+          final isSwitched = onOff == 1;
+
+          // 🟢 اگر دیالوگ منتظر پاسخ است (در حالت Loading)، وضعیت Success فرستاده می‌شود
+          if (state.onOffStatus is OnOffLoading) {
+            return state.copyWith(
+              newIsSwitched: isSwitched,
+              newOnOffStatus: OnOffSuccess(onOff),
+            );
+          }
+
+          // 🟢 اگر دیالوگ بسته شده و فقط دیتا از سوکت می‌رسد، فقط switch آپدیت می‌شود و status دست‌نخورده می‌ماند
+          return state.copyWith(
+            newIsSwitched: isSwitched,
+          );
+        },
+
+        onError: (error, stackTrace) {
+          return state.copyWith(
+            newOnOffStatus: OnOffError(error.toString()),
+          );
+        },
+      );
+
+    },
+        transformer: concurrent(),);
+
 
     on<ResetOnOffStatus>((event, emit) {
       // مقدار استاتوس را دوباره به حالت اولیه (یا موفقیت قبلی/خالی) برمی‌گردانیم

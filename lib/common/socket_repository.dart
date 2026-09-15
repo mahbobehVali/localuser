@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:mahaliii/common/params/create_time_params.dart';
 import 'package:mahaliii/common/utils/sharedpreference.dart';
@@ -33,13 +32,14 @@ class SocketRepository {
   bool isConnecting = false; // جلوگیری از درخواست‌های همزمان اتصال
   String? _managerPin;       // پین مدیر (همیشه ثابت)
   String? _currentWellPin;   // پین چاهی که در حال حاضر داخل آن هستیم
+
   // استریم کنترلرها برای صفحات مختلف
-  final _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
-  final _waterController = StreamController<dynamic>.broadcast();
-  final _createTimeController = StreamController<dynamic>.broadcast();
-  final _deleteTimeController = StreamController<dynamic>.broadcast();
-  final _onAndOffTimeController = StreamController<dynamic>.broadcast();
-  final _todayController = StreamController<dynamic>.broadcast();
+   StreamController<dynamic> _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
+   StreamController<dynamic> _waterController = StreamController<dynamic>.broadcast();
+   StreamController<dynamic> _createTimeController = StreamController<dynamic>.broadcast();
+   StreamController<dynamic> _deleteTimeController = StreamController<dynamic>.broadcast();
+   StreamController<dynamic> _onAndOffTimeController = StreamController<dynamic>.broadcast();
+   StreamController<dynamic> _todayController = StreamController<dynamic>.broadcast();
 
   // گرفتن استریم‌ها در صفحات/بلاک‌ها
   Stream<dynamic> get dashboardStatusCheckFinger => _statusControllerCheckFinger.stream;
@@ -49,51 +49,79 @@ class SocketRepository {
   Stream<dynamic> get onAndOffTimeStream => _onAndOffTimeController.stream;
   Stream<dynamic> get todayStream => _todayController.stream;
 
-  Future<void> initAndConnect(String managerPin) async {
-    print("agaiiiin");
+  Completer<bool>? _connectCompleter;
+
+  Future<bool> initAndConnect(String managerPin, [String? level, int? id]) async {
+    // 🟢 اگر کنترلر بسته شده بود، دوباره آن را بسازید
+    if (_waterController.isClosed) {
+      _waterController = StreamController<WaterModel>.broadcast();
+    }
+    if (_createTimeController.isClosed) {
+      _createTimeController = StreamController<dynamic>.broadcast();
+    }
+    if (_deleteTimeController.isClosed) {
+      _deleteTimeController = StreamController<dynamic>.broadcast();
+    }
+    if (_onAndOffTimeController.isClosed) {
+      _onAndOffTimeController = StreamController<dynamic>.broadcast();
+    }
+    if (_statusControllerCheckFinger.isClosed) {
+      _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
+    }
+    print("_currentWellPin${_currentWellPin}");
+
     print("initAndConnectCalled---managerPin:$managerPin");
     _managerPin = managerPin;
-print("zfcsdfggg${_currentWellPin}");
+
     if (_socket != null && _socket!.connected) {
-      print("Socket already connected. Ensuring rooms are joined.");
+      print("Socket already connected.");
       _socket!.emit("join/room", {'room': _managerPin});
       if (_currentWellPin != null) {
-        print("sadcmsldmnkfv");
         _socket!.emit("join/room", {'room': _currentWellPin});
       }
-      return;
+      return true;
     }
 
-    if (isConnecting) return;
+    if (isConnecting && _connectCompleter != null) {
+      return _connectCompleter!.future;
+    }
+
     isConnecting = true;
+    _connectCompleter = Completer<bool>();
 
     String token = await getToken();
+    print("Token retrieved check: ${token.isNotEmpty}");
 
-    _socket = i_o.io('https://www.abyarinovin.ir',
+    _socket = i_o.io('https://user.abyarinovin.ir',
         i_o.OptionBuilder()
             .setTransports(['websocket'])
-            .setQuery({'token': token})
+            .enableWithCredentials()
+            // .setQuery({'token': token})
             .setAuth({'token': token})
             .enableAutoConnect()
+            .enableReconnection()
             .build()
     );
 
-    setupGlobalListeners();
-    _socket!.onConnect((_) async {
-      print(' Socket Connected globally!');
+    // _socket?.auth={"token":token};
+    _socket!.connect();
+    _socket!.on('error', (data) => print('❌ Socket General Error: $data'));
+    _socket!.on('connect_timeout', (data) => print('⏰ Connect Timeout: $data'));
 
-      // ۱. همیشه اتاق مدیر جوین می‌شود
+    setupGlobalListeners();
+
+    _socket!.onConnect((_) async {
+      print('Socket Connected globally!');
+      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
+        _connectCompleter!.complete(true);
+      }
       if (_managerPin != null) {
-        print("Joining manager room: $_managerPin");
+        print("joinroom");
         _socket!.emit("join/room", {'room': _managerPin});
       }
-
-      // ۲. 👈 اگر کاربر وارد چاهی شده بود، اینجا حتماً اتاق چاه هم جوین می‌شود
       if (_currentWellPin != null) {
-        print("Joining well room (from onConnect): $_currentWellPin");
         _socket!.emit("join/room", {'room': _currentWellPin});
       }
-
       isConnecting = false;
     });
 
@@ -102,13 +130,30 @@ print("zfcsdfggg${_currentWellPin}");
       isConnecting = false;
     });
 
-    _socket!.onConnectError((data) => print(' Connect Error: $data'));
-    _socket!.connect();
-  }
+    _socket!.onConnectError((data) {
+      print('Connect Error: $data');
+      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
+        _connectCompleter!.complete(false);
+      }
+      isConnecting = false;
+    });
 
+    // انتظار حداکثر ۸ ثانیه برای نتیجه اتصال
+    return _connectCompleter!.future.timeout(
+      const Duration(seconds: 16),
+      onTimeout: () {
+        isConnecting = false;
+        if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
+          _connectCompleter!.complete(false);
+        }
+        return false;
+      },
+    );
+  }
   /// متد مخصوص ورود به صفحه یک چاه جدید
-  void joinWellRoom(String wellPin) {
-    if (_currentWellPin == wellPin) return;
+  Future<bool> joinWellRoom(String wellPin) async {
+    print("joinWellRoomCalled");
+    if (_currentWellPin == wellPin) return _currentWellPin == wellPin;
 
     print("Switching well room from $_currentWellPin to: $wellPin");
     _currentWellPin = wellPin;
@@ -116,35 +161,45 @@ print("zfcsdfggg${_currentWellPin}");
     if (_socket != null && _socket!.connected) {
       print("Socket is connected, emitting room: $wellPin");
       _socket!.emit("join/room", {'room': wellPin});
+      return true;
     } else {
       print("Socket not connected yet. Initializing connection...");
       // اگر سوکت وصل نیست، متد اتصال را صدا می‌زنیم.
       // چون بالا متغیر _currentWellPin پر شده است، به محض اینکه onConnect اجرا شود،
       // خودکار هم مدیر و هم این چاه جدید جوین خواهند شد.
       initAndConnect(_managerPin ?? "manger");
+
+      return false;
     }
   }
 
   /// ۲. گوش دادن دائمی به رویدادها (گوش‌ها همیشه باز هستند، اما تا درخواستی فرستاده نشود، دیتایی نمی‌آید)
   void setupGlobalListeners() {
     if (_socket == null) return;
-    _socket!.off("dashboard/total/water");
-    _socket!.off("program/add");
-    _socket!.off("program/delete");
-    _socket!.off("motor/status");
-    _socket?.off("fingerprint/request_response");
 
+    // _socket!.off("dashboard/total/water");
+    // _socket!.off("program/add");
+    // _socket!.off("program/delete");
+    // _socket!.off("motor/status");
+    // _socket?.off("fingerprint/request_response");
+    _socket!.off("dashboard/total/water");
     _socket!.on("dashboard/total/water", (data) {
-      print("dashboard/total/water");
+      // 🟢 این پرینت‌ها مشخص می‌کنند مشکل از کجاست
+      print("1. Socket event triggered!");
+      print("2. Raw Data: $data");
+      print("3. Is Controller Closed? ${_waterController.isClosed}");
 
       if (data != null && !_waterController.isClosed) {
-        // تبدیل به مدل و اضافه کردن به استریم آب
+        print("data != null && !_waterController.isClosed");
         try {
           _waterController.add(WaterModel.fromJson(data));
-          print(' Data Water successfully added to stream');
+          print('Data Water successfully added to stream');
         } catch (e) {
           print('JSON 1 Parsing Error: $e');
-        }      }
+        }
+      } else {
+        print("❌ Condition failed! data is null OR controller is closed.");
+      }
     });
 
     _socket!.on("flowmeter/today", (data) {
@@ -266,40 +321,24 @@ print("zfcsdfggg${_currentWellPin}");
       });
   }
 
-  // تعریف یکCompleter برای جلوگیری از تلاش‌های هم‌زمان جهت اتصال
-  Completer<void>? _connectingCompleter;
-
   Future<void> safeEmit(String event, Map<String, dynamic> data) async {
-    print("pin:${data["pin"]}");
-    // اگر سوکت وصل نیست
+    String pin = data["pin"] ?? _managerPin ?? "manger";
+
     if (_socket == null || !_socket!.connected) {
-
-      // اگر در حال حاضر متدی مشغول وصل کردن سوکت است، منتظر همان بماند
-      if (_connectingCompleter != null && !_connectingCompleter!.isCompleted) {
-        await _connectingCompleter!.future;
-      } else {
-        _connectingCompleter = Completer<void>();
-        await initAndConnect(data["pin"]);
-
-        int attempts = 0;
-        while ((_socket == null || !_socket!.connected)
-            // && attempts < 40
-        ) {
-          // print("attempts");
-          await Future.delayed(const Duration(milliseconds: 100));
-          attempts++;
-        }
-        _connectingCompleter!.complete();
-      }
+      print("️ Socket not ready for $event. Triggering background connect...");
+      initAndConnect(pin);
+      // به جای مسدود کردن، خروج یا صف‌بندی امن
+      return;
     }
-
-    // ارسال داده در صورت اتصال
+    // چک مجدد بعد از تلاش برای اتصال
     if (_socket != null && _socket!.connected) {
       print("🚀 Emitting $event to server...");
       _socket!.emit(event, data);
     } else {
-      print(" Cannot emit $event. Socket is disconnected.");
+      print("❌ Failed to emit $event, socket still disconnected.");
     }
+    // print("🚀 Emitting $event to server...");
+    // _socket!.emit(event, data);
   }
 
   void requestWaterData(dynamic level, dynamic areaId) {
@@ -371,7 +410,7 @@ print("zfcsdfggg${_currentWellPin}");
     _socket?.off("fingerprint/request_response");
     _socket?.off("fingerprint/status");
     _socket?.disconnect();
-    _socket?.dispose();
+    // _socket?.dispose();
 
     if (!_waterController.isClosed) _waterController.close();
     if (!_createTimeController.isClosed) _createTimeController.close();
