@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:mahaliii/common/params/flowmeter_params.dart';
+import 'package:mahaliii/common/widgets/icon_container.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/config/texts_style.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/repository/status_summary_repository.dart';
@@ -14,6 +15,7 @@ import '../../../../common/utils/sharedpreference.dart';
 import '../../../../common/widgets/last_activity_widget.dart';
 import '../../../../common/widgets/pagination_widget.dart';
 import '../../../../common/widgets/water_amount_container.dart';
+import '../../../../config/color_palette.dart';
 import '../../../../locator.dart';
 import '../../../../main.dart';
 import '../../domain/usecase/last_activity_usecase.dart';
@@ -133,64 +135,266 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                   Text("وضعیت مصرف آب همه چاه‌های تحت مدیریت",style: TextStyleP.f14Bold),
                   ///socket water
                   SizedBox(height: 8.h),
+                  Row(
+                    children: [
+                      // باکس ۱: حجم آب مصرفی تا این لحظه
 
-                  BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
-                    builder: (context, state) {
-                      if (state.waterStatus is WaterSuccess) {
-                        final waterSuccess = state.waterStatus as WaterSuccess;
-
-                        if (waterSuccess.waterData != null) {
-                          return Column(
-
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 10.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: ColorPalette.inverseGrey),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center, // وسط‌چین افقی
                             children: [
                               Row(
                                 children: [
-
-
-                                  Expanded(
-                                    child: WaterAmountContainer(
-                                      image: "assets/icons/flowmeter.png",
-
-                                      title: "امروز",
-                                      amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.today!.toDouble().round())} m³",
-                                    ),
+                                  IconContainer(icon: Image.asset("assets/icons/flowmeter.png"),color: ColorPalette.lightBlue,),
+                                  SizedBox(width: 5.w,),
+                                  Text(
+                                    "امروز",
+                                    style: TextStyleP.f14Bold,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-
-                                   SizedBox(width: 8.w),
-                                  Expanded(
-                                    child: WaterAmountContainer(
-                                      image: "assets/icons/flowmeter.png",
-
-                                      title: "این ماه",
-                                      amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.monthly!.toDouble().round())} m³",
-                                    ),
-                                  ),
-
+                                  
                                 ],
                               ),
-                               SizedBox(height: 8.h),
-                              WaterAmountContainer(
-                                image: "assets/icons/flowmeter.png",
-                                title: "از ابتدای سال",
-                                amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.total!.toDouble().round())} m³",
-                                year: true,
+                              SizedBox(height: 5.h),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
+                                    builder: (context, state) {
+                                      if (state.waterStatus is WaterSuccess) {
+                                        final waterSuccess = state.waterStatus as WaterSuccess;
+                                        final totalValue = waterSuccess.waterData?.today ?? 0;
 
+                                        if (waterSuccess.waterData == null) return const SizedBox();
+                                        String formattedValue = NumberFormat.decimalPattern('fa').format(totalValue.toDouble().round());
+
+                                        return Text(
+                                          "\u200E$formattedValue m³",
+                                          style: TextStyleP.f16Bold,
+                                          textAlign: TextAlign.center,
+                                        );
+                                      } else if (state.waterStatus is WaterLoading) {
+                                        return Padding(
+                                          padding: EdgeInsets.only(top: 10.h),
+                                          child: ShimmerClass.shimmerContainer(height: 20),
+                                        );
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
-                          );
-                        } else {
-                          return const SizedBox();
-                        }
-                      }
-                      else if (state.waterStatus is WaterLoading) {
-                        return ShimmerClass.shimmerListviewHor(height: 100);
-                      }else if (state.waterStatus is WaterError) {
-                        return Center(child: Text((state.waterStatus as WaterError).error),);
-                      } else {
-                        return const SizedBox();
-                      }
-                    },
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 5.w,),
+
+                      // باکس ۲: حجم آب مصرفی این ماه
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 10.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: ColorPalette.inverseGrey),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center, // وسط‌چین افقی
+                            children: [
+                              Row(
+                                children: [
+                                  IconContainer(icon: Image.asset("assets/icons/flowmeter.png"),color: ColorPalette.lightBlue,),
+                                  SizedBox(width: 5.w,),
+                                  Text(
+                                    "این ماه",
+                                    style: TextStyleP.f14Bold,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 5.h),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
+                                    builder: (context, state) {
+                                      if (state.waterStatus is WaterSuccess) {
+                                        final waterSuccess = state.waterStatus as WaterSuccess;
+                                        final monthlyValue = waterSuccess.waterData?.monthly ?? 0;
+
+                                        if (waterSuccess.waterData == null) return const SizedBox();
+                                        String formattedValue = NumberFormat.decimalPattern('fa').format(monthlyValue.toDouble().round());
+
+                                        return Text(
+                                          "\u200E$formattedValue m³",
+                                          style: TextStyleP.f16Bold,
+                                          textAlign: TextAlign.center,
+                                        );
+                                      } else if (state.waterStatus is WaterLoading) {
+                                        return Padding(
+                                          padding: EdgeInsets.only(top: 10.h),
+                                          child: ShimmerClass.shimmerContainer(height: 20),
+                                        );
+                                      } else {
+                                        return const SizedBox();
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  SizedBox(height: 8.h),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: ColorPalette.inverseGrey),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center, // وسط‌چین افقی
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(right: 8.w, top: 10.h),
+                          child: Row(
+
+                            children: [
+                              IconContainer(icon: Image.asset("assets/icons/flowmeter.png"),color: ColorPalette.lightBlue,),
+                              SizedBox(width: 5.w,),
+                              Text(
+                                "از ابتدای سال",
+                                style: TextStyleP.f14Bold,
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: 5.h),
+                        Stack(
+                          children: [
+                            Image.asset("assets/icons/group.png"),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                // textDirection: TextDirection.LTR!, // اجبار جهت راست‌به‌چپ برای چینش
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(right: 8.w, top: 10.h),
+                                    child: BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
+                                      builder: (context, state) {
+                                        if (state.waterStatus is WaterSuccess) {
+                                          final waterSuccess = state.waterStatus as WaterSuccess;
+                                          final totalValue = waterSuccess.waterData?.total ?? 0;
+
+                                          if (waterSuccess.waterData == null) return const SizedBox();
+                                          String formattedValue = NumberFormat.decimalPattern('fa').format(totalValue.toDouble().round());
+
+                                          return Text(
+                                            "\u200E$formattedValue m³",
+                                            style: TextStyleP.f16Bold,
+                                            textAlign: TextAlign.center,
+                                          );
+                                        } else if (state.waterStatus is WaterLoading) {
+                                          return Padding(
+                                            padding: EdgeInsets.only(top: 10.h),
+                                            child: ShimmerClass.shimmerContainer(height: 20),
+                                          );
+                                        } else {
+                                          return const SizedBox();
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
+                  //   builder: (context, state) {
+                  //     if (state.waterStatus is WaterSuccess) {
+                  //       final waterSuccess = state.waterStatus as WaterSuccess;
+                  //
+                  //       if (waterSuccess.waterData != null) {
+                  //         return Column(
+                  //
+                  //           children: [
+                  //
+                  //             Row(
+                  //               children: [
+                  //
+                  //
+                  //                 Expanded(
+                  //                   child: WaterAmountContainer(
+                  //                     image: "assets/icons/flowmeter.png",
+                  //
+                  //                     title: "امروز",
+                  //                     amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.today!.toDouble().round())} m³",
+                  //                   ),
+                  //                 ),
+                  //
+                  //                  SizedBox(width: 8.w),
+                  //                 Expanded(
+                  //                   child: WaterAmountContainer(
+                  //                     image: "assets/icons/flowmeter.png",
+                  //
+                  //                     title: "این ماه",
+                  //                     amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.monthly!.toDouble().round())} m³",
+                  //                   ),
+                  //                 ),
+                  //
+                  //               ],
+                  //             ),
+                  //              SizedBox(height: 8.h),
+                  //             WaterAmountContainer(
+                  //               image: "assets/icons/flowmeter.png",
+                  //               title: "از ابتدای سال",
+                  //               amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.total!.toDouble().round())} m³",
+                  //               year: true,
+                  //
+                  //             ),
+                  //           ],
+                  //         );
+                  //       } else {
+                  //         return const SizedBox();
+                  //       }
+                  //     }
+                  //     else if (state.waterStatus is WaterLoading) {
+                  //       return ShimmerClass.shimmerListviewHor(height: 100);
+                  //     }else if (state.waterStatus is WaterError) {
+                  //       return Center(child: Text((state.waterStatus as WaterError).error),);
+                  //     } else {
+                  //       return const SizedBox();
+                  //     }
+                  //   },
+                  // ),
                   SizedBox(height: 16.h),
 
                   ///chart

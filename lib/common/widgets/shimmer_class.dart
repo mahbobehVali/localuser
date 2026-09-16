@@ -378,8 +378,8 @@ class ShimmerClass {
   static Widget shimmerContainer({double height = 100}) {
     return Shimmer.fromColors(
       // استفاده از رنگ‌های استاندارد و دارای تضاد مناسب
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: Colors.grey.shade800,
+      highlightColor: Colors.grey.shade300,
       direction: ShimmerDirection.rtl,
       child: Container(
         height: height.h, // اعمال .h فقط در همین‌جا

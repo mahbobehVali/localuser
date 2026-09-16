@@ -25,11 +25,7 @@ class _WellScreenState extends State<WellScreen> {
 
     return Scaffold(
       body: BlocProvider<WellDetailBloc>(
-        create: (context) {
-          WellDetailBloc wellBloc= locator<WellDetailBloc>();
-          wellBloc.add(WellStart());
-          return wellBloc;
-        },
+          create: (context) => locator<WellDetailBloc>()..add(WellStart()),
         child: Padding(
           padding:  EdgeInsets.symmetric(vertical: 64.h,horizontal: 12.w),
           child: Column(

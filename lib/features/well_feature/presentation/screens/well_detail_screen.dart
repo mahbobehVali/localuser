@@ -127,53 +127,24 @@ class _WellDetailScreenState extends State<WellDetailScreen>
   late WellDetailBloc _bloc;
   late AnimationController _controller;
   @override
-  void initState()  {
+  void initState() {
     super.initState();
-        print("widget.wellsDataEntity.statusWell == 1${widget.wellsDataEntity.statusWell == 1}");
 
+    // ۱. دریافت نمونه تازه از BLoC
     _bloc = locator<WellDetailBloc>();
 
-    final wellPin = widget.wellsDataEntity.pin ?? ""; // پین همان چاه خاص
+    final wellPin = widget.wellsDataEntity.pin ?? "";
     locator<SocketRepository>().joinWellRoom(wellPin);
 
+    // ۲. ارسال ایونت‌ها به نمونه فعال
     _bloc
-      ..add(
-        WellWorkHourStart(
-          FlowMeterParams(
-            type: 2,
-            ids: [widget.wellsDataEntity.deviceId!],
-          ),
-        ),
-      )
-      ..add(
-        WellPerformance(
-          FlowMeterParams(
-            type: 2,
-            time: 2,
-            ids: [widget.wellsDataEntity.deviceId!],
-          ),
-        ),
-      )..add(
-        FlowMeterEvent(
-          FlowMeterParams(
-            type: 0,
-            ids: [widget.wellsDataEntity.deviceId!],
-          ),
-        ),
-      )
-      ..add(
-        GetProgram(widget.wellsDataEntity.id!),
-      )
-      ..add(
-        FirstSwitch(
-          widget.wellsDataEntity.statusWell == 1,
-        ),
-      )
-      ..add(
-        ChangeUserLocalId(
-          widget.wellsDataEntity.userLocalId,
-        ),
-      )..add(AutoSwitchChange());
+      ..add(WellWorkHourStart(FlowMeterParams(type: 2, ids: [widget.wellsDataEntity.deviceId!])))
+      ..add(WellPerformance(FlowMeterParams(type: 2, time: 2, ids: [widget.wellsDataEntity.deviceId!])))
+      ..add(FlowMeterEvent(FlowMeterParams(type: 0, ids: [widget.wellsDataEntity.deviceId!])))
+      ..add(GetProgram(widget.wellsDataEntity.id!))
+      ..add(FirstSwitch(widget.wellsDataEntity.statusWell == 1))
+      ..add(ChangeUserLocalId(widget.wellsDataEntity.userLocalId))
+      ..add(AutoSwitchChange());
 
     _controller = AnimationController(
       vsync: this,
@@ -193,6 +164,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
   @override
   void dispose() {
     _controller.dispose();
+    _bloc.close(); // ۳. بستن BLoC هنگام خروج از صفحه
     super.dispose();
   }
 
