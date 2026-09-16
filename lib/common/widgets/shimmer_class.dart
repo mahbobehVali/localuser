@@ -375,18 +375,19 @@ class ShimmerClass {
     );
   }
 
-  static Widget shimmerContainer({double height = 100}) {
+  static Widget shimmerContainer({
+    double height = 100,
+  }) {
     return Shimmer.fromColors(
-      // استفاده از رنگ‌های استاندارد و دارای تضاد مناسب
-      baseColor: Colors.grey.shade800,
-      highlightColor: Colors.grey.shade300,
+      //  ۱. تغییر رنگ پایه از قرمز به طوسی
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
       direction: ShimmerDirection.rtl,
       child: Container(
-        height: height.h, // اعمال .h فقط در همین‌جا
-        // width: double.infinity,
-        margin: const EdgeInsets.symmetric(vertical: 10),
+        height: height.h,
+        //  ۲. حذف margin اضافی تا در ارتفاع‌های کم (مثل 20) ناپدید نشود
         decoration: BoxDecoration(
-          color: Colors.white, // رنگ ماسک باید کاملاً کدر (مثل سفید) باشد
+          color: Colors.white, // رنگ ماسک سفید یا طوسی روشن
           borderRadius: BorderRadius.circular(10),
         ),
       ),

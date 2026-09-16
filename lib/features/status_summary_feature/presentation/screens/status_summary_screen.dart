@@ -186,7 +186,9 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                                       } else if (state.waterStatus is WaterLoading) {
                                         return Padding(
                                           padding: EdgeInsets.only(top: 10.h),
-                                          child: ShimmerClass.shimmerContainer(height: 20),
+                                          child: SizedBox(
+                                              width: 80.w,
+                                              child: ShimmerClass.shimmerContainer(height: 20)),
                                         );
                                       } else {
                                         return const SizedBox();
@@ -248,7 +250,9 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                                       } else if (state.waterStatus is WaterLoading) {
                                         return Padding(
                                           padding: EdgeInsets.only(top: 10.h),
-                                          child: ShimmerClass.shimmerContainer(height: 20),
+                                          child: SizedBox(
+                                              width: 80.w,
+                                              child: ShimmerClass.shimmerContainer(height: 20)),
                                         );
                                       } else {
                                         return const SizedBox();
@@ -318,10 +322,9 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                                             textAlign: TextAlign.center,
                                           );
                                         } else if (state.waterStatus is WaterLoading) {
-                                          return Padding(
-                                            padding: EdgeInsets.only(top: 10.h),
-                                            child: ShimmerClass.shimmerContainer(height: 20),
-                                          );
+                                          return SizedBox(
+                                              width: 80.w,
+                                              child: ShimmerClass.shimmerContainer(height: 20));
                                         } else {
                                           return const SizedBox();
                                         }
