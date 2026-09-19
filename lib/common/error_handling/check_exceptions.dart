@@ -13,22 +13,21 @@ class CheckExceptions {
       case 200:
         return response;
 
-        //نام کاربری اشتباه است
+        //موبایل یا رمز اشتباه برای ورود message
       case 400:
         throw UnauthenticatedException();
 
-        //  رمز عبور اشتباه است
+        //  موبایل یا رمز عبور اشتباه است برای ورود message
         // حساب کاربری شما غیرفعال هست
-        // کد اعتبارسنجی اشتباه
+        // message کد اعتبارسنجی اشتباه
       case 401:
         throw NotAllowedToEnterException(response: response);
 
-          //شماره شما در سامانه ثبت نشده(فراموشی رمز)
-      //نظر خود را ثبت کرده اید(نظر در مورد مشاوره)
+          // شماره شما در سامانه ثبت نشده(فراموشی رمز) mobile
         case 404:
           throw UnaverificatedException(response: response);
 
-        //کد اعتبارسنجی منقضی
+        // message  کد اعتبارسنجی منقضی
       case 408:
         throw VerificationCodeExpiredException();
 
@@ -58,54 +57,76 @@ class CheckExceptions {
       ///wrong username or password, inactive userAccount, checking documents, wrong verificationCode
 
       case NotAllowedToEnterException:
-        return DataFailed(error: appException.response!.data["message"],
-            isNotLogin: true,isTokenExpired: true
-        );
+        final data = appException.response?.data;
+        final errorMessage = (data is Map && data.containsKey('message') && data['message'] != null)
+            ? data['message']
+            : 'خطایی رخ داده'; // پیام پیش‌فرض در صورت نبود کلید message
+
+        return DataFailed(error: errorMessage,isNotLogin: true,isTokenExpired: true);
 
 
       ///The user is not registered in the system
 
       case UnauthenticatedException:
-        return DataFailed(error: appException.response?.data["mobile"]);
+        final data = appException.response?.data;
+        final errorMessage = (data is Map && data.containsKey('message') && data['message'] != null)
+            ? data['message']
+            : 'خطایی رخ داده'; // پیام پیش‌فرض در صورت نبود کلید message
+
+        return DataFailed(error: errorMessage);
 
  case UnaverificatedException:
-        return DataFailed(error: appException.response?.data["mobile"]);
+   final data = appException.response?.data;
+   final errorMessage = (data is Map && data.containsKey('mobile') && data['mobile'] != null)
+       ? data['mobile']
+       : 'خطایی رخ داده'; // پیام پیش‌فرض در صورت نبود کلید message
+
+   return DataFailed(error: errorMessage);
 
       ///The verification code has expired
 
       case VerificationCodeExpiredException:
-        return DataFailed(error: appException.message);
+        final data = appException.response?.data;
+        final errorMessage = (data is Map && data.containsKey('message') && data['message'] != null)
+            ? data['message']
+            : 'خطایی رخ داده'; // پیام پیش‌فرض در صورت نبود کلید message
+
+        return DataFailed(error: errorMessage);
 
 
       ///Already registered
 
       case AlreadyRegisteredException:
-        return DataFailed(
-            error:
-            // password==true?
-            appException.response!.data["errors"].length==1? appException.response!.data["errors"][0]:
-                "${appException.response!.data["errors"][0]}\n${appException.response!.data["errors"][1]}"
-            // appException.response!.data["errors"]["mobile"][0]
-            // "خطایی رخ داده"
+        final data = appException.response?.data;
+        String errorMessage = 'خطایی رخ داده';
 
-        );
+        if (data is Map) {
+          final errors = data['errors'];
+
+          // ۱. بررسی وجود لیست خطاها و خالی نبودن آن
+          if (errors is List && errors.isNotEmpty) {
+            if (errors.length == 1) {
+              errorMessage = errors[0].toString();
+            } else {
+              errorMessage = '${errors[0]}\n${errors[1]}';
+            }
+          }
+          // ۲. اگر لیست errors نبود، کلید message بررسی می‌شود
+          else if (data['message'] != null) {
+            errorMessage = data['message'].toString();
+          }
+        }
+
+        return DataFailed(error: errorMessage);
 
       case WrongPreviousPasswordException:
-        return DataFailed(
-            error:
-            appException.response!.data["message"]
+        final data = appException.response?.data;
+        final errorMessage = (data is Map && data.containsKey('message') && data['message'] != null)
+            ? data['message']
+            : 'خطایی رخ داده'; // پیام پیش‌فرض در صورت نبود کلید message
 
-        );
+        return DataFailed(error: errorMessage);
 
-      case AlreadyRegisteredException:
-        return DataFailed(
-            error:
-            // password==true?
-            appException.response!.data["message"]
-          // appException.response!.data["errors"]["mobile"][0]
-          // "خطایی رخ داده"
-
-        );
 
       /// server error
       case ServerException:

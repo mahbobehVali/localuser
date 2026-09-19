@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/bottom_nav/wrapper_bloc.dart';
 import 'package:mahaliii/config/color_palette.dart';
 
 import 'bottom_nav_cubit.dart';
@@ -40,7 +41,7 @@ class BottomNavWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return BlocBuilder<BottomNavCubit, int>(
+    return BlocBuilder<WrapperBloc, WrapperState>(
       buildWhen: (previous, current) => previous!=current,
       builder: (context, state) {
 
@@ -63,16 +64,16 @@ class BottomNavWidget extends StatelessWidget {
 
                       children: [
                         SizedBox(
-                            child: Image.asset(state==index?bottomNavItems[index]["activeIcon"]:bottomNavItems[index]["icon"],
-                                color: state==index?ColorPalette.darkBlue:Colors.black)),
+                            child: Image.asset(state.nav==index?bottomNavItems[index]["activeIcon"]:bottomNavItems[index]["icon"],
+                                color: state.nav==index?ColorPalette.darkBlue:Colors.black)),
                         SizedBox(height: 6.h),
                         Text(bottomNavItems[index]["title"],
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                          color: state==index?ColorPalette.darkBlue:Colors.black,
+                          color: state.nav==index?ColorPalette.darkBlue:Colors.black,
                           fontWeight: FontWeight.w500
                         ),),
-                      if(state==index)  Container(
+                      if(state.nav==index)  Container(
                           margin: EdgeInsets.all(5),
                           height: 3.h,
                           color: ColorPalette.darkBlue,
@@ -80,7 +81,7 @@ class BottomNavWidget extends StatelessWidget {
                       ],
                     ),
                     onTap: () {
-                      BlocProvider.of<BottomNavCubit>(context).change(index);
+                      BlocProvider.of<WrapperBloc>(context).add(ChangeNav(index));
 
                       pageController.animateToPage(index,
                           duration: const Duration(microseconds: 500), curve: Curves.easeIn);

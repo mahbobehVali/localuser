@@ -457,7 +457,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   BarChartRodData(
                                                     toY: liveYValues[index],
                                                     color: ColorPalette.darkBlue,
-                                                    width: 12,
+                                                    width: 15.w,
                                                     borderRadius: BorderRadius.circular(2),
                                                   ),
                                                 ],
@@ -744,14 +744,14 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                     // چک کردن لیست اول
                                                     toY: index < currentYValues.length ? currentYValues[index].toDouble() : 0.0,
                                                     color: ColorPalette.orange,
-                                                    width: 12,
+                                                    width: 15.w,
                                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
                                                   ),
                                                   if(successState.previousWellWorkEntity!=null) BarChartRodData(
                                                     // چک کردن لیست دوم
                                                     toY: index < previousYValues.length ? previousYValues[index].toDouble() : 0.0,
                                                     color: ColorPalette.grey,
-                                                    width: 12,
+                                                    width: 15.w,
                                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
                                                   ),
                                                 ],

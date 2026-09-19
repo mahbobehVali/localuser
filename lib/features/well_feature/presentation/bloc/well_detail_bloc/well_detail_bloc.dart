@@ -222,8 +222,8 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
         // socketRepository.onAndOffTimeStream,
         socketRepository.onAndOffTimeStream,
         onData: (onOff) {
-          print("onOff == 1${onOff == 1}");
-          final isSwitched = onOff == 1;
+          print("onOff == 1${onOff["status"] == 1}");
+          final isSwitched = onOff["status"] == 1;
 
           // 🟢 اگر دیالوگ منتظر پاسخ است (در حالت Loading)، وضعیت Success فرستاده می‌شود
           if (state.onOffStatus is OnOffLoading) {
@@ -493,10 +493,10 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     );
 
   }
-  @override
-  Future<void> close() {
-    socketRepository.dispose(); // قطع سوکت دقیقا هنگام خروج از صفحه
-    return super.close();
-  }
+  // @override
+  // Future<void> close() {
+  //   socketRepository.dispose(); // قطع سوکت دقیقا هنگام خروج از صفحه
+  //   return super.close();
+  // }
 
 }

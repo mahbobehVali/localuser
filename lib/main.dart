@@ -10,6 +10,7 @@ import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'bottom_nav/bottom_nav_cubit.dart';
+import 'bottom_nav/wrapper_bloc.dart';
 import 'common/socket_repository.dart';
 import 'common/widgets/function_widgets.dart';
 import 'features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
@@ -70,7 +71,7 @@ class _MyAppState extends State<MyApp> {
 
           return MultiBlocProvider(
               providers: [
-                BlocProvider<BottomNavCubit>(create: (_) => BottomNavCubit()),
+                BlocProvider<WrapperBloc>(create: (_) => WrapperBloc(locator<SocketRepository>())),
                 // BlocProvider<WellDetailBloc>(create: (_) {
                 //    return WellDetailBloc(
                 //   locator<WellsRepository>(),

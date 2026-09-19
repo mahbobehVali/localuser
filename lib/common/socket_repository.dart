@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:mahaliii/common/params/create_time_params.dart';
 import 'package:mahaliii/common/utils/sharedpreference.dart';
+import 'package:mahaliii/features/well_feature/data/model/on_off_model.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 import 'package:socket_io_client/socket_io_client.dart' as i_o;
 
@@ -245,11 +246,13 @@ class SocketRepository {
     });
 
     _socket!.on("motor/status", (data) {
+      print("data${data}");
       print("pomplisten");
       if (data != null && !_onAndOffTimeController.isClosed) {
         // تبدیل به مدل و اضافه کردن به استریم آب
         try {
-          _onAndOffTimeController.add(data["status"]);
+          final model=OnOffModel.fromJson(data);
+          _onAndOffTimeController.add(model);
 
           print(' motor/status successfully added to stream');
         } catch (e) {

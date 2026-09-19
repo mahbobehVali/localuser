@@ -110,6 +110,9 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
         emit(state.copyWith(newWaterStatus: WaterError("اتصال به سرور برقرار نشد")));
         return;
       }
+      if (isConnected) {
+        print("connect");
+      }
       // socketRepository.requestWaterData(event.level,event.areaId);
       Future.microtask(() {
         socketRepository.requestWaterData(event.level, event.areaId);
@@ -135,10 +138,10 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
   }
 
   //  این بخش حیاتی برای "خروج از صفحه" است
-  @override
-  Future<void> close() {
-    socketRepository.dispose(); // قطع سوکت دقیقا هنگام خروج از صفحه
-    return super.close();
-  }
+  // @override
+  // Future<void> close() {
+  //   socketRepository.dispose(); // قطع سوکت دقیقا هنگام خروج از صفحه
+  //   return super.close();
+  // }
 
 }

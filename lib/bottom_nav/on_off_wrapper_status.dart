@@ -3,33 +3,33 @@ import 'package:equatable/equatable.dart';
 import 'package:mahaliii/features/well_feature/domain/entity/on_off_entity.dart';
 
 
-abstract class OnOffStatus extends Equatable {
-  const OnOffStatus();
+abstract class OnOffWrapperStatus extends Equatable {
+  const OnOffWrapperStatus();
 }
 
-class OnOffLoading extends OnOffStatus {
+class OnOffWrapperLoading extends OnOffWrapperStatus {
   @override
   List<Object> get props => [];
 }
 
-class OnOffInitial extends OnOffStatus {
+class OnOffWrapperInitial extends OnOffWrapperStatus {
   @override
   List<Object> get props => [];
 }
 
-class OnOffError extends OnOffStatus {
+class OnOffWrapperError extends OnOffWrapperStatus {
   final String error;
 
-  const OnOffError(this.error);
+  const OnOffWrapperError(this.error);
 
   @override
   List<Object> get props => [error];
 }
 
-class OnOffSuccess extends OnOffStatus {
+class OnOffWrapperSuccess extends OnOffWrapperStatus {
   final OnOffEntity offEntity;
 
- const OnOffSuccess(this.offEntity);
+ const OnOffWrapperSuccess(this.offEntity);
 
 
   @override
