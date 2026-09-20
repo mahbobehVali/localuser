@@ -71,32 +71,52 @@ class BottomSheets {
     String permissionName;
 
     if (source == ImageSource.camera) {
-      status = await Permission.camera.request();
       permissionName = 'دوربین';
+      // ۱. ابتدا بررسی وضعیت فعلی دسترسی
+      status = await Permission.camera.status;
+
+      if (!status.isGranted && !status.isLimited) {
+        // ۲. اگر دسترسی ندارد، درخواست بده
+        status = await Permission.camera.request();
+      }
     } else {
       permissionName = 'گالری';
 
-      // مدیریت درست دسترسی گالری بر اساس نسخه اندروید
       if (Platform.isAndroid) {
-        // در اندروید ۱۳ به بالا photo/media استفاده می‌شود
-        status = await Permission.photos.request();
+        // برای اندروید: بررسی براساس نیاز سیستم‌عامل
+        // در اندروید ۱۳+ ابتدا photos چک می‌شود، اگر پشتیبانی نشد به سراغ storage می‌رود
+        Permission targetPermission = Permission.photos;
 
-        // اگر photos پشتیبانی نشد (اندروید ۱۲ و پایین‌تر)، storage را چک کن
+        status = await targetPermission.status;
+
+        // اگر Photos محدود یا ناامیدکننده بود، Storage را تست کن (برای اندروید ۱۲ به پایین)
         if (status.isDenied) {
-          status = await Permission.storage.request();
+          PermissionStatus storageStatus = await Permission.storage.status;
+          if (storageStatus.isGranted) {
+            return true;
+          }
+
+          // درخواست برای photos؛ اگر منسوخ بود storage را درخواست بده
+          status = await Permission.photos.request();
+          if (status.isDenied) {
+            status = await Permission.storage.request();
+          }
         }
       } else {
         // برای iOS
-        status = await Permission.photos.request();
+        status = await Permission.photos.status;
+        if (!status.isGranted && !status.isLimited) {
+          status = await Permission.photos.request();
+        }
       }
     }
 
-    // ۱. اگر دسترسی داده شده باشد
+    // ۱. اگر دسترسی داده شد (کامل یا محدود)
     if (status.isGranted || status.isLimited) {
       return true;
     }
 
-    // ۲. اگر کاربر برای همیشه رد کرده باشد (Permanently Denied)
+    // ۲. اگر کاربر دسترسی را برای همیشه رد کرده است
     if (status.isPermanentlyDenied) {
       if (context.mounted) {
         await _showSettingsPrompt(context, permissionName);
@@ -104,14 +124,10 @@ class BottomSheets {
       return false;
     }
 
-    // ۳. اگر دفعه اول/دوم رد کرده باشد (Denied)
-    if (status.isDenied) {
-      // می‌توانید مجدداً درخواست دهید یا پیغام مناسب دهید
-      return false;
-    }
-
+    // ۳. اگر رد شد (Denied)
     return false;
   }
+
   // Future<void> settingNewPlanBottomSheet(
   //     BuildContext context,
   //     PlanBloc planBloc,
@@ -358,44 +374,37 @@ class BottomSheets {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                //  دکمه دوربین
+                // دکمه دوربین
                 GlobalElevatedButton(
                   widget: const Text("دوربین", style: TextStyle(color: Colors.black)),
                   onTap: () async {
-                    final cameraGranted = await _checkAndRequestPermission(context, ImageSource.camera);
+                    // اول BottomSheet را ببندید تا Context مشکلی پیدا نکند
+                    Navigator.of(ctx).pop();
 
-                    if (context.mounted) {
-                      if (cameraGranted) {
-                        supportBloc.add(AddSupportImageClicked());
-                        Navigator.of(context).pop();
-                      } else {
-                        // ShowSnacksBars.snack(
-                        //   context,
-                        //   "برای گرفتن عکس، به دسترسی دوربین نیاز است.",
-                        //   duration: 3,
-                        // );
-                      }
+                    final cameraGranted = await _checkAndRequestPermission(context, ImageSource.camera);
+                    if (cameraGranted) {
+                      supportBloc.add(AddSupportImageClicked());
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("برای گرفتن عکس، به دسترسی دوربین نیاز است.")),
+                      );
                     }
                   },
                 ),
 
-                //  دکمه گالری
+                // دکمه گالری
                 GlobalElevatedButton(
                   widget: const Text("گالری", style: TextStyle(color: Colors.black)),
                   onTap: () async {
-                    final galleryGranted = await _checkAndRequestPermission(context, ImageSource.gallery);
+                    Navigator.of(ctx).pop();
 
-                    if (context.mounted) {
-                      if (galleryGranted) {
-                        supportBloc.add(AddSupportFileClicked());
-                        Navigator.of(context).pop();
-                      } else {
-                        // ShowSnacksBars.snack(
-                        //   context,
-                        //   "برای انتخاب فایل، به دسترسی گالری نیاز است.",
-                        //   duration: 3,
-                        // );
-                      }
+                    final galleryGranted = await _checkAndRequestPermission(context, ImageSource.gallery);
+                    if (galleryGranted) {
+                      supportBloc.add(AddSupportFileClicked());
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("برای انتخاب فایل، به دسترسی گالری نیاز است.")),
+                      );
                     }
                   },
                 ),

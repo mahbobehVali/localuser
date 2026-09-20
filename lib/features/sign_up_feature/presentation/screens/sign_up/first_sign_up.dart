@@ -24,11 +24,11 @@ class FirstSignUp extends StatefulWidget {
 class _FirstSignUpState extends State<FirstSignUp> {
   GlobalKey<FormState> signUpFormKey = GlobalKey();
 
-  TextEditingController nameController = TextEditingController(text: "محبوبه ولی منفرد");
+  TextEditingController nameController = TextEditingController();
 
-  TextEditingController nationalCodeController = TextEditingController(text: "0371326915" );
+  TextEditingController nationalCodeController = TextEditingController();
 
-  TextEditingController mobileController = TextEditingController(text: "09357912300" );
+  TextEditingController mobileController = TextEditingController();
 
   @override
   void dispose() {

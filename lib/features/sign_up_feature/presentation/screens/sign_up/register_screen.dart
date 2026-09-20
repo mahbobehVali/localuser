@@ -30,7 +30,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   GlobalKey<FormState> signUpFormKey = GlobalKey();
 
-  TextEditingController passController = TextEditingController(text: "Aasdfsdffsdfdf#3");
+  TextEditingController passController = TextEditingController();
   TextEditingController codeController = TextEditingController();
 
   @override
