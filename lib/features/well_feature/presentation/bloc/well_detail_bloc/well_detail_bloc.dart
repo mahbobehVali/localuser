@@ -182,8 +182,12 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       await emit.forEach<dynamic>(
         socketRepository.onAndOffTimeStream.timeoutFirst(const Duration(seconds: 10)),
         onData: (onOff) {
-          print("onOff == 1${onOff == 1}");
-          final isSwitched = onOff == 1;
+          if (onOff.deviceId != event.deviceId) {
+            // اگر مربوط به چاه دیگری است، هیچ تغییری در استیت این صفحه ایجاد نکن
+            return state;
+          }
+          print("onOff ==== 1${onOff == 1}");
+          final isSwitched = onOff.status == 1;
 
           // 🟢 اگر دیالوگ منتظر پاسخ است (در حالت Loading)، وضعیت Success فرستاده می‌شود
           if (state.onOffStatus is OnOffLoading) {
@@ -222,8 +226,13 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
         // socketRepository.onAndOffTimeStream,
         socketRepository.onAndOffTimeStream,
         onData: (onOff) {
-          print("onOff == 1${onOff["status"] == 1}");
-          final isSwitched = onOff["status"] == 1;
+          if (onOff.deviceId != event.deviceId) {
+            // اگر مربوط به چاه دیگری است، هیچ تغییری در استیت این صفحه ایجاد نکن
+            return state;
+          }
+
+          print("onOff == 1${onOff.status == 1}");
+          final isSwitched = onOff.status == 1;
 
           // 🟢 اگر دیالوگ منتظر پاسخ است (در حالت Loading)، وضعیت Success فرستاده می‌شود
           if (state.onOffStatus is OnOffLoading) {

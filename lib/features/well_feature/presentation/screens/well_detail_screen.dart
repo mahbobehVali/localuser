@@ -15,6 +15,7 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/screens/widgets/program_widget.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
+import '../../../../bottom_nav/wrapper_bloc.dart';
 import '../../../../common/utils/constants.dart';
 import '../../../../common/widgets/global_snackbar.dart';
 import '../../../../common/widgets/icon_container.dart';
@@ -144,7 +145,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       ..add(GetProgram(widget.wellsDataEntity.id!))
       ..add(FirstSwitch(widget.wellsDataEntity.statusWell == 1))
       ..add(ChangeUserLocalId(widget.wellsDataEntity.userLocalId))
-      ..add(AutoSwitchChange());
+      ..add(AutoSwitchChange(widget.wellsDataEntity.deviceId!));
 
     _controller = AnimationController(
       vsync: this,
@@ -1503,12 +1504,29 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                           BlocListener<WellDetailBloc, WellDetailState>(
                                             listenWhen: (previous, current) => previous.isSwitched != current.isSwitched,
                                             listener: (context, state) {
-                                              // 🟢 هر زمان پمپ از جای دیگر روشن/خاموش شود این بخش اجرا می‌شود (بدون بستن صفحه!)
-                                              GlobalSnackBar.show(
-                                                context,
-                                                message: state.isSwitched == true ? "پمپ روشن شد" : "پمپ خاموش شد",
-                                                duration: 2,
-                                              );
+                                              if(state.onOffStatus is OnOffSuccess){
+                                                final isSuccess = state.onOffStatus as OnOffSuccess;
+
+                                                // 🟢 دسترسی مستقیم به استیت WrapperBloc بدون نیاز به ساخت BlocListener جدید
+                                                final wrapperState = context.read<WrapperBloc>().state;
+
+                                                // 🟢 جستجو در لیست چاه‌های WrapperBloc
+                                                final bool exists = wrapperState.wells.any(
+                                                      (well) => well.data?.deviceId == isSuccess.offEntity.deviceId,
+                                                );
+
+                                                print("🟢 Socket Switch State Changed: ${state.isSwitched}");
+                                                print("Exist in wells: $exists");
+
+                                                if (exists) {
+                                                  GlobalSnackBar.show(
+                                                    context,
+                                                    message: state.isSwitched == true ? "${isSuccess.offEntity.name} روشن شد" : "${isSuccess.offEntity.name} خاموش شد",
+                                                    duration: 2,
+                                                  );
+                                                }
+                                              }
+
                                             },
 
                                             child: CupertinoSwitch(

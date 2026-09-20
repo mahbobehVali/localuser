@@ -64,14 +64,21 @@ class _WrapperState extends State<Wrapper> {
           return isSwitchChanged && isSuccess;
         },
         listener: (context, state) {
+          final isSuccess = state.onOffWrapperStatus as OnOffWrapperSuccess;
           print("🟢 Socket Switch State Changed: ${state.isSwitched}");
-
-          GlobalSnackBar.show(
-            context,
-            message: state.isSwitched == true ? "پمپ روشن شد" : "پمپ خاموش شد",
-            duration: 2,
-
+          final bool exists = state.wells.any(
+                (well) => well.data?.deviceId == isSuccess.offEntity.deviceId,
           );
+
+          if (exists)
+            GlobalSnackBar.show(
+              context,
+              message: state.isSwitched == true ? "${isSuccess.offEntity.name} روشن شد" : "${isSuccess.offEntity.name} خاموش شد",
+              duration: 2,
+
+            );
+
+
         },
         child: PageView(
           physics: const NeverScrollableScrollPhysics(),

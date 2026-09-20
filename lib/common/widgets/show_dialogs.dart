@@ -724,7 +724,7 @@ class ShowDialogs {
             child: AlertDialog(
               content: SizedBox(
                 height: 30.h,
-                child: const Center(child: Text("این برنامه توسط شخص دیگری ثبت شده است.")),
+                child: const Center(child: Text("شما مجاز به حذف برنامه مدیر نیستید.")),
               ),
               actionsAlignment: MainAxisAlignment.center,
               actions: [
@@ -832,7 +832,9 @@ class ShowDialogs {
                                     userLocalID: wellsDataEntity.userLocalId,
                                     status: value ? 1 : 0,
                                   ),
+                                  wellsDataEntity.deviceId!
                                 ),
+
                               );
                             },
                             widget: isLoading

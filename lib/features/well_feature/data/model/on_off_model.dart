@@ -7,21 +7,21 @@ class OnOffModel extends OnOffEntity {
   OnOffModel({
      int? status,
      int? id,
-     int? well_id,
-     int? devic_id,
+     int? wellId,
+     int? deviceId,
      int? area_id,
      String? name,
 
 
-  }) : super(status, id,well_id,devic_id,area_id,name);
+  }) : super(status, id,wellId,deviceId,area_id,name);
 
   factory OnOffModel.fromJson(dynamic json) {
 
     return OnOffModel(
       status: json["status"],
       id: json["id"],
-      well_id: json["well_id"],
-      devic_id: json["devic_id"],
+      wellId: json["well_id"],
+      deviceId: json["device_id"],
       area_id: json["area_id"],
       name: json["name"],
 

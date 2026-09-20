@@ -24,3 +24,23 @@ class ChangeNav extends WrapperEvent {
   // TODO: implement props
   List<Object?> get props => [value];
 }
+
+class SetInitialWellsEvent extends WrapperEvent {
+  final List<WellsEntity> wellsList; // فرض بر اینکه مدل شما WellsEntity است
+  SetInitialWellsEvent(this.wellsList);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [wellsList];
+}
+
+// رویداد جدید: تغییر وضعیت یک چاه
+class UpdateWellStatusEvent extends WrapperEvent {
+  final int wellId;
+  final int status; // 0: خاموش, 1: روشن, غیره
+  UpdateWellStatusEvent({required this.wellId, required this.status});
+
+  @override
+  // TODO: implement props
+  List<Object?> get props =>[wellId,status];
+}

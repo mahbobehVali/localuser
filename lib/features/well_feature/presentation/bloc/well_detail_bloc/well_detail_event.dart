@@ -29,18 +29,21 @@ class StatusEvent extends WellDetailEvent {
 class SwitchClicked extends WellDetailEvent {
   final bool isSwitch;
   final CreateTimeParams createTimeParams;
+  final int deviceId;
 
-  const SwitchClicked(this.isSwitch,this.createTimeParams);
+
+  const SwitchClicked(this.isSwitch,this.createTimeParams,this.deviceId);
 
   @override
   // TODO: implement props
-  List<Object?> get props => [isSwitch,createTimeParams];
+  List<Object?> get props => [isSwitch,createTimeParams,deviceId];
 }
 
 class AutoSwitchChange extends WellDetailEvent {
+  final int deviceId;
 
 
-  const AutoSwitchChange();
+  const AutoSwitchChange(this.deviceId);
 
   @override
   // TODO: implement props

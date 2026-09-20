@@ -2,6 +2,7 @@ import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/bottom_nav/wrapper_bloc.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/well_detail_screen.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
@@ -14,9 +15,7 @@ import '../bloc/status_summary_bloc/status_summary_bloc.dart';
 import '../bloc/status_summary_bloc/status_summary_status.dart';
 
 class ManagementWellsWidget extends StatefulWidget {
-  const ManagementWellsWidget({
-    super.key,
-  });
+  const ManagementWellsWidget({super.key});
 
   @override
   State<ManagementWellsWidget> createState() => _ManagementWellsWidgetState();
@@ -25,11 +24,22 @@ class ManagementWellsWidget extends StatefulWidget {
 class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
 
   @override
+  void initState() {
+    super.initState();
+    // 🟢 اگر استیت از قبل موفق بوده، مستقیم همان اول به WrapperBloc پاس بدهید
+    final statusSummaryBloc = BlocProvider.of<StatusSummaryBloc>(context);
+    if (statusSummaryBloc.state.statusSummaryStatus is StatusSummarySuccess) {
+      final successState = statusSummaryBloc.state.statusSummaryStatus as StatusSummarySuccess;
+      BlocProvider.of<WrapperBloc>(context).add(SetInitialWellsEvent(successState.wellsEntity));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: Colors.white
+        borderRadius: BorderRadius.circular(5),
+        color: Colors.white,
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -38,147 +48,160 @@ class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Text("لیست چاه‌های تحت مدیریت",style: TextStyleP.f14Medium),
+              child: Text("لیست چاه‌های تحت مدیریت", style: TextStyleP.f14Medium),
             ),
             SizedBox(height: 10.h),
-            BlocConsumer<StatusSummaryBloc, StatusSummaryState>(
+
+            // ۱. لیسنر برای مواقعی که دیتا بعد از ساخته شدن این صفحه از API می‌رسد
+            BlocListener<StatusSummaryBloc, StatusSummaryState>(
               listener: (context, state) {
-                if(state.statusSummaryStatus is StatusSummaryExit){
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
-                    return LoginScreen();
-                  },));
+                if (state.statusSummaryStatus is StatusSummaryExit) {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                }
+
+                if (state.statusSummaryStatus is StatusSummarySuccess) {
+                  StatusSummarySuccess statusSummarySuccess =
+                  state.statusSummaryStatus as StatusSummarySuccess;
+
+                  BlocProvider.of<WrapperBloc>(context)
+                      .add(SetInitialWellsEvent(statusSummarySuccess.wellsEntity));
                 }
               },
-              buildWhen: (previous, current) =>
-              previous.statusSummaryStatus!=current.statusSummaryStatus,
-              listenWhen: (previous, current) =>
-              previous.statusSummaryStatus!=current.statusSummaryStatus,
-              builder: (context, state) {
-                if(state.statusSummaryStatus is StatusSummarySuccess){
-                  StatusSummarySuccess statusSummarySuccess=state.statusSummaryStatus as StatusSummarySuccess;
+              child: BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
+                builder: (context, statusState) {
+                  // ۲. اگر API کلاً به خطا خورده بود
+                  if (statusState.statusSummaryStatus is StatusSummaryError) {
+                    final errorState = statusState.statusSummaryStatus as StatusSummaryError;
+                    return Center(child: Text(errorState.error));
+                  }
 
-                  return ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    padding: EdgeInsets.zero, // این خط فاصله اضافه را حذف می‌کند
+                  // ۳. اگر API هنوز در حال لودینگ است
+                  if (statusState.statusSummaryStatus is StatusSummaryLoading) {
+                    return ShimmerClass.shimmerListviewVertical(height: 70, count: 4);
+                  }
 
-                    itemCount: statusSummarySuccess.wellsEntity.length,
-                    itemBuilder: (context, index) {
-                      final wellData = statusSummarySuccess.wellsEntity[index].data;
-                      final isWellOn = wellData?.statusWell == 1;
-                      final alertCount = wellData?.alert ?? 0;
+                  // ۴. ساخت لیست از WrapperBloc (که چاه‌ها را با سوکت به‌روز نگه می‌دارد)
+                  if(statusState.statusSummaryStatus is StatusSummarySuccess){
+                    print("yesss");
+                    return BlocBuilder<WrapperBloc, WrapperState>(
+                      builder: (context, wrapperState) {
+                        if (wrapperState.wells.isEmpty) {
+                          print("emty");
+                          return ShimmerClass.shimmerListviewVertical(height: 70, count: 4);
+                        }
 
-                      return GestureDetector(
-                        onTap: () async {
+                        final wellsList = wrapperState.wells;
 
+                        return ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          itemCount: wellsList.length,
+                          itemBuilder: (indexContext, index) {
+                            final wellData = wellsList[index].data;
+                            final alertCount = wellData?.alert ?? 0;
 
-                            // منتظر ماندن برای دریافت نتیجه خروج از صفحه دوم
-                            final updatedSwitchStatus = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => WellDetailScreen(
-                                  wellsDataEntity: statusSummarySuccess.wellsEntity[index].data!,
-                                ),
-                              ),
-                            );
-
-                            // اگر کاربر تغییری داده بود و مقداری برگشت داده شد
-                            if (updatedSwitchStatus != null && updatedSwitchStatus is bool) {
-                              setState(() {
-                                // آپدیت کردن فیلد statusWell در همان آیتم خاص بدون نیاز به رفرش کل لیست
-                                statusSummarySuccess.wellsEntity[index].data!.statusWell = updatedSwitchStatus ? 1 : 0;
-                              });
-                            }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: ColorPalette.inverseGrey),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  IconContainer(
-                                    icon: Icon(Icons.location_on_outlined),
-                                    color: ColorPalette.iconContainerColor,
-                                    width: 24,
-                                    height: 24,
+                            return GestureDetector(
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => WellDetailScreen(
+                                      wellsDataEntity: wellData!,
+                                    ),
                                   ),
-                                  SizedBox(width: 8.w),
-                                  Expanded(
-                                    child: Column(
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                margin: const EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: ColorPalette.inverseGrey),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        SizedBox(height:4.h),
-                                        Text(statusSummarySuccess.wellsEntity[index].data!.wellName!),
-
-                                        SizedBox(height: 8.h),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text.rich(
-                                              TextSpan(
-                                                text: 'وضعیت: ',
-                                                style: const TextStyle(color: Colors.black),
+                                        IconContainer(
+                                          icon: const Icon(Icons.location_on_outlined),
+                                          color: ColorPalette.iconContainerColor,
+                                          width: 24,
+                                          height: 24,
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(height: 4.h),
+                                              Text(wellData?.wellName ?? ''),
+                                              SizedBox(height: 8.h),
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
-                                                  TextSpan(
-                                                    text: isWellOn ? 'روشن' : 'خاموش',
-                                                    style: TextStyle(
-                                                      color: isWellOn ? ColorPalette.darkGreen : ColorPalette.darkRed,
+                                                  Text.rich(
+                                                    TextSpan(
+                                                      text: 'وضعیت: ',
+                                                      style: const TextStyle(color: Colors.black),
+                                                      children: [
+                                                        TextSpan(
+                                                          text: wellData?.statusWell == 0
+                                                              ? 'خاموش'
+                                                              : wellData?.statusWell == 1
+                                                              ? 'روشن'
+                                                              : "غیر فعال",
+                                                          style: TextStyle(
+                                                            color: wellData?.statusWell == 0
+                                                                ? ColorPalette.darkRed
+                                                                : wellData?.statusWell == 1
+                                                                ? ColorPalette.darkGreen
+                                                                : ColorPalette.orange,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
+                                                  Text(
+                                                    alertCount == 0
+                                                        ? 'هشدار فعال: ندارد'
+                                                        : 'هشدار فعال: ${alertCount.toString().toPersianDigit()} عدد',
+                                                  ),
                                                 ],
-                                              ),
-                                            ),
-                                            Text(
-                                              alertCount == 0 ? 'هشدار فعال: ندارد' : 'هشدار فعال: ${alertCount.toString().toPersianDigit()} عدد',
-                                            ),
-                                          ],
+                                              )
+                                            ],
+                                          ),
                                         )
                                       ],
                                     ),
-                                  )
-
-                                ],
-                              ),
-                              Padding(
-                                padding:  EdgeInsets.symmetric(vertical: 8.h),
-                                child: DottedLine(
-                                  dashColor: ColorPalette.inverseGrey,
-
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(vertical: 8.h),
+                                      child: DottedLine(
+                                        dashColor: ColorPalette.inverseGrey,
+                                      ),
+                                    ),
+                                    const Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text("مشاهده چاه"),
+                                        Icon(Icons.navigate_next)
+                                      ],
+                                    )
+                                  ],
                                 ),
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text("مشاهده چاه"),
-                                  Icon(Icons.navigate_next)
-                                ],
-                              )
-                            ],
-                          ),
-
-                        ),
-                      );
-                    },);
-                }
-                else if(state.statusSummaryStatus is StatusSummaryLoading){
-                  return ShimmerClass.shimmerListviewVertical(height: 70,count: 4);
-
-                }
-                else if(state.statusSummaryStatus is StatusSummaryError){
-                  StatusSummaryError statusSummaryError=state.statusSummaryStatus as StatusSummaryError;
-                  return Center(child: Text(statusSummaryError.error));
-                }
-                else{
-                  return Center(child: SizedBox());
-                }
-
-              },
+                            );
+                          },
+                        );
+                      },
+                    );
+                  }
+                  return SizedBox();
+                },
+              ),
             ),
           ],
         ),

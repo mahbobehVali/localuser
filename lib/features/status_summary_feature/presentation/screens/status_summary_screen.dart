@@ -51,7 +51,8 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
 
       // ۲. مقداردهی اولیه بلوک در initState
       _statusSummaryBloc..add(WellsListStart())..add(SocketEvent("area", int.parse(info[6])))
-        ..add(ReportFlowMeter(FlowMeterParams(type: 1, ids: int.parse(info[6]))))..add(LastActivityStart(FlowMeterParams(type: 0, page: 1)));
+        ..add(ReportFlowMeter(FlowMeterParams(type: 1, ids: int.parse(info[6]))))..add(LastActivityStart(FlowMeterParams(type: 0, page: 1)))
+      ;
     }
   }
 
