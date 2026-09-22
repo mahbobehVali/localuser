@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart' show NumberFormat;
 import 'package:mahaliii/features/alert_feature/domain/entity/alert_type_entity.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
@@ -76,6 +77,40 @@ class Constants {
   //   final emailRegExp = RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$");
   //   return emailRegExp.hasMatch(email);
   // }
+
+  String formatPrice(dynamic input, {int? decimalDigits}) {
+    if (input == null) return '۰';
+
+    // ۱. تبدیل ورودی به عدد
+    num? number;
+    if (input is num) {
+      number = input;
+    } else if (input is String) {
+      // تبدیل اعداد فارسی/عربی احتمالی به انگلیسی قبل از پارس
+      String cleanString = input.toEnglishDigit().replaceAll(',', '').trim();
+      number = num.tryParse(cleanString);
+    }
+
+    // اگر ورودی معتبر نبود
+    if (number == null) return '۰';
+
+    // ۲. فرمت‌بندی سه رقم سه رقم با حفظ اعشار
+    final formatter = NumberFormat.decimalPattern('en_US');
+
+    if (decimalDigits != null) {
+      formatter.minimumFractionDigits = decimalDigits;
+      formatter.maximumFractionDigits = decimalDigits;
+    }else{
+      formatter.minimumFractionDigits = 2;
+      formatter.maximumFractionDigits = 2;
+    }
+
+    String formatted = formatter.format(number);
+
+    // ۳. تبدیل به ارقام فارسی و اعمال کاراکترهای LTR برای جلوگیری از به‌هم‌ریختگی
+    return "\u2066${formatted.toPersianDigit()}\u2069";
+  }
+
 
   String getPersianWeekDay(String date) {
     try {
@@ -637,9 +672,10 @@ class LastActivitySlot {
 class VolumeSlot {
   final String? name;
   final String? status;
+  final String? value;
   final String? amount;
   final String? capacity;
   final String? disCapacity;
 
-  VolumeSlot({this.name, this.status, this.amount, this.capacity,this.disCapacity});
+  VolumeSlot({this.name, this.status,this.value, this.amount, this.capacity,this.disCapacity});
 }

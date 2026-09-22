@@ -19,6 +19,10 @@ class SupportAnswersEmpty extends SupportAnswersStatus {
   @override
   List<Object> get props => [];
 }
+class SupportAnswersExit extends SupportAnswersStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class SupportAnswersError extends SupportAnswersStatus {
   final String error;

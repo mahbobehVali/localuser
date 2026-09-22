@@ -44,7 +44,8 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
           for (int i = 0; i < yValues.length; i++) {
             final val = yValues[i];
             String name=xLabels[i].toString().toPersianDigit();
-            final amount = val.toString();
+            dynamic value = val.toString();
+            dynamic amount = val.toString();
 
             String statusMessage = "نرمال";
             String overCapacity = "۰.۰";
@@ -68,17 +69,21 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
               statusMessage = "قطع";
               disCapacity = (val - disconnectCap).toString();
               overCapacity = (disconnectCap - cap).toString(); // اگر بحرانی است، یعنی از حد مجاز هم رد شده
+              amount=cap.toString();
             } else if (val > cap) {
+
               statusMessage = "هشدار";
               overCapacity = (val - cap).toString();
+              amount=cap.toString();
             }
 
             flatList.add(VolumeSlot(
               name: name,
-              amount: amount,
+              value: value,
               status: statusMessage,
               capacity: overCapacity,
               disCapacity: disCapacity,
+              amount: amount,
             ));
 
           }
@@ -265,7 +270,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                             ),
                                             // ۲. مقدار عدد (کاملاً در سمت چپ با ایزوله‌سازی LTR)
                                             TextSpan(
-                                              text: "\u2066${rod.toY.toString().toPersianDigit()}\u2069",
+                                              text: "\u2066${Constants().formatPrice(item.amount)}\u2069",
                                               style: const TextStyle(
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.bold,
@@ -281,6 +286,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                             // با گذاشتن کاراکتر جهت‌دار راست‌به‌راست (RLI) دور برچسب
 
                                             const TextSpan(
+
                                               text: "\u202bحجم مصرف:\u202c\n",
                                               style: TextStyle(
                                                 color: Colors.black,
@@ -290,7 +296,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                             ),
 
                                             TextSpan(
-                                              text: "\u2066${double.tryParse(item.capacity ?? '')?.toStringAsFixed(3).toPersianDigit() ?? "۰.۰"}\u2069",
+                                              text: "\u2066${Constants().formatPrice(item.capacity)}\u2069",
                                               style: const TextStyle(
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.bold,
@@ -317,7 +323,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                             ),
 
                                             TextSpan(
-                                              text: "\u2066${double.tryParse(item.disCapacity ?? '')?.toStringAsFixed(3).toPersianDigit() ?? "۰.۰"}\u2069",
+                                              text: "\u2066${Constants().formatPrice(item.disCapacity)}\u2069",
                                               style: const TextStyle(
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.bold,
@@ -422,7 +428,7 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                       // دسترسی آسان به دیتای آماده از flatList
                       final item = flatList[index - 1];
                       double? parsedValue = double.tryParse(item.capacity ?? '');
-                      double? parsedAmountValue = double.tryParse(item.amount ?? '');
+                      double? parsedAmountValue = double.tryParse(item.value ?? '');
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                         decoration: BoxDecoration(

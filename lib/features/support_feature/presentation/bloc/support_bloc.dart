@@ -94,7 +94,12 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
 
       }
       if (dataState is DataFailed) {
-        emit(state.copyWith(newSupportAnswersStatus: SupportAnswersError(dataState.error!)));
+        if (dataState.isTokenExpired) {
+          // locator<SharedPrefOperator>().logout(); // ۱. پاک کردن توکن
+          emit(state.copyWith(newSupportAnswersStatus: SupportAnswersExit()));
+        }else {
+          emit(state.copyWith(newSupportAnswersStatus: SupportAnswersError(dataState.error!)));
+        }
 
       }    });
 

@@ -25,6 +25,7 @@ import '../../../../common/widgets/bottom_sheets.dart';
 import '../../../../common/widgets/global_snackbar.dart';
 import '../../../../common/widgets/image_converter.dart';
 import '../../../../locator.dart';
+import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../domain/usecase/send_answer_usecase.dart';
 import '../../domain/usecase/support_close_usecase.dart';
 
@@ -83,7 +84,18 @@ class SupportAnswerScreen extends StatelessWidget {
                child: Container(
                  color: Colors.white,
                  padding: EdgeInsets.all(20.sp),
-                 child: BlocBuilder<SupportBloc,SupportState>(builder: (context, state) {
+                 child: BlocConsumer<SupportBloc,SupportState>(
+                   listenWhen: (previous, current) => previous.supportAnswersStatus!=current.supportAnswersStatus,
+                   listener: (context, state) {
+                     if (state.supportAnswersStatus is SupportAnswersExit) {
+                       Navigator.of(context).pushReplacement(
+                         MaterialPageRoute(builder: (context) => LoginScreen()),
+                       );
+                     }
+                   },
+                   builder: (context, state) {
+
+
                    if(state.supportAnswersStatus is SupportAnswersLoading){
                      return ShimmerClass.shimmerListviewVerticalAbdRow(height: 40);
                    } if(state.supportAnswersStatus is SupportAnswersError){
