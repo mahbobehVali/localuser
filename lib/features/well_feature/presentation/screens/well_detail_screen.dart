@@ -1503,6 +1503,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                           ),
                                           BlocListener<WellDetailBloc, WellDetailState>(
                                             listenWhen: (previous, current) => previous.isSwitched != current.isSwitched,
+                                            // buildWhen: (previous, current) => previous.isSwitched != current.isSwitched,
                                             listener: (context, state) {
                                               if(state.onOffStatus is OnOffSuccess){
                                                 final isSuccess = state.onOffStatus as OnOffSuccess;

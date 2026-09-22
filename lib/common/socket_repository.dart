@@ -97,8 +97,10 @@ class SocketRepository {
         i_o.OptionBuilder()
             .setTransports(['websocket'])
             .enableWithCredentials()
+            .setExtraHeaders({'Authorization': 'Bearer $token'})
             // .setQuery({'token': token})
             .setAuth({'token': token})
+            .setQuery({'token': token})
             .enableAutoConnect()
             .enableReconnection()
             .build()
@@ -108,22 +110,30 @@ class SocketRepository {
     _socket!.connect();
     _socket!.on('error', (data) => print('❌ Socket General Error: $data'));
     _socket!.on('connect_timeout', (data) => print('⏰ Connect Timeout: $data'));
-
+    _socket!.onConnectError((data) => print('Connect Error: $data'));
+    _socket!.onError((data) => print('Socket Error: $data'));
+    _socket!.onDisconnect((data) => print('Socket Disconnected reason: $data'));
     setupGlobalListeners();
 
     _socket!.onConnect((_) async {
       print('Socket Connected globally!');
-      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
-        _connectCompleter!.complete(true);
+      try {
+        if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
+          _connectCompleter!.complete(true);
+        }
+        if (_managerPin != null) {
+          print("joinroom manager: $_managerPin");
+          _socket!.emit("join/room", {'room': _managerPin});
+        }
+        if (_currentWellPin != null) {
+          print("joinroom well: $_currentWellPin");
+          _socket!.emit("join/room", {'room': _currentWellPin});
+        }
+      } catch (e) {
+        print("Error inside onConnect: $e");
+      } finally {
+        isConnecting = false;
       }
-      if (_managerPin != null) {
-        print("joinroom");
-        _socket!.emit("join/room", {'room': _managerPin});
-      }
-      if (_currentWellPin != null) {
-        _socket!.emit("join/room", {'room': _currentWellPin});
-      }
-      isConnecting = false;
     });
 
     _socket!.onDisconnect((data) {
@@ -412,7 +422,7 @@ class SocketRepository {
     _socket?.off("motor/status");
     _socket?.off("fingerprint/request_response");
     _socket?.off("fingerprint/status");
-    _socket?.disconnect();
+    // _socket?.disconnect();
     // _socket?.dispose();
 
     if (!_waterController.isClosed) _waterController.close();
