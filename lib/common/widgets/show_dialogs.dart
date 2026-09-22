@@ -373,13 +373,14 @@ class ShowDialogs {
                                 ScaffoldMessenger.of(context).clearSnackBars();
 
                                 // نمایش اسنک‌بار سبز موفقیت
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(createTimeSuccess.status==1?  "برنامه با موفقیت ثبت شد":"پاسخی از سمت دستگاه دریافت نشد"),
-                                    backgroundColor: Colors.green,
-                                    duration: const Duration(seconds: 3),
-                                  ),
-                                );
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //   SnackBar(
+                                //     content: Text(createTimeSuccess.status==1?  "برنامه با موفقیت ثبت شد":"پاسخی از سمت دستگاه دریافت نشد"),
+                                //     backgroundColor: Colors.green,
+                                //     duration: const Duration(seconds: 3),
+                                //   ),
+                                // );
+                                GlobalSnackBar.show(context, message: createTimeSuccess.status==1?  "برنامه با موفقیت ثبت شد":"پاسخی از سمت دستگاه دریافت نشد");
 
                                 // بستن دیالوگ
                                 Navigator.of(dialogContext).pop();
@@ -551,14 +552,15 @@ class ShowDialogs {
                               ScaffoldMessenger.of(context).clearSnackBars();
 
                               // نمایش اسنک‌بار سبز موفقیت
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-
-                                  content: Text(deleteTimeSuccess.status==1?  "برنامه با موفقیت حذف شد":"پاسخی از سمت دستگاه دریافت نشد"),
-                                  backgroundColor:deleteTimeSuccess.status==1? ColorPalette.darkGreen:ColorPalette.darkRed,
-                                  duration: const Duration(seconds: 3),
-                                ),
-                              );
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //   SnackBar(
+                              //
+                              //     content: Text(deleteTimeSuccess.status==1?  "برنامه با موفقیت حذف شد":"پاسخی از سمت دستگاه دریافت نشد"),
+                              //     backgroundColor:deleteTimeSuccess.status==1? ColorPalette.darkGreen:ColorPalette.darkRed,
+                              //     duration: const Duration(seconds: 3),
+                              //   ),
+                              // );
+                              GlobalSnackBar.show(context, message: deleteTimeSuccess.status==1?  "برنامه با موفقیت حذف شد":"پاسخی از سمت دستگاه دریافت نشد");
 
                               // بستن دیالوگ
                               Navigator.of(dialogContext).pop();
