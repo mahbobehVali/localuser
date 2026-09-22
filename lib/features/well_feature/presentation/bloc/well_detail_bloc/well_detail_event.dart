@@ -68,15 +68,6 @@ class FirstSwitch extends WellDetailEvent {
   List<Object?> get props => [isSwitch];
 }
 
-class DayClicked extends WellDetailEvent {
-  final AlertTypeEntity alertTypeEntity;
-
- const DayClicked(this.alertTypeEntity);
-
-  @override
-  // TODO: implement props
-   List<Object?> get props => [alertTypeEntity];
-}
 
 class WellWorkHourStart extends WellDetailEvent {
   final FlowMeterParams flowMeterParams;
@@ -145,6 +136,15 @@ class GetProgram extends WellDetailEvent {
   @override
   // TODO: implement props
   List<Object?> get props => [id];
+}
+class DayClicked extends WellDetailEvent {
+  final AlertTypeEntity alertTypeEntity;
+
+  const DayClicked(this.alertTypeEntity);
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [alertTypeEntity];
 }
 
 class ChangeWellTab extends WellDetailEvent {

@@ -42,7 +42,7 @@ class BottomNavWidget extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return BlocBuilder<WrapperBloc, WrapperState>(
-      buildWhen: (previous, current) => previous!=current,
+      buildWhen: (previous, current) => previous.nav!=current.nav,
       builder: (context, state) {
 
         return Container(

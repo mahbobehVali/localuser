@@ -34,7 +34,7 @@ class _CustomWellMultiSelectFieldState extends State<CustomWellMultiSelectField>
             Text(
               widget.selectedWellIds.isEmpty
                   ? "انتخاب چاه"
-                  : "${widget.selectedWellIds.length.toString().toPersianDigit()} چاه",
+                  : "تعداد: ${widget.selectedWellIds.length.toString().toPersianDigit()} چاه",
               style:  TextStyle(color: ColorPalette.black),
             ),
             Icon(Icons.arrow_drop_down, color: ColorPalette.black),

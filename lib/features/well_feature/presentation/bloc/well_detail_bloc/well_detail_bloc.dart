@@ -264,20 +264,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       emit(state.copyWith(newOnOffStatus: OnOffInitial()));
     });
 
-    on<ResetCreateTimeStatus>((event, emit) {
-      // مقدار استاتوس را دوباره به حالت اولیه (یا موفقیت قبلی/خالی) برمی‌گردانیم
-      emit(state.copyWith(newCreateTimeStatus: CreateTimeInitial()));
-    });
-    on<ResetDeleteStatus>((event, emit) {
-      // مقدار استاتوس را دوباره به حالت اولیه (یا موفقیت قبلی/خالی) برمی‌گردانیم
-      emit(state.copyWith(newDeleteTimeStatus: DeleteTimeInitial()));
-    });
 
-
-    on<DayClicked>((event, emit) async {
-      emit(state.copyWith(newDaySelected: event.alertTypeEntity));
-
-    });
 
     on<WellWorkHourStart>((event, emit) async {
       // print("event.flowMeterParams.type${event.flowMeterParams.type}");
@@ -418,6 +405,10 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
         emit(state.copyWith(newGetProgramStatus: GetProgramError(getProgram.error!)));
       }
     });
+    on<DayClicked>((event, emit) async {
+      emit(state.copyWith(newDaySelected: event.alertTypeEntity));
+
+    });
 
     on<ChangeWellTab>((event, emit) async {
       emit(state.copyWith(newSelectedWellTab: event.selectedTabIndex));
@@ -500,6 +491,15 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       );
     }
     );
+
+    on<ResetCreateTimeStatus>((event, emit) {
+      // مقدار استاتوس را دوباره به حالت اولیه (یا موفقیت قبلی/خالی) برمی‌گردانیم
+      emit(state.copyWith(newCreateTimeStatus: CreateTimeInitial()));
+    });
+    on<ResetDeleteStatus>((event, emit) {
+      // مقدار استاتوس را دوباره به حالت اولیه (یا موفقیت قبلی/خالی) برمی‌گردانیم
+      emit(state.copyWith(newDeleteTimeStatus: DeleteTimeInitial()));
+    });
 
   }
   // @override
