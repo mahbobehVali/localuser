@@ -24,11 +24,11 @@ class FirstSignUp extends StatefulWidget {
 class _FirstSignUpState extends State<FirstSignUp> {
   GlobalKey<FormState> signUpFormKey = GlobalKey();
 
-  TextEditingController nameController = TextEditingController();
+  TextEditingController nameController = TextEditingController(text: "fsdf fdsf");
 
-  TextEditingController nationalCodeController = TextEditingController();
+  TextEditingController nationalCodeController = TextEditingController(text: "0371326915");
 
-  TextEditingController mobileController = TextEditingController();
+  TextEditingController mobileController = TextEditingController(text: "09357912300");
 
   @override
   void dispose() {
@@ -127,13 +127,13 @@ class _FirstSignUpState extends State<FirstSignUp> {
                       listener: (BuildContext context, SignUpState state) {
                         if (state.firstLevelSendStatus is FirstLevelSuccess) {
                           FirstLevelSuccess firstLevelSuccess=state.firstLevelSendStatus as FirstLevelSuccess;
-                          BlocProvider.of<SignUpBloc>(context).add(
-                            SaveServerId(
-                              state.signUpParams.copyWith(
-                                  newServerId:firstLevelSuccess.serverId
-                              ),
-                            ),
-                          );
+                          // BlocProvider.of<SignUpBloc>(context).add(
+                          //   SaveServerId(
+                          //     state.signUpParams.copyWith(
+                          //         newServerId:firstLevelSuccess.serverId
+                          //     ),
+                          //   ),
+                          // );
                           widget.pageController.nextPage(
 
                             duration: Duration(milliseconds: 5),
@@ -171,7 +171,7 @@ class _FirstSignUpState extends State<FirstSignUp> {
                           },
                           widget: state.firstLevelSendStatus is FirstLevelLoading
                               ? const CircularProgressIndicator()
-                              : Text("ارسال کد تایید", style: TextStyleP.colorBlack),
+                              : Text("مرحله بعد", style: TextStyleP.colorBlack),
                         );
                       },
                     ),

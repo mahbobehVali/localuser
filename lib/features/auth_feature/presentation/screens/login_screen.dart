@@ -33,10 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // final GlobalKey<FormState> passwordFormKey = GlobalKey();
   // final TextEditingController mobileController = TextEditingController();
-  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController(text: "09032732153");
 
   // final TextEditingController passwordController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController(text: "Kk@123456#");
   bool _rememberMe = false;
 
   @override

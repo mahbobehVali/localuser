@@ -6,7 +6,7 @@ class WellsEntity extends Equatable{
   final String? areaName;
   final WellsDataEntity? data;
 
-  const WellsEntity( this.areaId, this.areaName, this.data);
+  const WellsEntity( {this.areaId, this.areaName, this.data});
 
   @override
   // TODO: implement props

@@ -90,13 +90,17 @@ class ReportScreen extends StatelessWidget {
                               final status = state.wellReportStatus;
 
                               if (status is WellReportSuccess) {
-
                                 return CustomWellMultiSelectField(
                                   allWells: status.wellsEntity,
                                   selectedWellIds: state.oneWell,
-                                  onConfirm: (selectedIds) {
+                                  onConfirm: (selectedIds, selectedNames) {
+                                    // 🟢 اکنون علاوه بر selectedIds به selectedNames هم دسترسی دارید
                                     context.read<ReportBloc>().add(
-                                      WellSelected(selectedIds,),
+                                      WellSelected(
+                                        selectedIds,
+                                        // اگر Event شما پارامتر نام‌ها را هم می‌پذیرد می‌توانید اینطور ارسال کنید:
+                                        // selectedNames,
+                                      ),
                                     );
                                   },
                                 );

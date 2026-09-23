@@ -24,7 +24,7 @@ class SignUpState {
   final RegionEntity? oneRegionEntity;
   final bool ignoreArea;
   final int? step;
-  final int? serverId;
+  final String? serverId;
   final List<AlertTypeEntity> responsibilityList;
   final int? selectedResponsibility;
   final AgainSendValidationStatus? againSendValidationStatus;
@@ -77,7 +77,7 @@ class SignUpState {
          RegionEntity? newOneRegionEntity,
          bool? newIgnoreArea,
         int? newStep,
-        int? newServerId,
+        String? newServerId,
          List<AlertTypeEntity>? newResponsibilityList,
         int? newSelectedResponsibility,
         AgainSendValidationStatus? newAgainSendValidationStatus,

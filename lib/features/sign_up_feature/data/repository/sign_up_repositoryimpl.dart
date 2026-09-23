@@ -22,7 +22,7 @@ class SignUpRepositoryImpl extends SignUpRepository {
     try {
       Response response = await apiProvider.firstSignUp(firstLevelSignInParams);
 
-      return DataSuccess(response.data["smsID"]);
+      return DataSuccess(response.data);
     } on AppException catch (e) {
       return CheckExceptions.getError(e);
     }

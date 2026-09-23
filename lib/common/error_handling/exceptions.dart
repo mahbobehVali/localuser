@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 
-
-
 ///  ///use in repository file
 class AppException implements Exception {
   final String message;
@@ -67,7 +65,7 @@ class FetchDataException extends AppException {
 }
 
 class VerificationCodeExpiredException extends AppException {
-  VerificationCodeExpiredException({String? message})
+  VerificationCodeExpiredException({String? message,super.response})
       : super(message: message ?? " مهلت استفاده از کد به پایان رسیده است.");
 }
 

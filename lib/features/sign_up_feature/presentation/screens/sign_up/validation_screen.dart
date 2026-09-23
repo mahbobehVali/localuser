@@ -11,6 +11,7 @@ import '../../../../../common/widgets/global_elevated_button.dart';
 import '../../../../../common/widgets/show_snack_bar.dart';
 import '../../../../../config/color_palette.dart';
 import '../../../../../config/texts_style.dart';
+import '../../../../auth_feature/presentation/screens/login_screen.dart';
 import '../../bloc/again_validation_status.dart';
 import '../../bloc/sign_up_bloc.dart';
 
@@ -25,7 +26,6 @@ class ValidationScreen extends StatefulWidget {
 class _ValidationScreenState extends State<ValidationScreen> {
   GlobalKey<FormState> signUpFormKey = GlobalKey();
 
-  TextEditingController passController = TextEditingController();
   TextEditingController codeController = TextEditingController();
   Timer? _timer; // تغییر از late به Nullable
     int _remainingSeconds = 120;
@@ -40,7 +40,6 @@ class _ValidationScreenState extends State<ValidationScreen> {
   void dispose() {
     _timer?.cancel(); // استفاده از ? برای جلوگیری از خطا در صورت null بودن
     super.dispose();
-    passController.dispose();
     codeController.dispose();
   }
 
@@ -93,6 +92,13 @@ class _ValidationScreenState extends State<ValidationScreen> {
                           child: TextFormField(
                             controller: codeController,
                             keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value!.isEmpty || value.length<4) {
+                                return 'وارد کردن کد تایید الزامی می باشد';
+                              }
+
+                              return null;
+                            },
                           ),
                         ),
 
@@ -158,11 +164,9 @@ class _ValidationScreenState extends State<ValidationScreen> {
                           listenWhen: (previous, current) => previous.sendValidationStatus!=current.sendValidationStatus,
                           listener: (BuildContext context, SignUpState state) {
                             if (state.sendValidationStatus is SendValidationSuccess) {
-                              widget.pageController.nextPage(
-
-                                duration: Duration(milliseconds: 5),
-                                curve: Curves.bounceIn,
-                              );
+                              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {
+                                return LoginScreen();
+                              },), (route) => false);
                             }
                             if (state.sendValidationStatus is SendValidationError) {
                               SendValidationError registerError = state.sendValidationStatus as SendValidationError;
@@ -184,7 +188,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
 
                                           newServerId: state.serverId,
                                           newCode: int.parse(codeController.text.toString().toEnglishDigit()),
-                                            newStep: state.step!+1
+                                            // newStep: state.step!+1
                                         )
                                     ),
                                   );

@@ -8,7 +8,7 @@ class SignUpParams {
   int? areaId;
   int? step;
   int? code;
-  int? serverId;
+  String? serverId;
 
 
 
@@ -35,7 +35,7 @@ class SignUpParams {
         int? newAreaId,
         int? newStep,
         int? newCode,
-        int? newServerId,
+        String? newServerId,
 
       }) {
     return SignUpParams(

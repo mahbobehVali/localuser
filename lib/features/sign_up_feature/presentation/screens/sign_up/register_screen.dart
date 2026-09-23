@@ -30,7 +30,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   GlobalKey<FormState> signUpFormKey = GlobalKey();
 
-  TextEditingController passController = TextEditingController();
+  TextEditingController passController = TextEditingController(text: "Mm12345678#");
   TextEditingController codeController = TextEditingController();
 
   @override
@@ -305,9 +305,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             BlocConsumer<SignUpBloc, SignUpState>(
                               listener: (BuildContext context, SignUpState state) {
                                 if (state.registerStatus is RegisterComplete) {
-                                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {
-                                    return LoginScreen();
-                                  },), (route) => false);
+                                  RegisterComplete registerComplete=state.registerStatus as RegisterComplete;
+                                  // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {
+                                  //   return LoginScreen();
+                                  // },), (route) => false);
+
+                                  widget.pageController.nextPage(
+
+                                    duration: Duration(milliseconds: 5),
+                                    curve: Curves.bounceIn,
+                                  );
                                 }
                                 if (state.registerStatus is RegisterError) {
                                   RegisterError registerError = state.registerStatus as RegisterError;
@@ -349,15 +356,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       BlocProvider.of<SignUpBloc>(context)
                                         ..add(
                                           RegisterClicked(
-                                            SignUpParams(
-                                              password: passController.text,
-                                              areaId: state.oneAreaEntity!.id,
-                                              type: state.selectedResponsibility!,
-                                              mobile: state.signUpParams.mobile,
-                                              serverId: state.signUpParams.serverId,
-                                              nationalCode: state.signUpParams.nationalCode,
-                                              name: state.signUpParams.name,
-                                              code: state.signUpParams.code,
+                                            state.signUpParams.copyWith(
+                                              newPassword: passController.text,
+                                              newAreaId: state.oneAreaEntity!.id,
+                                              newType: state.selectedResponsibility!,
+                                              newMobile: state.signUpParams.mobile,
+                                              // serverId: state.serverId,
+                                              newNationalCode: state.signUpParams.nationalCode,
+                                              newName: state.signUpParams.name,
+                                              // code: state.signUpParams.code,
+                                                newStep: state.step!+1
                                             ),
                                           ),
                                         )

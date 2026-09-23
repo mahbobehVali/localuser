@@ -4,11 +4,11 @@ import 'package:persian_number_utility/persian_number_utility.dart';
 import '../../../../../config/color_palette.dart';
 import '../../../status_summary_feature/domain/entity/wells_entity.dart';
 
-
 class CustomWellMultiSelectField extends StatefulWidget {
   final List<WellsEntity> allWells;
   final List<int> selectedWellIds;
-  final Function(List<int>) onConfirm;
+  // 🟢 تغییر callback برای ارسال همزمان IDها و Nameها
+  final Function(List<int> selectedIds, List<String> selectedNames) onConfirm;
 
   const CustomWellMultiSelectField({
     Key? key,
@@ -22,8 +22,25 @@ class CustomWellMultiSelectField extends StatefulWidget {
 }
 
 class _CustomWellMultiSelectFieldState extends State<CustomWellMultiSelectField> {
+
+  // 🟢 متد کمکی برای دریافت عنوان نمایش داده شده در کادر اصلی
+  String _getDisplayText() {
+    if (widget.selectedWellIds.isEmpty) {
+      return "انتخاب چاه";
+    } else if (widget.selectedWellIds.length == 1) {
+      // پیدا کردن نام چاه بر اساس ID انتخاب شده
+      final selectedWell = widget.allWells.firstWhere(
+            (well) => well.data?.deviceId == widget.selectedWellIds.first,
+        orElse: () => WellsEntity(),
+      );
+      return selectedWell.data?.wellName?.toString().toPersianDigit() ?? "انتخاب چاه";
+    } else {
+      return "${widget.selectedWellIds.length.toString().toPersianDigit()} چاه";
+    }
+  }
+
   @override
-  Widget build(context) {
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: () => _showCustomDialog(context),
       child: Padding(
@@ -31,11 +48,13 @@ class _CustomWellMultiSelectFieldState extends State<CustomWellMultiSelectField>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              widget.selectedWellIds.isEmpty
-                  ? "انتخاب چاه"
-                  : "تعداد: ${widget.selectedWellIds.length.toString().toPersianDigit()} چاه",
-              style:  TextStyle(color: ColorPalette.black),
+            Expanded(
+              child: Text(
+                _getDisplayText(), // 🟢 استفاده از متن جدید
+                style: TextStyle(color: ColorPalette.black),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
             Icon(Icons.arrow_drop_down, color: ColorPalette.black),
           ],
@@ -52,28 +71,26 @@ class _CustomWellMultiSelectFieldState extends State<CustomWellMultiSelectField>
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            print("widget.allWells.length${widget.allWells.length}");
             bool isAllSelected = tempSelectedIds.length == widget.allWells.length;
 
             return AlertDialog(
               contentPadding: EdgeInsets.zero,
               titlePadding: const EdgeInsets.all(16),
-              // ✅ حذف عنوان پیش‌فرض برای مدیریت بهتر فضا
-              title: const Text("انتخاب چاه", textAlign: TextAlign.right,),
+              title: const Text("انتخاب چاه", textAlign: TextAlign.right),
               content: SizedBox(
                 width: double.maxFinite,
-                // محاسبه ارتفاع: هدر (۵۰) + هر آیتم (۵۰)
                 height: ((widget.allWells.length + 1) * 50.0).clamp(150.0, 400.0),
                 child: Column(
                   children: [
-                    // ✅ گزینه «انتخاب همه» با چیدمان سفارشی
                     _buildCustomCheckboxTile(
                       title: "انتخاب همه",
                       value: isAllSelected,
                       onChanged: (bool? value) {
                         setStateDialog(() {
                           if (value == true) {
-                            tempSelectedIds = widget.allWells.map((e) => e.data!.deviceId!).toList();
+                            tempSelectedIds = widget.allWells
+                                .map((e) => e.data!.deviceId!)
+                                .toList();
                           } else {
                             tempSelectedIds.clear();
                           }
@@ -81,16 +98,13 @@ class _CustomWellMultiSelectFieldState extends State<CustomWellMultiSelectField>
                       },
                     ),
                     const Divider(height: 1),
-                    // لیست مناطق
                     Expanded(
                       child: ListView.builder(
                         itemCount: widget.allWells.length,
                         itemBuilder: (context, index) {
-
                           final well = widget.allWells[index];
                           final isSelected = tempSelectedIds.contains(well.data!.deviceId);
 
-                          // ✅ هر آیتم منطقه با چیدمان سفارشی
                           return _buildCustomCheckboxTile(
                             title: well.data!.wellName.toString().toPersianDigit(),
                             value: isSelected,
@@ -117,7 +131,14 @@ class _CustomWellMultiSelectFieldState extends State<CustomWellMultiSelectField>
                 ),
                 TextButton(
                   onPressed: () {
-                    widget.onConfirm(tempSelectedIds);
+                    // 🟢 استخراج نام چاه‌های انتخاب شده
+                    List<String> selectedNames = widget.allWells
+                        .where((well) => tempSelectedIds.contains(well.data?.deviceId))
+                        .map((well) => well.data?.wellName ?? '')
+                        .toList();
+
+                    // ارسال هم IDها و هم Nameها
+                    widget.onConfirm(tempSelectedIds, selectedNames);
                     Navigator.pop(context);
                   },
                   child: const Text("تایید", style: TextStyle(color: Colors.black)),
@@ -130,43 +151,39 @@ class _CustomWellMultiSelectFieldState extends State<CustomWellMultiSelectField>
     );
   }
 
-  // ✅ متد کمکی برای ساخت ردیف سفارشی (چک‌باکس و عنوان کنار هم)
   Widget _buildCustomCheckboxTile({
     required String title,
     required bool value,
     required ValueChanged<bool?> onChanged,
   }) {
     return InkWell(
-      // با کلیک روی کل ردیف، چک‌باکس تغییر وضعیت می‌دهد
       onTap: () => onChanged(!value),
       child: Container(
         height: 50,
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
-          // mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            //  چک‌باکس
             SizedBox(
               width: 24.0,
               height: 24.0,
               child: Checkbox(
                 value: value,
                 activeColor: ColorPalette.darkBlue,
-                onChanged: onChanged, // مدیریت تغییر وضعیت از طریق خود چک‌باکس
-                // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap, // برای حذف فضای اضافی لمس در صورت نیاز
+                onChanged: onChanged,
               ),
             ),
-            //  عنوان
-            const SizedBox(width: 16.0), // فاصله بین عنوان و چک‌باکس
-
-            Text(
-              title,
-              textAlign: TextAlign.right,
-              style: const TextStyle(fontSize: 16),
+            const SizedBox(width: 16.0),
+            Expanded(
+              child: Text(
+                title,
+                textAlign: TextAlign.right,
+                style: const TextStyle(fontSize: 16),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-
           ],
         ),
       ),
     );
-  }}
+  }
+}

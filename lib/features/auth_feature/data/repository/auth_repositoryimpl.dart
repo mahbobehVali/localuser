@@ -23,6 +23,7 @@ class AuthRepositoryImpl extends AuthRepository {
       AuthEntity authEntity = AuthModel.fromJson(response.data);
       return DataSuccess(authEntity);
     } on AppException catch (e) {
+      print("e.response?.statusCode${e.response?.statusCode}");
       return CheckExceptions.getError(e);
     }
   }

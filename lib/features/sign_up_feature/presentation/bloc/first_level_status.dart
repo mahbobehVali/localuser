@@ -28,10 +28,10 @@ class FirstLevelError extends FirstLevelSendStatus {
 }
 
 class FirstLevelSuccess extends FirstLevelSendStatus {
-  final int serverId;
+  // final int serverId;
 
-  const  FirstLevelSuccess(this.serverId);
+  const  FirstLevelSuccess();
 
   @override
-  List<Object> get props => [serverId];
+  List<Object> get props => [];
 }

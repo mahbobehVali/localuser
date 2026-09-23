@@ -10,7 +10,7 @@ class WellsModel extends WellsEntity {
     int? areaId,
     String? areaName,
     WellsDataEntity? data,
-  }) : super(areaId, areaName, data);
+  }) : super(areaId: areaId, areaName: areaName, data: data);
 
   factory WellsModel.fromJson(dynamic json) {
 

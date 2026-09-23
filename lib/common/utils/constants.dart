@@ -176,15 +176,18 @@ class Constants {
 
   final List<Color> lineColors = [
     ColorPalette.lightBlue,
-    ColorPalette.lightOrange,
     ColorPalette.darkGreen,
     ColorPalette.darkBlue,
+    ColorPalette.lightOrange,
     ColorPalette.orange,
-    Colors.brown,
-    Colors.purple,
-    Colors.pinkAccent,
+    ColorPalette.darkRed,
+    ColorPalette.textBlue,
+    ColorPalette.lightGreen,
+    ColorPalette.primaryTextGreen,
 
-    Color(0xff228367DD),
+
+
+
   ];
 
   List<dynamic> alert = [
@@ -253,8 +256,8 @@ class Constants {
   List<String> signUpConstant=[
 
     "اطلاعات هویتی",
-    "پیامک تایید",
     "اطلاعات تکمیلی",
+    "پیامک تایید",
 
   ];
 

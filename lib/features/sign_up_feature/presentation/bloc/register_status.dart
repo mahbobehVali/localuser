@@ -16,6 +16,7 @@ class RegisterLoading extends RegisterStatus {
 }
 
 class RegisterComplete extends RegisterStatus {
+  // final int serverId;
 
   RegisterComplete();
 

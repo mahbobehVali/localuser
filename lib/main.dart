@@ -9,6 +9,7 @@ import 'package:mahaliii/features/auth_feature/presentation/screens/login_screen
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'auth_screen.dart';
 import 'bottom_nav/bottom_nav_cubit.dart';
 import 'bottom_nav/wrapper_bloc.dart';
 import 'common/socket_repository.dart';
@@ -54,8 +55,8 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     // سوکت باید فقط یک‌بار در زمان ساخت اپلیکیشن متصل شود
-    socketRepository.initAndConnect("manger");
-    _bloc = locator<WellDetailBloc>();
+    // socketRepository.initAndConnect("manger");
+    // _bloc = locator<WellDetailBloc>();
 
   }
 
@@ -171,7 +172,7 @@ class _MyAppState extends State<MyApp> {
               ],
               locale: const Locale("fa", "IR"), // زبان پیش‌فرض برنامه
 
-              home: token.isEmpty? LoginScreen():Wrapper(),
+              home: token.isEmpty? AuthScreen():Wrapper(),
                           ),
                         ));
         }else{

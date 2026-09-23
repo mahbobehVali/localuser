@@ -45,7 +45,7 @@ class SignUpScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Image.asset("assets/images/blackLogo.png",width: 28.w),
+                  Image.asset("assets/images/blackLogo.png",width: 28.w,color: ColorPalette.primaryTextGreen),
                   SizedBox(
                     width: 14.w,
                   ),
@@ -89,9 +89,9 @@ class SignUpScreen extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     FirstSignUp(pageController: pageController),
-
-                    ValidationScreen(pageController: pageController),
                     RegisterScreen(pageController: pageController),
+                    ValidationScreen(pageController: pageController),
+
                   ],
                 ),
               ),

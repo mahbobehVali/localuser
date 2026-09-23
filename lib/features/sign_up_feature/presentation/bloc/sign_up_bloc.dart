@@ -51,7 +51,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     oneAreaEntity: null,
     ignoreArea: true,
     step: 0,
-    serverId: 0,
+    serverId: "0",
       responsibilityList: Constants().responsibilityList,
     selectedResponsibility: null,
     againSendValidationStatus: AgainSendValidationInitial(),
@@ -72,13 +72,13 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       DataState dataState = await firstSignupUseCase(event.signUpParams);
 
       if (dataState is DataSuccess) {
-         int serverId = dataState.data;
+         // int serverId = dataState.data;
         emit(state.copyWith(
           newSignUpParams: event.signUpParams,
-          newFirstLevelSendStatus: FirstLevelSuccess(dataState.data),
+          newFirstLevelSendStatus: FirstLevelSuccess(),
           // newMobile: event.signUpParams.mobile,
           newStep: event.signUpParams.step,
-          newServerId: serverId
+          // newServerId: serverId
 
         ));
       }
@@ -92,21 +92,36 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
     on<RegisterClicked>((event, emit) async {
       emit(state.copyWith(newRegisterStatus: RegisterLoading(),
+        newStep: event.signUpParams.step,
 
       ));
 
 
-      DataState dataState = await registerUseCase(event.signUpParams);
+      print("event.signUpParams.mobile${event.signUpParams.mobile}");
+      DataState dataState = await firstSignupUseCase(SignUpParams(
+        mobile: event.signUpParams.mobile,
+        nationalCode: "100"
+      ));
 
       if (dataState is DataSuccess) {
         // AuthEntity authEntity = dataState.data;
-
         ///save token
         // await locator<SharedPrefOperator>().setUserToken( "", dataState.data["type"] ?? 0);
+      print("dataState.data${dataState.data}");
+      final String smsId = dataState.data["smsID"].toString();
 
-        emit(state.copyWith(
+      emit(state.copyWith(
             newSignUpParams: event.signUpParams,
-            newRegisterStatus: RegisterComplete()));
+            newRegisterStatus: RegisterComplete(),
+            newServerId: smsId
+           ));
+        // add(
+        //   SaveServerId(
+        //     event.signUpParams.copyWith(
+        //         newServerId:dataState.data.serverId
+        //     ),
+        //   ),
+        // );
       }
       if (dataState is DataFailed) {
         emit(
@@ -118,14 +133,14 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       emit(state.copyWith(newSendValidationStatus: SendValidationLoading(),
 
       ));
-      DataState dataState = await sendValidationCodeUseCase(event.signUpParams);
+      DataState dataState = await registerUseCase(event.signUpParams);
 
       if (dataState is DataSuccess) {
 
         emit(state.copyWith(
             newSignUpParams: event.signUpParams,
             newSendValidationStatus: SendValidationSuccess(),
-          newStep: event.signUpParams.step,));
+          ));
       }
       if (dataState is DataFailed) {
         emit(
@@ -134,14 +149,20 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     });
 
     on<AgainSendValidationButtonClicked>((event, emit) async {
+      print("state.signUpParams${state.signUpParams.mobile}");
+      print("state.signUpParams${state.signUpParams.nationalCode}");
       emit(state.copyWith(newAgainSendValidationStatus: AgainSendValidationLoading()));
-      DataState dataState = await firstSignupUseCase(state.signUpParams);
+      DataState dataState = await firstSignupUseCase(SignUpParams(
+        mobile: state.signUpParams.mobile,
+        nationalCode: '100'
+      ));
 
       if (dataState is DataSuccess) {
+        print("dadadf${dataState.data}");
 
         emit(state.copyWith(
-            newAgainSendValidationStatus: AgainSendValidationSuccess(dataState.data),
-        newServerId: dataState.data));
+            newAgainSendValidationStatus: AgainSendValidationSuccess(dataState.data["smsID"]),
+        newServerId: dataState.data["smsID"].toString()));
       }
       if (dataState is DataFailed) {
         emit(

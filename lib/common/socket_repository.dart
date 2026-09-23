@@ -10,10 +10,11 @@ import '../features/status_summary_feature/data/model/water_model.dart';
 import '../features/well_feature/data/model/well_flowmeter_one_model.dart';
 import '../locator.dart';
 
-Future<dynamic> getToken() async {
-  final userToken = locator<SharedPrefOperator>().getUserToken();
-  return userToken;
-}
+// Future<dynamic> getToken() async {
+//   final userToken = locator<SharedPrefOperator>().getUserToken();
+//   print("sdsfs${userToken}");
+//   return userToken;
+// }
 
 enum FingerprintSource {
   requestResponse, // لیسنر اول
@@ -29,6 +30,7 @@ class FingerprintResponse {
 }
 
 class SocketRepository {
+
   i_o.Socket? _socket;
   bool isConnecting = false; // جلوگیری از درخواست‌های همزمان اتصال
   String? _managerPin;       // پین مدیر (همیشه ثابت)
@@ -51,6 +53,20 @@ class SocketRepository {
   Stream<dynamic> get todayStream => _todayController.stream;
 
   Completer<bool>? _connectCompleter;
+
+  // 🟢 تابع دریافت توکن همراه با چک کردن مقدار خالی
+  Future<String> _getOrWaitForToken({int maxRetries = 10, Duration delay = const Duration(milliseconds: 500)}) async {
+    for (int i = 0; i < maxRetries; i++) {
+      final token = await locator<SharedPrefOperator>().getUserToken();
+      if (token.trim().isNotEmpty) {
+        print("🔑 Token successfully fetched on attempt ${i + 1}: $token");
+        return token;
+      }
+      print("⏳ Token is empty. Retrying (${i + 1}/$maxRetries)...");
+      await Future.delayed(delay); // ۵۰۰ میلی‌ثانیه صبر تا شارژ/ذخیره شدن توکن
+    }
+    return ""; // اگر بعد از چند ثانیه بازم خالی بود
+  }
 
   Future<bool> initAndConnect(String managerPin, [String? level, int? id]) async {
     // 🟢 اگر کنترلر بسته شده بود، دوباره آن را بسازید
@@ -89,23 +105,36 @@ class SocketRepository {
 
     isConnecting = true;
     _connectCompleter = Completer<bool>();
-
-    String token = await getToken();
+    // 🟢 ۲. منتظر بمانید تا توکن حتماً پر شود (حداکثر ۵ ثانیه صبر می‌کند)
+    String token = await _getOrWaitForToken(maxRetries: 10, delay: const Duration(milliseconds: 500));
+// 🔴 اگر بعد از صبر کردن، همچنان توکن خالی بود اتصال برقرار نشود
+    if (token.isEmpty) {
+      print("❌ Could not obtain a valid token. Aborting connection.");
+      isConnecting = false;
+      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
+        _connectCompleter!.complete(false);
+      }
+      return false;
+    }
+    // String token = await getToken();
     print("Token retrieved check: ${token.isNotEmpty}");
+    print("token: ${token}");
 
     _socket = i_o.io('https://user.abyarinovin.ir',
         i_o.OptionBuilder()
             .setTransports(['websocket'])
             .enableWithCredentials()
-            .setExtraHeaders({'Authorization': 'Bearer $token'})
+            // .setExtraHeaders({'Authorization': 'Bearer $token'})
             // .setQuery({'token': token})
             .setAuth({'token': token})
-            .setQuery({'token': token})
             .enableAutoConnect()
             .enableReconnection()
             .build()
     );
 
+    // _socket?.auth({'token': token});
+    _socket!.on('unauthorized', (data) => print('❌ Unauthorized: $data'));
+    _socket!.on('error', (data) => print('❌ Error: $data'));
     // _socket?.auth={"token":token};
     _socket!.connect();
     _socket!.on('error', (data) => print('❌ Socket General Error: $data'));
@@ -136,10 +165,10 @@ class SocketRepository {
       }
     });
 
-    _socket!.onDisconnect((data) {
+    _socket!..onDisconnect((data) {
       print('Socket Disconnected');
       isConnecting = false;
-    });
+    })..connect();
 
     _socket!.onConnectError((data) {
       print('Connect Error: $data');
