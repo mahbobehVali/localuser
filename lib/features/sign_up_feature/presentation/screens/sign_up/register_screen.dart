@@ -378,7 +378,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   },
                                   widget: state.registerStatus is RegisterLoading
                                       ? const CircularProgressIndicator()
-                                      : Text("تکمیل ثبت نام", style: TextStyleP.colorBlack),
+                                      : Text("ارسال کد تایید", style: TextStyleP.colorBlack),
                                 );
                               },
                             ),

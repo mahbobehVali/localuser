@@ -143,6 +143,7 @@ class ShowDialogs {
 
                         TextFormField(
                           controller: code,
+                          keyboardType: TextInputType.number,
                         ),
                         SizedBox(height: 10.h),
 

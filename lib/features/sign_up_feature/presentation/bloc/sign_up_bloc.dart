@@ -111,6 +111,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       final String smsId = dataState.data["smsID"].toString();
 
       emit(state.copyWith(
+          newStep: event.signUpParams.step,
             newSignUpParams: event.signUpParams,
             newRegisterStatus: RegisterComplete(),
             newServerId: smsId

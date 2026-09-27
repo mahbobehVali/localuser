@@ -196,7 +196,7 @@ class _ValidationScreenState extends State<ValidationScreen> {
                               },
                               widget: state.sendValidationStatus is SendValidationLoading
                                   ? const CircularProgressIndicator()
-                                  : Text("تایید", style: TextStyleP.colorBlack),
+                                  : Text("تکمیل ثبت نام", style: TextStyleP.colorBlack),
                             );
                           },
                         ),

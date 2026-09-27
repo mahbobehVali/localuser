@@ -45,5 +45,22 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<key>NSCameraUsageDescription</key>
+        <string>جهت ثبت و تغییر تصویر گواهی‌ها یا پروفایل به دسترسی دوربین نیاز است.</string>
+
+        <!-- دسترسی به گالری عکس (image_picker & image_cropper) -->
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>جهت انتخاب تصویر از گالری به دسترسی آلبوم عکس‌ها نیاز است.</string>
+
+        <!-- دسترسی به میکروفون (در صورت استفاده از فیلم‌برداری در image_picker) -->
+        <key>NSMicrophoneUsageDescription</key>
+        <string>جهت ضبط ویدیو به دسترسی میکروفون نیاز است.</string>
+
+        <!-- دسترسی و اشتراک‌گذاری فایل‌ها (file_picker & share_plus & excel) -->
+        <key>LSSupportsOpeningDocumentsInPlace</key>
+        <true/>
+        <key>UIFileSharingEnabled</key>
+        <true/>
 </dict>
 </plist>

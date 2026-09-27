@@ -151,6 +151,7 @@ class _AccountScreenState extends State<AccountScreen>{
                              children: [
                                BlocConsumer<AccountBloc, AccountState>(
                                  listenWhen: (previous, current) => previous.sendSmsStatus!=current.sendSmsStatus,
+                                 buildWhen: (previous, current) => previous.sendSmsStatus!=current.sendSmsStatus,
                                 listener: (context, state) {
 
                                   if(state.sendSmsStatus is SendSmsSuccess){

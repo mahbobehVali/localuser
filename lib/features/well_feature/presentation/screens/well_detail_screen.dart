@@ -46,82 +46,57 @@ class _WellDetailScreenState extends State<WellDetailScreen>
   int currentTab = -1; // برای هندل کردن تغییر تب‌ها
   // late AnimationController _controller;
   List<PieChartSectionData> showingSections({dynamic on, dynamic off}) {
-    return List.generate(2, (i) {
-      // final isTouched = i == touchedIndex;
-      // final fontSize = isTouched ? 25.0 : 16.0;
-      // final radius = isTouched ? 60.0 : 50.0;
-      final shadows = [Shadow(color: ColorPalette.black, blurRadius: 2)];
-      return switch (i) {
-        0 =>
-            PieChartSectionData(
-              color: ColorPalette.darkGreen,
-              value: (on ?? 0).toDouble(),
-              title: '',
-              titleStyle: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                shadows: shadows,
-              ),
-            ),
-        1 =>
-            PieChartSectionData(
-              color: ColorPalette.lightGrey,
-              value: (off ?? 0).toDouble(),
-              title: '',
-              titleStyle: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: ColorPalette.white,
-                shadows: shadows,
-              ),
-            ),
-        _ => throw SizedBox(),
-      };
-    });
-  }
+    final double onValue = (on is num) ? on.toDouble() : 0.0;
+    final double offValue = (off is num) ? off.toDouble() : 0.0;
+    final double remainingValue = (168 - (onValue + offValue)).clamp(0.0, 168.0);
 
-  List<PieChartSectionData> sec({dynamic on, dynamic off}) {
-    final double onVal = (on ?? 0).toDouble();
-    final double offVal = (off ?? 0).toDouble();
+    // final shadows = [ Shadow(color: ColorPalette.black, blurRadius: 2)];
 
-    // اگر هر دو صفر بودند، کل چارت را خاکستری نشان بده
-    if (onVal == 0 && offVal == 0) {
-      return [
-        PieChartSectionData(
-          color: Colors.grey.shade300,
-          value: 100,
-          title: '',
-          radius: 50.0,
-        ),
-      ];
-    }
+    return List.generate(3, (i) {
+      final double radius =  55.0;
 
-    return List.generate(2, (i) {
-      const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
       return switch (i) {
         0 => PieChartSectionData(
-          color: ColorPalette.darkBlue,
-          value: onVal,
-          title: '',
-          titleStyle: const TextStyle(
+          color: ColorPalette.darkGreen,
+          value: onValue,
+          title: onValue > 0 ? '${onValue.toString().toPersianDigit()}' : '',
+          radius: radius,
+          titleStyle: TextStyle(
+            fontSize:  13.0,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            shadows: shadows,
+
           ),
         ),
         1 => PieChartSectionData(
-          color: Colors.grey.shade400,
-          value: offVal,
-          title: '',
-          titleStyle: const TextStyle(
+          color: ColorPalette.darkRed,
+          value: offValue,
+          title: offValue > 0 ? '${offValue.toString().toPersianDigit()}' : '',
+          radius: radius,
+          titleStyle: TextStyle(
+            fontSize:  13.0,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            shadows: shadows,
+
           ),
         ),
-        _ => throw StateError('Invalid index'),
+        2 => PieChartSectionData(
+          color: ColorPalette.lightGrey,
+          value: remainingValue,
+          title: remainingValue > 0 ? '${remainingValue.toString().toPersianDigit()}' : '',
+          radius: radius,
+          titleStyle: TextStyle(
+            fontSize: 13.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+
+          ),
+        ),
+        _ => throw UnimplementedError(),
       };
     });
   }
+
   bool builtOnce = false;
   bool selected=false;
 
@@ -327,7 +302,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text("میزان حجم آب عبوری دبی سنج", style: TextStyleP.f12Regular),
+                                            Text("میزان مصرف آب", style: TextStyleP.f12Regular),
                                             BlocBuilder<WellDetailBloc, WellDetailState>(
                                               buildWhen: (previous, current) =>
                                               current.selectedChartVolumeTab!=previous.selectedChartVolumeTab ||
@@ -1214,17 +1189,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                             WeekWellWorkSuccess wellWorkSuccess = state.weekWellWorkStatus as WeekWellWorkSuccess;
                                             final dynamic on = wellWorkSuccess.currentWellWorkEntity.list.totalOn;
                                             final dynamic off = wellWorkSuccess.currentWellWorkEntity.list.totalOff;
-                                            final double onVal = (on ?? 0).toDouble();
-                                            final double offVal = (off ?? 0).toDouble();
-                                            final bool isEmpty = onVal == 0 && offVal == 0;
-                                            // final double onVal = 0;
-                                            // final double offVal = 0;
-                                            // final bool isEmpty = onVal == 0 && offVal == 0;
+
                                             return Center(
-                                                child:
-                                                isEmpty
-                                                    ? Center(child: SizedBox()):
-                                                Column(
+                                                child: Column(
                                                   children: [
                                                     SizedBox(
                                                       width: double.infinity,
@@ -1241,6 +1208,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                 on: on,
                                                                 off: off,
                                                               ),
+
                                                             ),
                                                             duration: const Duration(milliseconds: 150),
                                                             curve: Curves.linear,
@@ -1251,14 +1219,10 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                             children: [
                                                               Text(
                                                                 textAlign: TextAlign.center,
-                                                                "\u200E${wellWorkSuccess.currentWellWorkEntity.list.totalOn.toString().toPersianDigit()} ساعت روشن\nاز \u200Eمجموع ${(on + off).toStringAsFixed(2).toString().toPersianDigit()} ساعت",
+                                                                "کل ساعات\n۱۶۸ ساعت",
                                                                 style: TextStyleP.f14Bold,
                                                               ),
-                                                              const SizedBox(height: 10),
-                                                              Text(
-                                                                "ساعات کارکرد پمپ",
-                                                                style: TextStyleP.f12Regular,
-                                                              ),
+
                                                             ],
                                                           ),
                                                         ],
@@ -1270,9 +1234,10 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                       children: [
                                                         Indicator(color: ColorPalette.darkGreen, text: 'مجموع ساعات روشن بودن', isSquare: false),
-                                                        Indicator(color: ColorPalette.lightGrey, text: 'مجموع ساعات خاموش بودن', isSquare: false),
+                                                        Indicator(color: ColorPalette.darkRed, text: 'مجموع ساعات خاموش بودن', isSquare: false),
                                                       ],
                                                     ),
+                                                    Indicator(color: ColorPalette.lightGrey, text: 'مجموع ساعات هفته', isSquare: false),
                                                   ],
                                                 ));
                                           } else if (state.weekWellWorkStatus is WeekWellWorkError) {

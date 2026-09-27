@@ -187,10 +187,6 @@ class AlertScreen extends StatelessWidget {
                                       selected: state.selectedAlertPage ?? 1,
                                       lastPage: alertSuccess.alertsEntity.meta.lastPage!,
                                       onPageChanged: (newPage) {
-                                        print("state.alertFilterModel!.filterType${state.alertFilterModel!.filterType}");
-                                        print("state.alertFilterModel!.filterStatus${state.alertFilterModel!.filterStatus}");
-                                        print("state.alertFilterModel!.filterWellName${state.alertFilterModel!.filterWellName}");
-                                        print("state.alertFilterModel!.filterDate${state.alertFilterModel!.filterDate}");
 
                                         BlocProvider.of<AlertBloc>(context).add(
                                           AlertStart(
