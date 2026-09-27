@@ -17,8 +17,8 @@ class WellsApiProvider {
       "reportType":0,
       "startDate":flowMeterParams.startDate,
       "endDate":flowMeterParams.endDate,
-      "startTime":"00:00",
-      "endTime":"23:59",
+      "startTime":flowMeterParams.startHour,
+      "endTime":flowMeterParams.endHour,
     }: {
       "type":flowMeterParams.type,
       "ids":flowMeterParams.ids,
@@ -67,8 +67,8 @@ class WellsApiProvider {
       "reportType":0,
       "startDate":flowMeterParams.startDate,
       "endDate":flowMeterParams.endDate,
-      "startTime":"00:00",
-      "endTime":"23:59",
+      "startTime":flowMeterParams.startHour,
+      "endTime":flowMeterParams.endHour,
     }:  {
       "type":flowMeterParams.type,
       "ids":flowMeterParams.ids,

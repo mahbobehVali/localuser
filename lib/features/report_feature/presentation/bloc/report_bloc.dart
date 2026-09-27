@@ -37,9 +37,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   wells: [],
     oneWell: [],
     startDate: "",
-    startHour: "",
+
     endDate: "",
-    endHour: "",
+    startHour: "۰۰:۰۰",
+    endHour: "۲۳:۵۹",
     reportCountStatus: ReportCountInitial(),
     reportFlowMeterStatus:  ReportFlowMeterInitial(),
     reportDetailFlowMeterStatus: ReportDetailFlowMeterInitial(),

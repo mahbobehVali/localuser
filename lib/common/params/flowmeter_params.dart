@@ -11,6 +11,8 @@ class FlowMeterParams {
   String? level;
   String? startDate;
   String? endDate;
+  String? startHour;
+  String? endHour;
   bool? total;
 
 
@@ -25,6 +27,8 @@ class FlowMeterParams {
      this.level,
      this.startDate,
      this.endDate,
+     this.startHour,
+     this.endHour,
      this.total=false,
   });
 
@@ -40,20 +44,24 @@ class FlowMeterParams {
         String? newLevel,
         String? newStartDate,
         String? newEndDate,
+        String? newStartHour,
+        String? newEndHour,
         bool? newTotal
 
       }) {
     return FlowMeterParams(
         status: newStatus ?? status,
-        type: type ?? type,
-        time: time??time,
+        type: newType ?? type,
+        time: newTime??time,
         page: newPage??page,
         ids: newIds??ids,
         reportType: newReportType??reportType,
-        limit: limit??limit,
-        level: level??level,
-        startDate: startDate??startDate,
-        endDate: endDate??endDate,
+        limit: newLimit??limit,
+        level: newLevel??level,
+        startDate: newStartDate??startDate,
+        endDate: newEndDate??endDate,
+        startHour: newStartHour??startHour,
+        endHour: newEndHour??endHour,
       total: newTotal??false
 
 

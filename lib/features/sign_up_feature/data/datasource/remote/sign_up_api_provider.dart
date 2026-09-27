@@ -10,13 +10,13 @@ class SignUpApiProvider {
 
   /// type =0 for local user and 1 for supeizer
 
-  Future<dynamic> firstSignUp(
-      SignUpParams signUpParams,
+  Future<dynamic> firstSignUp(SignUpParams signUpParams,
       ) async {
-
 
     try {
       var response = await dio.post("user/validate", data: {
+
+
 
         "mobile": signUpParams.mobile,
         "nationalCode": signUpParams.nationalCode,
@@ -24,6 +24,7 @@ class SignUpApiProvider {
       );
       return response;
     } on DioException catch (e) {
+
       return CheckExceptions.response(e.response);
     }
   }

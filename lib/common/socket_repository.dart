@@ -107,7 +107,9 @@ class SocketRepository {
     _connectCompleter = Completer<bool>();
     // 🟢 ۲. منتظر بمانید تا توکن حتماً پر شود (حداکثر ۵ ثانیه صبر می‌کند)
     String token = await _getOrWaitForToken(maxRetries: 10, delay: const Duration(milliseconds: 500));
-// 🔴 اگر بعد از صبر کردن، همچنان توکن خالی بود اتصال برقرار نشود
+//  اگر بعد از صبر کردن، همچنان توکن خالی بود اتصال برقرار نشود
+    print('TOKEN BEFORE SOCKET: [$token]');
+    print('TOKEN LENGTH: ${token.length}');
     if (token.isEmpty) {
       print("❌ Could not obtain a valid token. Aborting connection.");
       isConnecting = false;
@@ -116,9 +118,7 @@ class SocketRepository {
       }
       return false;
     }
-    // String token = await getToken();
-    print("Token retrieved check: ${token.isNotEmpty}");
-    print("token: ${token}");
+
 
     _socket = i_o.io('https://user.abyarinovin.ir',
         i_o.OptionBuilder()
@@ -127,21 +127,28 @@ class SocketRepository {
             // .setExtraHeaders({'Authorization': 'Bearer $token'})
             // .setQuery({'token': token})
             .setAuth({'token': token})
-            .enableAutoConnect()
+            .disableAutoConnect()
             .enableReconnection()
             .build()
     );
 
-    // _socket?.auth({'token': token});
     _socket!.on('unauthorized', (data) => print('❌ Unauthorized: $data'));
-    _socket!.on('error', (data) => print('❌ Error: $data'));
-    // _socket?.auth={"token":token};
-    _socket!.connect();
+
     _socket!.on('error', (data) => print('❌ Socket General Error: $data'));
     _socket!.on('connect_timeout', (data) => print('⏰ Connect Timeout: $data'));
-    _socket!.onConnectError((data) => print('Connect Error: $data'));
+    _socket!.onConnectError((data) {
+      print('Connect Error: $data');
+      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
+        _connectCompleter!.complete(false);
+      }
+      isConnecting = false;
+    });
     _socket!.onError((data) => print('Socket Error: $data'));
-    _socket!.onDisconnect((data) => print('Socket Disconnected reason: $data'));
+    _socket!.onDisconnect((data) {
+      print('Socket Disconnected');
+      isConnecting = false;
+    });
+
     setupGlobalListeners();
 
     _socket!.onConnect((_) async {
@@ -164,19 +171,9 @@ class SocketRepository {
         isConnecting = false;
       }
     });
-
-    _socket!..onDisconnect((data) {
-      print('Socket Disconnected');
-      isConnecting = false;
-    })..connect();
-
-    _socket!.onConnectError((data) {
-      print('Connect Error: $data');
-      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
-        _connectCompleter!.complete(false);
-      }
-      isConnecting = false;
-    });
+    //  آخرین خط
+    print(' Connecting socket...');
+    _socket!.connect();
 
     // انتظار حداکثر ۸ ثانیه برای نتیجه اتصال
     return _connectCompleter!.future.timeout(

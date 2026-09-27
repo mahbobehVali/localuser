@@ -400,25 +400,25 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                             }
 
                                             // ۲. اضافه کردن دیتای جدید سوکت به لیست کش شده (بدون پاک شدن قبلی‌ها)
-                                            if (state.selectedChartVolumeTab == 0 && state.flowMeterTodayStatus is FlowMeterTodaySuccess) {
-                                              final todayEntity = (state.flowMeterTodayStatus as FlowMeterTodaySuccess).wellFlowMeterTodayOneEntity;
-
-                                              if (todayEntity != null && todayEntity.deviceId == widget.wellsDataEntity.deviceId) {
-                                                final socketX = todayEntity.xAxis.toString();
-                                                final socketY = todayEntity.yAxis!.toDouble();
-
-                                                if (liveXLabels.isNotEmpty && liveXLabels.last == socketX) {
-                                                  final lastY = liveYValues.last;
-                                                  if (lastY != socketY) {
-                                                    liveYValues[liveYValues.length - 1] = (lastY + socketY) / 2;
-                                                  }
-                                                } else if (!liveXLabels.contains(socketX)) {
-                                                  // دیتای جدید سوکت به لیست اضافه می‌شود و ماندگار خواهد بود
-                                                  liveXLabels.add(socketX);
-                                                  liveYValues.add(socketY);
-                                                }
-                                              }
-                                            }
+                                            // if (state.selectedChartVolumeTab == 0 && state.flowMeterTodayStatus is FlowMeterTodaySuccess) {
+                                            //   final todayEntity = (state.flowMeterTodayStatus as FlowMeterTodaySuccess).wellFlowMeterTodayOneEntity;
+                                            //
+                                            //   if (todayEntity != null && todayEntity.deviceId == widget.wellsDataEntity.deviceId) {
+                                            //     final socketX = todayEntity.xAxis.toString();
+                                            //     final socketY = todayEntity.yAxis!.toDouble();
+                                            //
+                                            //     if (liveXLabels.isNotEmpty && liveXLabels.last == socketX) {
+                                            //       final lastY = liveYValues.last;
+                                            //       if (lastY != socketY) {
+                                            //         liveYValues[liveYValues.length - 1] = (lastY + socketY) / 2;
+                                            //       }
+                                            //     } else if (!liveXLabels.contains(socketX)) {
+                                            //       // دیتای جدید سوکت به لیست اضافه می‌شود و ماندگار خواهد بود
+                                            //       liveXLabels.add(socketX);
+                                            //       liveYValues.add(socketY);
+                                            //     }
+                                            //   }
+                                            // }
                                           },
                                           builder: (context, state) {
                                             final status = state.flowMeterStatus;

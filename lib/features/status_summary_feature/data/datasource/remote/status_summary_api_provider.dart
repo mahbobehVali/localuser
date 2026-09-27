@@ -51,8 +51,8 @@ class StatusSummaryApiProvider {
       "ids":flowMeterParams.ids,
       "startDate":flowMeterParams.startDate,
       "endDate":flowMeterParams.endDate,
-      "startTime":"00:00",
-      "endTime":"23:59",
+      "startTime":flowMeterParams.startHour,
+      "endTime":flowMeterParams.endHour,
       "limit":5,
       "page":flowMeterParams.page,
 

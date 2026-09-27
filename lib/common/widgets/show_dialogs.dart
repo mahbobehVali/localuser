@@ -831,7 +831,7 @@ class ShowDialogs {
                                     code: wellsDataEntity.code,
                                     pin: wellsDataEntity.pin,
                                     deviceID: wellsDataEntity.deviceId,
-                                    userLocalID: wellsDataEntity.userLocalId,
+                                    userLocalID: state.userLocalId,
                                     status: value ? 1 : 0,
                                   ),
                                   wellsDataEntity.deviceId!

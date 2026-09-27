@@ -35,9 +35,9 @@ class PaginationWidget extends StatelessWidget {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
 
-                        border: Border.all(color: Colors.grey)
+                        border: Border.all(color: selected == 1 ? Colors.grey :Colors.black)
                     ),
-                    child: Icon(Icons.navigate_before)),
+                    child: Icon(Icons.navigate_before,color: selected == 1 ? Colors.grey :Colors.black)),
               ),
 
               SizedBox(
@@ -65,7 +65,7 @@ class PaginationWidget extends StatelessWidget {
                           color:selected==index+1?Color(0xff82A5D2):Colors.transparent,
 
                           border: Border.all(
-                              color: selected==index+1?Colors.transparent:Colors.grey
+                              color: Colors.black
                           )
                       ),
                       child: Center(child: Text((index+1).toString().toPersianDigit()))
@@ -85,9 +85,9 @@ class PaginationWidget extends StatelessWidget {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
 
-                        border: Border.all(color: Colors.grey)
+                        border: Border.all(color:selected == lastPage ? Colors.grey : Colors.black)
                     ),
-                    child: Icon(Icons.navigate_next)),
+                    child: Icon(Icons.navigate_next,color:selected == lastPage ? Colors.grey : Colors.black)),
               ),
 
             ],

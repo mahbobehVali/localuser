@@ -32,11 +32,11 @@ class TimePickerField extends StatelessWidget {
                 width: double.infinity,
                 height: 40.h,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
+                  border: Border.all(color: ignoring?Colors.grey:Colors.black),
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: Center(
-                  child: Text(displayText),
+                  child: Text(displayText,style: TextStyle(color: ignoring?Colors.grey:Colors.black),),
                 ),
               ),
             ),

@@ -73,7 +73,7 @@ class ReportScreen extends StatelessWidget {
                         Container(
                           height: 40.h,
                           decoration:
-                          BoxDecoration(border: Border.all(color: Colors.grey),
+                          BoxDecoration(border: Border.all(color: Colors.black),
                               borderRadius: BorderRadius.circular(5)),
                           child: BlocConsumer<ReportBloc, ReportState>(
                             listener: (context, state) {
@@ -146,12 +146,22 @@ class ReportScreen extends StatelessWidget {
                               final end = "${picked.end.year}/${p(picked.end.month)}/${p(picked.end.day)}";
 
                               context.read<ReportBloc>().add(ChangeDate(start, end));
+                              if(Constants().getDaysBetweenShamsiDates(start, end)!=0) {
+                                context.read<ReportBloc>().add(
+                                  ChangeStartClock("${p(00)}:${p(00)}"),
+                                );
+
+                                context.read<ReportBloc>().add(
+                                  ChangeEndClock("${p(23)}:${p(59)}"),
+
+                                );
+                              }
                             }
                           },
                           child: Container(
                             width: double.infinity,
                             height: 40.h,
-                            decoration:  BoxDecoration(border: Border.all(color: Colors.grey),
+                            decoration:  BoxDecoration(border: Border.all(color: Colors.black),
                                 borderRadius: BorderRadius.circular(5)),
 
                             child: Center(child: Text(
@@ -173,22 +183,37 @@ class ReportScreen extends StatelessWidget {
                 children: [
                   //  فیلد ساعت شروع
                   BlocBuilder<ReportBloc, ReportState>(
-                    buildWhen: (prev, curr) => prev.startHour != curr.startHour,
+                    buildWhen: (prev, curr) =>
+                    prev.startHour != curr.startHour ||
+                    prev.endHour != curr.endHour ||
+                    prev.startDate!=curr.startDate || prev.endDate!=curr.endDate,
                     builder: (context, state) {
-                      final displayStart = (state.startHour.isNotEmpty == true) ? state.startHour : "00:00";
+                      final displayStart =  state.startHour.toString().toPersianDigit();
 
                       return TimePickerField(
                         title: "ساعت شروع",
                         displayText: displayStart,
-                        ignoring: !(state.oneWell.length == 1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1 == 1),
+                        ignoring: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)!=0,
 
                         onTap: () async {
                           final picked = await Constants().showCustomTimePicker(context);
+
+
                           if (picked != null && context.mounted) {
-                            String p(int n) => n.toString().padLeft(2, '0');
-                            context.read<ReportBloc>().add(
-                              ChangeStartClock("${p(picked.hour)}:${p(picked.minute)}"),
-                            );
+
+                            final parts = state.endHour.toEnglishDigit().split(':');
+
+                            final hours = int.parse(parts[0]);
+                            final minutes = int.parse(parts[1]);
+
+                            if ((picked.hour * 60 + picked.minute) < (hours * 60 + minutes)) {
+                              String p(int n) => n.toString().padLeft(2, '0');
+                              context.read<ReportBloc>().add(
+                                ChangeStartClock("${p(picked.hour)}:${p(picked.minute)}"),
+                              );
+                            } else {
+                              GlobalSnackBar.show(context, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",duration: 3);
+                            }
                           }
                         },
                       );
@@ -199,20 +224,23 @@ class ReportScreen extends StatelessWidget {
 
                   //  فیلد ساعت پایان
                   BlocBuilder<ReportBloc, ReportState>(
+
                     buildWhen: (prev, curr) =>
-                    prev.endHour != curr.endHour || prev.startHour != curr.startHour,
+                        prev.endHour != curr.endHour ||
+                        prev.startHour != curr.startHour ||
+                        prev.startDate!=curr.startDate || prev.endDate!=curr.endDate,
                     builder: (context, state) {
-                      final isStartEmpty = state.startHour.isEmpty;
-                      final displayEnd = (state.endHour.isNotEmpty == true) ? state.endHour : "23:59";
+
+                      final displayEnd =  state.endHour.toString().toPersianDigit() ;
 
                       return TimePickerField(
                         title: "ساعت پایان",
                         displayText: displayEnd,
-                        ignoring: isStartEmpty,
+                        ignoring: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)!=0,
                         onTap: () async {
                           final picked = await Constants().showCustomTimePicker(context);
                           if (picked != null && context.mounted) {
-                            final parts = state.startHour.split(':');
+                            final parts = state.startHour.toEnglishDigit().split(':');
                             final hours = int.parse(parts[0]);
                             final minutes = int.parse(parts[1]);
 
@@ -222,7 +250,7 @@ class ReportScreen extends StatelessWidget {
                                 ChangeEndClock("${p(picked.hour)}:${p(picked.minute)}"),
                               );
                             } else {
-                              GlobalSnackBar.show(context, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد");
+                              GlobalSnackBar.show(context, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",duration: 3);
                             }
                           }
                         },
@@ -236,9 +264,17 @@ class ReportScreen extends StatelessWidget {
               ///search
               BlocBuilder<ReportBloc, ReportState>(
                 builder: (context, state) {
+                  final startParts = state.startHour.toEnglishDigit().split(':');
+                  final startHours = int.parse(startParts[0]);
+                  final startMinutes = int.parse(startParts[1]);
+
+                  final endParts = state.endHour.toEnglishDigit().split(':');
+                  final endHours = int.parse(endParts[0]);
+                  final endMinutes = int.parse(endParts[1]);
+
+                  bool bigger= (endMinutes * 60 + endHours) <= (startMinutes * 60 + startHours);
                   final isFormValid = (state.startDate.isNotEmpty) &&
                       (state.endDate.isNotEmpty) && state.oneWell.isNotEmpty;
-
 
                   return GlobalElevatedButton(
                     borderRadius: 5,
@@ -246,42 +282,46 @@ class ReportScreen extends StatelessWidget {
                     width: double.infinity,
                     backColor: isFormValid ? ColorPalette.darkBlue : ColorPalette.inverseGrey,
                     widget: const Text("جستجو", style: TextStyle(color: Colors.black)),
-                    onTap: isFormValid
+                    onTap:bigger?
+                        () {
+                        GlobalSnackBar.show(context, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد");
+                    }:
+                    isFormValid
                         ? () {
                       context.read<ReportBloc>()
                         // ..add(SearchClicked())
                         ..add(ReportFlowMeter(FlowMeterParams(
                         page: 1,
                         type: 5,
-                            endDate: state.endDate.isEmpty?"23:59":state.endDate,
-                            startDate: state.startDate.isEmpty?"23:59":state.startDate,
+                            endDate: state.endDate,
+                            startDate: state.startDate,
+                            startHour: state.startHour.toString().toEnglishDigit(),
+                            endHour: state.endHour.toString().toEnglishDigit(),
                         ids: state.oneWell
                       )))
-                        // ..add(ReportDetailFlowMeter(FlowMeterParams(
-                        //     page: 1,
-                        //     type: 5,
-                        //     endDate: state.endDate,
-                        //     startDate: state.startDate,
-                        //     ids: state.oneWell
-                        // )))
+
                         ..add(GetAlertCount(FlowMeterParams(
                           page: 1,
                           time: -1,
                           type: 5,
-                            endDate: state.endDate.isEmpty?"23:59":state.endDate,
-                            startDate: state.startDate.isEmpty?"23:59":state.startDate,
+                            endDate: state.endDate,
+                            startDate: state.startDate,
                           ids: state.oneWell
                       ))) ..add(ReportCommand(FlowMeterParams(
                           page: 1,
                           type: 5,
-                          endDate: state.endDate.isEmpty?"23:59":state.endDate,
-                          startDate: state.startDate.isEmpty?"23:59":state.startDate,
+                          endDate:state.endDate,
+                          startDate:state.startDate,
+                          startHour: state.startHour.toString().toEnglishDigit(),
+                          endHour: state.endHour.toString().toEnglishDigit(),
                           ids: state.oneWell
                       )))..add(UserActivityReportStart(FlowMeterParams(
                           page: 1,
                           type: 5,
-                          endDate: state.endDate.isEmpty?"23:59":state.endDate,
-                          startDate: state.startDate.isEmpty?"23:59":state.startDate,
+                          endDate:state.endDate,
+                          startDate: state.startDate,
+                          startHour: state.startHour.toString().toEnglishDigit(),
+                          endHour: state.endHour.toString().toEnglishDigit(),
                           ids: state.oneWell
                       )));
 
