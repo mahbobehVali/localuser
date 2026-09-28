@@ -185,8 +185,8 @@ class ReportScreen extends StatelessWidget {
                   BlocBuilder<ReportBloc, ReportState>(
                     buildWhen: (prev, curr) =>
                     prev.startHour != curr.startHour ||
-                    prev.endHour != curr.endHour ||
-                    prev.startDate!=curr.startDate || prev.endDate!=curr.endDate,
+                        prev.endHour != curr.endHour ||
+                        prev.startDate!=curr.startDate || prev.endDate!=curr.endDate,
                     builder: (context, state) {
                       final displayStart =  state.startHour.toString().toPersianDigit();
 
@@ -198,21 +198,36 @@ class ReportScreen extends StatelessWidget {
                         onTap: () async {
                           final picked = await Constants().showCustomTimePicker(context);
 
-
                           if (picked != null && context.mounted) {
+                            // ۱. اطمینان از وجود مقدار یا جایگزینی مقدار پیش‌فرض
+                            final endHourStr = state.endHour.isEmpty ? "23:59" : state.endHour;
 
-                            final parts = state.endHour.toEnglishDigit().split(':');
+                            // ۲. جداسازی بخش ساعت و دقیقه
+                            final parts = endHourStr.split(':');
 
-                            final hours = int.parse(parts[0]);
-                            final minutes = int.parse(parts[1]);
+                            // ۳. پاکسازی کامل کاراکترهای غیرعددی و تبدیل اعداد فارسی/عربی
+                            final rawHour = parts[0].toEnglishDigit().replaceAll(RegExp(r'[^\d]'), '');
+                            final rawMinute = parts.length > 1 ? parts[1].toEnglishDigit().replaceAll(RegExp(r'[^\d]'), '') : '0';
 
-                            if ((picked.hour * 60 + picked.minute) < (hours * 60 + minutes)) {
+                            // ۴. تبدیل ایمن با tryParse به همراه مقدار پشتیبان
+                            final hours = int.tryParse(rawHour) ?? 23;
+                            final minutes = int.tryParse(rawMinute) ?? 59;
+
+                            // ۵. محاسبه و مقایسه زمان‌ها
+                            final pickedTotalMinutes = picked.hour * 60 + picked.minute;
+                            final endTotalMinutes = hours * 60 + minutes;
+
+                            if (pickedTotalMinutes < endTotalMinutes) {
                               String p(int n) => n.toString().padLeft(2, '0');
                               context.read<ReportBloc>().add(
                                 ChangeStartClock("${p(picked.hour)}:${p(picked.minute)}"),
                               );
                             } else {
-                              GlobalSnackBar.show(context, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",duration: 3);
+                              GlobalSnackBar.show(
+                                context,
+                                message: "ساعت شروع باید کوچکتر از ساعت پایان باشد",
+                                duration: 3,
+                              );
                             }
                           }
                         },
@@ -226,7 +241,7 @@ class ReportScreen extends StatelessWidget {
                   BlocBuilder<ReportBloc, ReportState>(
 
                     buildWhen: (prev, curr) =>
-                        prev.endHour != curr.endHour ||
+                    prev.endHour != curr.endHour ||
                         prev.startHour != curr.startHour ||
                         prev.startDate!=curr.startDate || prev.endDate!=curr.endDate,
                     builder: (context, state) {
@@ -239,18 +254,37 @@ class ReportScreen extends StatelessWidget {
                         ignoring: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)!=0,
                         onTap: () async {
                           final picked = await Constants().showCustomTimePicker(context);
-                          if (picked != null && context.mounted) {
-                            final parts = state.startHour.toEnglishDigit().split(':');
-                            final hours = int.parse(parts[0]);
-                            final minutes = int.parse(parts[1]);
 
-                            if ((picked.hour * 60 + picked.minute) > (hours * 60 + minutes)) {
+                          if (picked != null && context.mounted) {
+                            // ۱. مقداردهی ایمن در صورت خالی بودن
+                            final startHourStr = state.startHour.isEmpty ? "00:00" : state.startHour;
+
+                            // ۲. جداسازی رشته
+                            final parts = startHourStr.split(':');
+
+                            // ۳. پاکسازی کاراکترهای مخفی و غیرعددی
+                            final rawHour = parts[0].toEnglishDigit().replaceAll(RegExp(r'[^\d]'), '');
+                            final rawMinute = parts.length > 1 ? parts[1].toEnglishDigit().replaceAll(RegExp(r'[^\d]'), '') : '0';
+
+                            // ۴. تبدیل ایمن به عدد با tryParse
+                            final hours = int.tryParse(rawHour) ?? 0;
+                            final minutes = int.tryParse(rawMinute) ?? 0;
+
+                            // ۵. محاسبه دقیق دقایق
+                            final pickedTotalMinutes = picked.hour * 60 + picked.minute;
+                            final startTotalMinutes = hours * 60 + minutes;
+
+                            if (pickedTotalMinutes > startTotalMinutes) {
                               String p(int n) => n.toString().padLeft(2, '0');
                               context.read<ReportBloc>().add(
                                 ChangeEndClock("${p(picked.hour)}:${p(picked.minute)}"),
                               );
                             } else {
-                              GlobalSnackBar.show(context, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",duration: 3);
+                              GlobalSnackBar.show(
+                                context,
+                                message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",
+                                duration: 3,
+                              );
                             }
                           }
                         },
@@ -264,15 +298,15 @@ class ReportScreen extends StatelessWidget {
               ///search
               BlocBuilder<ReportBloc, ReportState>(
                 builder: (context, state) {
-                  final startParts = state.startHour.toEnglishDigit().split(':');
-                  final startHours = int.parse(startParts[0]);
-                  final startMinutes = int.parse(startParts[1]);
-
-                  final endParts = state.endHour.toEnglishDigit().split(':');
-                  final endHours = int.parse(endParts[0]);
-                  final endMinutes = int.parse(endParts[1]);
-
-                  bool bigger= (endMinutes * 60 + endHours) <= (startMinutes * 60 + startHours);
+                  // final startParts = state.startHour.toEnglishDigit().split(':');
+                  // final startHours = int.parse(startParts[0]);
+                  // final startMinutes = int.parse(startParts[1]);
+                  //
+                  // final endParts = state.endHour.toEnglishDigit().split(':');
+                  // final endHours = int.parse(endParts[0]);
+                  // final endMinutes = int.parse(endParts[1]);
+                  //
+                  // bool bigger= (endMinutes * 60 + endHours) <= (startMinutes * 60 + startHours);
                   final isFormValid = (state.startDate.isNotEmpty) &&
                       (state.endDate.isNotEmpty) && state.oneWell.isNotEmpty;
 
@@ -282,10 +316,11 @@ class ReportScreen extends StatelessWidget {
                     width: double.infinity,
                     backColor: isFormValid ? ColorPalette.darkBlue : ColorPalette.inverseGrey,
                     widget: const Text("جستجو", style: TextStyle(color: Colors.black)),
-                    onTap:bigger?
-                        () {
-                        GlobalSnackBar.show(context, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد");
-                    }:
+                    onTap:
+                    // bigger?
+                    //     () {
+                    //     GlobalSnackBar.show(context, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد");
+                    // }:
                     isFormValid
                         ? () {
                       context.read<ReportBloc>()

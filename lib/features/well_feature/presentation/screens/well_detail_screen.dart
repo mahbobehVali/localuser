@@ -53,13 +53,14 @@ class _WellDetailScreenState extends State<WellDetailScreen>
     // final shadows = [ Shadow(color: ColorPalette.black, blurRadius: 2)];
 
     return List.generate(3, (i) {
-      final double radius =  55.0;
+      final double radius =  38.0.r;
 
       return switch (i) {
         0 => PieChartSectionData(
           color: ColorPalette.darkGreen,
           value: onValue,
           title: onValue > 0 ? '${onValue.toString().toPersianDigit()}' : '',
+
           radius: radius,
           titleStyle: TextStyle(
             fontSize:  13.0,
@@ -1168,87 +1169,106 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                     SizedBox(
                                       height: 10.h,
                                     ),
-                                    SizedBox(
-                                      height: 250.h,
-                                      child: BlocBuilder<WellDetailBloc, WellDetailState>(
-                                        buildWhen: (previous, current) {
+                                    BlocBuilder<WellDetailBloc, WellDetailState>(
+                                      buildWhen: (previous, current) {
 
-                                          if (builtOnce) return false;
+                                        if (builtOnce) return false;
 
-                                          if (current.weekWellWorkStatus is WeekWellWorkSuccess) {
-                                            builtOnce = true;
-                                          }
+                                        if (current.weekWellWorkStatus is WeekWellWorkSuccess) {
+                                          builtOnce = true;
+                                        }
 
-                                          return true;
-                                        },
-                                        builder: (context, state) {
-                                          if (state.weekWellWorkStatus is WeekWellWorkLoading) {
-                                            return ShimmerClass.pieChartShimmer();
-                                          }
-                                          else if (state.weekWellWorkStatus is WeekWellWorkSuccess) {
-                                            WeekWellWorkSuccess wellWorkSuccess = state.weekWellWorkStatus as WeekWellWorkSuccess;
-                                            final dynamic on = wellWorkSuccess.currentWellWorkEntity.list.totalOn;
-                                            final dynamic off = wellWorkSuccess.currentWellWorkEntity.list.totalOff;
+                                        return true;
+                                      },
+                                      builder: (context, state) {
+                                        if (state.weekWellWorkStatus is WeekWellWorkLoading) {
+                                          return ShimmerClass.pieChartShimmer();
+                                        }
+                                        else if (state.weekWellWorkStatus is WeekWellWorkSuccess) {
+                                          WeekWellWorkSuccess wellWorkSuccess = state.weekWellWorkStatus as WeekWellWorkSuccess;
+                                          final dynamic on = wellWorkSuccess.currentWellWorkEntity.list.totalOn;
+                                          final dynamic off = wellWorkSuccess.currentWellWorkEntity.list.totalOff;
 
-                                            return Center(
+                                          return Column(
+                                            mainAxisSize: MainAxisSize.min, // جلوگیری از اشغال فضای اضافی
+                                            children: [
+                                              SizedBox(
+                                                width: double.infinity,
+                                                height: 200.h, // کاهش ارتفاع باکس چارت از 200 به 160
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    PieChart(
+                                                      PieChartData(
+                                                        sectionsSpace: 0,
+                                                        centerSpaceRadius: 50.r, // کاهش شعاع داخلی از 80 به 55
+                                                        sections: showingSections(
+                                                          on: on,
+                                                          off: off,
+                                                        ),
+                                                      ),
+                                                      duration: const Duration(milliseconds: 150),
+                                                      curve: Curves.linear,
+                                                    ),
+                                                    Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                          "کل ساعات\n۱۶۸ ساعت",
+                                                          textAlign: TextAlign.center,
+                                                          style: TextStyleP.f14Bold,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              // SizedBox(height: 5.h),
+
+                                              // راهنماها (Indicators)
+                                              Padding(
+                                                padding: EdgeInsets.symmetric(horizontal: 8.w),
                                                 child: Column(
                                                   children: [
-                                                    SizedBox(
-                                                      width: double.infinity,
-                                                      height: 200.h,
-                                                      child: Stack(
-                                                        alignment: Alignment.center,
-                                                        children: [
-
-                                                          PieChart(
-                                                            PieChartData(
-                                                              sectionsSpace: 0,
-                                                              centerSpaceRadius: 80,
-                                                              sections: showingSections(
-                                                                on: on,
-                                                                off: off,
-                                                              ),
-
-                                                            ),
-                                                            duration: const Duration(milliseconds: 150),
-                                                            curve: Curves.linear,
-                                                          ),
-
-                                                          Column(
-                                                            mainAxisSize: MainAxisSize.min, // باعث می‌شود ستون فقط به اندازه محتوایش فضا بگیرد
-                                                            children: [
-                                                              Text(
-                                                                textAlign: TextAlign.center,
-                                                                "کل ساعات\n۱۶۸ ساعت",
-                                                                style: TextStyleP.f14Bold,
-                                                              ),
-
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 10.h),
-
                                                     Row(
                                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                       children: [
-                                                        Indicator(color: ColorPalette.darkGreen, text: 'مجموع ساعات روشن بودن', isSquare: false),
-                                                        Indicator(color: ColorPalette.darkRed, text: 'مجموع ساعات خاموش بودن', isSquare: false),
+                                                        Expanded(
+                                                          child: Indicator(
+                                                            color: ColorPalette.darkGreen,
+                                                            text: 'مجموع ساعات روشن بودن',
+                                                            isSquare: false,
+                                                          ),
+                                                        ),
+                                                        SizedBox(width: 8.w),
+                                                        Expanded(
+                                                          child: Indicator(
+                                                            color: ColorPalette.darkRed,
+                                                            text: 'مجموع ساعات خاموش بودن',
+                                                            isSquare: false,
+                                                          ),
+                                                        ),
                                                       ],
                                                     ),
-                                                    Indicator(color: ColorPalette.lightGrey, text: 'مجموع ساعات هفته', isSquare: false),
+                                                    SizedBox(height: 8.h),
+                                                    Indicator(
+                                                      color: ColorPalette.lightGrey,
+                                                      text: 'مجموع ساعات هفته',
+                                                      isSquare: false,
+                                                    ),
                                                   ],
-                                                ));
-                                          } else if (state.weekWellWorkStatus is WeekWellWorkError) {
-                                            WeekWellWorkError wellWorkError = state
-                                                .weekWellWorkStatus as WeekWellWorkError;
-                                            return Center(child: Text(wellWorkError.error));
-                                          } else {
-                                            return SizedBox();
-                                          }
-                                        },),
-                                    ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        } else if (state.weekWellWorkStatus is WeekWellWorkError) {
+                                          WeekWellWorkError wellWorkError = state
+                                              .weekWellWorkStatus as WeekWellWorkError;
+                                          return Center(child: Text(wellWorkError.error));
+                                        } else {
+                                          return SizedBox();
+                                        }
+                                      },),
 
 
                                   ],
