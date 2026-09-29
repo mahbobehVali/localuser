@@ -1,74 +1,66 @@
 
 import 'package:equatable/equatable.dart';
+import 'package:mahaliii/features/well_feature/domain/entity/signal_level_entity.dart';
 
 import '../../../domain/entity/well_flowmeter_one_entity.dart';
 
-abstract class FlowMeterTodayStatus extends Equatable {
-  const FlowMeterTodayStatus();
+abstract class SignalStatus extends Equatable {
+  const SignalStatus();
 }
 
-class FlowMeterTodayLoading extends FlowMeterTodayStatus {
+class SignalLoading extends SignalStatus {
   @override
   List<Object> get props => [];
 }
 
-class FlowMeterTodayRequestAccepted extends FlowMeterTodayStatus {
+class SignalRequestAccepted extends SignalStatus {
   final int status;
 
-  const FlowMeterTodayRequestAccepted(this.status);
+  const SignalRequestAccepted(this.status);
 
   @override
   List<Object> get props => [status];
 }
-class FlowMeterTodayRequestFailed extends FlowMeterTodayStatus {
+class SignalRequestFailed extends SignalStatus {
   final String error;
 
 
-  const FlowMeterTodayRequestFailed(this.error);
+  const SignalRequestFailed(this.error);
 
   @override
   List<Object> get props => [error];
 }
 
-class FlowMeterTodayInitial extends FlowMeterTodayStatus {
+class SignalInitial extends SignalStatus {
   @override
   List<Object> get props => [];
 }
 
-class FlowMeterTodayError extends FlowMeterTodayStatus {
+class SignalError extends SignalStatus {
   final String error;
 
-  const FlowMeterTodayError(this.error);
+  const SignalError(this.error);
 
   @override
   List<Object> get props => [error];
 }
 
-class FlowMeterTodayTodayError extends FlowMeterTodayStatus {
+class SignalTodayError extends SignalStatus {
   final String error;
 
-  const FlowMeterTodayTodayError(this.error);
+  const SignalTodayError(this.error);
 
   @override
   List<Object> get props => [error];
 }
 
-class FlowMeterTodaySuccess extends FlowMeterTodayStatus {
-  final WellFlowMeterOneEntity? wellFlowMeterTodayOneEntity;
+class SignalSuccess extends SignalStatus {
 
+   final SignalLevelEntity signalLevelEntity;
 
-  const FlowMeterTodaySuccess({ this.wellFlowMeterTodayOneEntity});
-
-  // // متد copyWith برای اینکه وقتی یکی آمد، قبلی پاک نشود
-  // FlowMeterTodaySuccess copyWith({
-  //   int? newStatus,
-  // }) {
-  //   return FlowMeterTodaySuccess(
-  //     status: newStatus ?? status,
-  //   );
-  // }
+  SignalSuccess(this.signalLevelEntity);
 
   @override
   // TODO: implement props
-  List<Object?> get props =>[wellFlowMeterTodayOneEntity];
+  List<Object?> get props =>[signalLevelEntity];
 }

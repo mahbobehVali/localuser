@@ -158,8 +158,9 @@ class ChangeWellTab extends WellDetailEvent {
 }
 class ChangeUserLocalId extends WellDetailEvent {
   final int? userLocalId;
+  final int? signal;
 
-  const ChangeUserLocalId(this.userLocalId);
+  const ChangeUserLocalId(this.userLocalId,[this.signal]);
 
   @override
   // TODO: implement props
@@ -232,9 +233,9 @@ class FlowMeterEvent extends WellDetailEvent {
   List<Object?> get props => [];
 }
 
-class FlowMeterToday extends WellDetailEvent {
+class SignalQuality extends WellDetailEvent {
 
-  const FlowMeterToday();
+  const SignalQuality();
 
   @override
   // TODO: implement props

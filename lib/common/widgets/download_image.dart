@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as Path;
 
@@ -93,14 +94,15 @@ class _PayvastSupportFileState extends State<PayvastSupportFile> {
       },
       child: Container(
         decoration: BoxDecoration(
-            border: BoxBorder.all(color: ColorPalette.grey)
-        ),
+             borderRadius: BorderRadius.circular(4),
+        border: BoxBorder.all(color: ColorPalette.inverseGrey),),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("فایل پیوست",style: TextStyle(color: ColorPalette.black)),
+              SizedBox(width: 5.w,),
               fileExists && downloading == false
                   ? Icon(Icons.file_copy_outlined, color: Colors.green) // اگر شرط اول درست باشد، این آیکون برگردانده می‌شود
                   : (downloading // اگر شرط اول غلط باشد، این شرط جدید ارزیابی می‌شود
@@ -115,10 +117,10 @@ class _PayvastSupportFileState extends State<PayvastSupportFile> {
                     valueColor: const AlwaysStoppedAnimation<Color>(
                         Colors.blue),
                   ),
-                  Icon(Icons.close,color: ColorPalette.white)
+                  Icon(Icons.close,color: ColorPalette.blue)
                 ],
               ) // در اینجا باید آیکون متناسب با 'downloading == true' بیاید
-                  : Icon(Icons.save_alt,color: ColorPalette.white,) // و اینجا آیکون متناسب با 'fileExists == false && downloading == false' (که در شرط اول پوشش داده نشده)
+                  : Icon(Icons.save_alt,color: ColorPalette.blue,) // و اینجا آیکون متناسب با 'fileExists == false && downloading == false' (که در شرط اول پوشش داده نشده)
               )
             ],
           ),

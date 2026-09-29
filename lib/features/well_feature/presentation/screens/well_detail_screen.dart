@@ -120,8 +120,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       ..add(FlowMeterEvent(FlowMeterParams(type: 0, ids: [widget.wellsDataEntity.deviceId!])))
       ..add(GetProgram(widget.wellsDataEntity.id!))
       ..add(FirstSwitch(widget.wellsDataEntity.statusWell == 1))
-      ..add(ChangeUserLocalId(widget.wellsDataEntity.userLocalId))
-      ..add(AutoSwitchChange(widget.wellsDataEntity.deviceId!));
+      ..add(ChangeUserLocalId(widget.wellsDataEntity.userLocalId,widget.wellsDataEntity.signalLevel))
+      ..add(AutoSwitchChange(widget.wellsDataEntity.deviceId!))
+      ..add(SignalQuality());
 
     _controller = AnimationController(
       vsync: this,
@@ -350,8 +351,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         ),
                                         BlocConsumer<WellDetailBloc, WellDetailState>(
                                           buildWhen: (previous, current) {
-                                            return previous.flowMeterTodayStatus != current.flowMeterTodayStatus ||
-                                                previous.flowMeterStatus != current.flowMeterStatus ||
+                                            return previous.flowMeterStatus != current.flowMeterStatus ||
                                                 previous.selectedChartVolumeTab != current.selectedChartVolumeTab;
                                           },
                                           listener: (context, state) {
@@ -1532,6 +1532,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                       ),
                                     ),
                                     SizedBox(height: 32.h),
+
                                       ///signal
                                     Container(
                                       height: 80.h,
@@ -1563,11 +1564,13 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                 ],
                                               ),
                                               SizedBox(height: 4.h,),
-                                              Text(Constants().signalLevel[widget.wellsDataEntity.signalLevel??0].name)
+                                              BlocBuilder<WellDetailBloc, WellDetailState>(builder: (context, state) {
+                                                return Text(Constants().signalLevel[state.signal].name);
+                                              },)
                                             ],
                                           ),
                                           // اگر عدد 3 پاس داده شود: 3 میله اول سبز و 2 میله بعدی طوسی می‌شوند
-                                          SignalBarChart(value: widget.wellsDataEntity.signalLevel??0,)
+                                          SignalBarChart(value: state.signal)
 
                                         ],
                                       ),

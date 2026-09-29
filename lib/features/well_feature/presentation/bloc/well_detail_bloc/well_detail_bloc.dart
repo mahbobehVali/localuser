@@ -70,8 +70,8 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     wellScreenStatus: WellScreenInitial(),
     userLocalId: null,
     flowMeterStatus: FlowMeterInitial(),
-    today: -1,
-    flowMeterTodayStatus: FlowMeterTodayInitial()
+    signal: -1,
+      signalStatus: SignalInitial()
   )) {
 
     on<WellStart>((event, emit) async {
@@ -346,8 +346,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
           )));
         }
 
-        add(FlowMeterToday());
-
       }
       if (flowMeterDataState is DataFailed) {
         if (flowMeterDataState.isTokenExpired) {
@@ -359,31 +357,25 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       }
     });
 
-    on<FlowMeterToday>((event, emit) async {
-      print("todaybloc");
-      // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
-      // if (state.onOffStatus is! OnOffSuccess) {
-      //   emit(state.copyWith(newOnOffStatus: OnOffSuccess()));
-      // }
-      // ارسال درخواست مخصوص این صفحه
-      // emit(state.copyWith(newOnOffStatus: OnOffLoading()));
-
-      // socketRepository.onAndOff(event.createTimeParams);
+    on<SignalQuality>((event, emit) async {
+      print("SignalQuality");
 
       // ۲. مدیریت استریم با emit.forEach
       await emit.forEach<dynamic>(
-        // socketRepository.onAndOffTimeStream,
-        socketRepository.todayStream,
-        onData: (today) {
-          // print("today$today");
+        socketRepository.signalStream,
+        onData: (signal) {
+          print("SignalQuality$signal");
+          print("signal_level${signal["signal_level"]}");
           // دیتای دریافتی را به وضعیت موفقیت می‌بریم
           return state.copyWith(
-              newFlowMeterTodayStatus: FlowMeterTodaySuccess(wellFlowMeterTodayOneEntity: today));
+              newSignalStatus: SignalSuccess(signal),newSignal: signal["signal_level"]);
+
+
         },
         onError: (error, stackTrace) {
           print("❌ BLoC Stream Error: $error");
           return state.copyWith(
-            newFlowMeterTodayStatus: FlowMeterTodayError(error.toString()),
+            newSignalStatus: SignalError(error.toString()),
           );
         },
       );
@@ -416,7 +408,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     });
 
     on<ChangeUserLocalId>((event, emit) async {
-      emit(state.copyWith(newUserLocalId: event.userLocalId));
+      emit(state.copyWith(newUserLocalId: event.userLocalId,newSignal: event.signal));
 
     });
 

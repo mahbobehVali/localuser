@@ -48,6 +48,13 @@ class RadioRow extends StatelessWidget {
 
           children: List.generate(list.length, (index) {
             return RadioMenuButton(
+              style: ButtonStyle(
+                // ۱. حذف هاله‌ی افکت کلیک (Splash/Hover/Focus)
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
+
+                // ۲. اختیاری: حذف افکت انیمیشنی موجی (Inkstplash)
+                splashFactory: NoSplash.splashFactory,
+              ),
               value:list[index]["id"],
               groupValue: state.selectedRadio,
               onChanged: (value) {

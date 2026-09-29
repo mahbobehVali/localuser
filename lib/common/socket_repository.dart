@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:mahaliii/common/params/create_time_params.dart';
 import 'package:mahaliii/common/utils/sharedpreference.dart';
 import 'package:mahaliii/features/well_feature/data/model/on_off_model.dart';
+import 'package:mahaliii/features/well_feature/data/model/signal_level_model.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 import 'package:socket_io_client/socket_io_client.dart' as i_o;
 
@@ -43,6 +44,7 @@ class SocketRepository {
    StreamController<dynamic> _deleteTimeController = StreamController<dynamic>.broadcast();
    StreamController<dynamic> _onAndOffTimeController = StreamController<dynamic>.broadcast();
    StreamController<dynamic> _todayController = StreamController<dynamic>.broadcast();
+   StreamController<dynamic> _signalController = StreamController<dynamic>.broadcast();
 
   // گرفتن استریم‌ها در صفحات/بلاک‌ها
   Stream<dynamic> get dashboardStatusCheckFinger => _statusControllerCheckFinger.stream;
@@ -51,6 +53,7 @@ class SocketRepository {
   Stream<dynamic> get deleteTimeStream => _deleteTimeController.stream;
   Stream<dynamic> get onAndOffTimeStream => _onAndOffTimeController.stream;
   Stream<dynamic> get todayStream => _todayController.stream;
+  Stream<dynamic> get signalStream => _todayController.stream;
 
   Completer<bool>? _connectCompleter;
 
@@ -239,21 +242,38 @@ class SocketRepository {
       }
     });
 
-    _socket!.on("flowmeter/today", (data) {
-      // print("todayyyyyyyyyy");
-      if (data != null && !_todayController.isClosed) {
-        // تبدیل به مدل و اضافه کردن به استریم آب
-        try {
-          final model=WellFlowMeterOneModel.fromJson(data);
+    // _socket!.on("flowmeter/today", (data) {
+    //   // print("todayyyyyyyyyy");
+    //   if (data != null && !_todayController.isClosed) {
+    //     // تبدیل به مدل و اضافه کردن به استریم آب
+    //     try {
+    //       final model=WellFlowMeterOneModel.fromJson(data);
+    //
+    //       _todayController.add(model);
+    //
+    //       // print(' flowmeter Today successfully added to stream');
+    //     } catch (e) {
+    //
+    //       print('JSON 2 Parsing Error: $e');
+    //     }      }
+    // });
 
-          _todayController.add(model);
+      _socket!.on("signal_quality", (data) {
+            // print("todayyyyyyyyyy");
+            if (data != null && !_signalController.isClosed) {
+              print("datasignal${data}");
+              // تبدیل به مدل و اضافه کردن به استریم آب
+              try {
+                final model=SignalLevelModel.fromJson(data);
 
-          // print(' flowmeter Today successfully added to stream');
-        } catch (e) {
+                _signalController.add(model);
 
-          print('JSON 2 Parsing Error: $e');
-        }      }
-    });
+                // print(' flowmeter Today successfully added to stream');
+              } catch (e) {
+
+                print('JSON 2 Parsing Error: $e');
+              }      }
+          });
 
 
     _socket!.on("program/add", (data) {

@@ -53,7 +53,7 @@ class SupportAnswerScreen extends StatelessWidget {
           return supportBloc;
         },
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w,vertical: 50.h),
+          padding: EdgeInsets.only(left: 16.w,right: 16.w,top: 50.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -83,7 +83,7 @@ class SupportAnswerScreen extends StatelessWidget {
              Expanded(
                child: Container(
                  color: Colors.white,
-                 padding: EdgeInsets.all(20.sp),
+                 padding: EdgeInsets.symmetric(horizontal: 20.w),
                  child: BlocConsumer<SupportBloc,SupportState>(
                    listenWhen: (previous, current) => previous.supportAnswersStatus!=current.supportAnswersStatus,
                    listener: (context, state) {
@@ -473,9 +473,6 @@ class _ExpandableTextState extends State<ExpandableText> {
             displayText,
             style: const TextStyle(fontSize: 16),
           ),
-
-
-
 
 
           Padding(
