@@ -359,6 +359,10 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
     on<SignalQuality>((event, emit) async {
       print("SignalQuality");
+      emit(state.copyWith(
+        newSignalStatus: SignalSuccess(),
+        newSignal: event.initialSignal, // یا state.signal اگر از قبل مقداردهی شده
+      ));
 
       // ۲. مدیریت استریم با emit.forEach
       await emit.forEach<dynamic>(
@@ -368,7 +372,8 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
           print("signal_level${signal["signal_level"]}");
           // دیتای دریافتی را به وضعیت موفقیت می‌بریم
           return state.copyWith(
-              newSignalStatus: SignalSuccess(signal),newSignal: signal["signal_level"]);
+              newSignalStatus: SignalSuccess(signal),
+              newSignal: signal["signal_level"]);
 
 
         },
@@ -408,7 +413,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     });
 
     on<ChangeUserLocalId>((event, emit) async {
-      emit(state.copyWith(newUserLocalId: event.userLocalId,newSignal: event.signal));
+      emit(state.copyWith(newUserLocalId: event.userLocalId));
 
     });
 

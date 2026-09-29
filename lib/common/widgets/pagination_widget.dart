@@ -2,99 +2,178 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
+import '../../config/color_palette.dart';
 import '../../config/texts_style.dart';
 
 class PaginationWidget extends StatelessWidget {
-  const PaginationWidget({super.key,required this.selected,required this.lastPage,
-    required this.onPageChanged});
+  const PaginationWidget({
+    super.key,
+    required this.selected,
+    required this.lastPage,
+    required this.onPageChanged,
+  });
 
   final int selected;
   final int lastPage;
-  final Function(int page) onPageChanged; // تعریف جدید
+  final Function(int page) onPageChanged;
+
+  /// منطق دقیق تولید شماره صفحات با سه نقطه ثابت
+  List<dynamic> _buildPageItems() {
+    if (lastPage <= 1) return [1];
+
+    final List<dynamic> items = [];
+
+    if (selected == lastPage) {
+      // اگر روی آخرین صفحه هستید: نمایش عدد قبل‌تر + سه نقطه + صفحه آخر (مثلاً: 28 ... 30)
+      if (lastPage - 2 > 0) {
+        items.add(lastPage - 2);
+        items.add("...");
+      }
+      items.add(lastPage);
+    } else {
+      // در سایر صفحات: شماره صفحه فعلی + سه نقطه + شماره صفحه آخر (مثلاً: 1 ... 30 یا 2 ... 30)
+      items.add(selected);
+
+      // اگر فاصله بین صفحه فعلی و صفحه آخر بیشتر از ۱ است، سه نقطه بگذار
+      if (lastPage - selected > 1) {
+        items.add("...");
+      }
+
+      items.add(lastPage);
+    }
+
+    return items;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return lastPage>1?
-    Padding(
+    if (lastPage <= 1) return const SizedBox();
+
+    final pageItems = _buildPageItems();
+
+    return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text("صفحه ${selected.toString().toPersianDigit()} از ${lastPage.toString().toPersianDigit()} ",style: TextStyleP.f10Regular),
+          // متن وضعیت صفحه
+          Text(
+            "صفحه ${selected.toString().toPersianDigit()} از ${lastPage.toString().toPersianDigit()}",
+            style: TextStyleP.f10Regular,
+          ),
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: selected == 1 ? null : () => onPageChanged(selected - 1), // پاس دادن صفحه قبلی
-                child: Container(
-                    width: 30.w,
-                    height: 30.h,
-                    // padding: const EdgeInsets.symmetric(vertical: 7),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-
-                        border: Border.all(color: selected == 1 ? Colors.grey :Colors.black)
-                    ),
-                    child: Icon(Icons.navigate_before,color: selected == 1 ? Colors.grey :Colors.black)),
+              // ۱. دکمه رفتن به اولین صفحه (<<)
+              _buildIconButton(
+                icon: Icons.first_page,
+                isDisabled: selected == 1,
+                onTap: () => onPageChanged(1),
               ),
 
-              SizedBox(
+              // ۲. دکمه صفحه قبل (<)
+              _buildIconButton(
+                icon: Icons.navigate_before,
+                isDisabled: selected == 1,
+                onTap: () => onPageChanged(selected - 1),
+              ),
 
-                width: lastPage*46> MediaQuery.sizeOf(context).width*0.4?
-                MediaQuery.sizeOf(context).width*0.4:
-                lastPage*46,
-                height: 30.h,
+              const SizedBox(width: 4),
 
-                child: ListView.builder(
+              // ۳. مربعات شماره صفحه و سه نقطه‌ها
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: pageItems.map((item) {
+                  // رندر کردن سه نقطه (...)
+                  if (item == "...") {
+                    return Container(
+                      width: 20.w,
+                      height: 30.h,
+                      alignment: Alignment.center,
+                      child: Text(
+                        "...",
+                        style: TextStyle(
+                          color: ColorPalette.black,
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  }
 
-                  scrollDirection: Axis.horizontal,
-                  itemCount: lastPage,itemBuilder: (context, index) {
+                  // رندر کردن مربع اعداد
+                  final int page = item as int;
+                  final isSelected = selected == page;
+
                   return GestureDetector(
-                    onTap: selected == index+1 ? null : () => onPageChanged(index+1), // پاس دادن صفحه قبلی
-
+                    onTap: isSelected ? null : () => onPageChanged(page),
                     child: Container(
                       width: 30.w,
                       height: 30.h,
-                      // padding: const EdgeInsets.all(7),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-
+                      margin: const EdgeInsets.symmetric(horizontal: 3),
                       decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color:selected==index+1?Color(0xff82A5D2):Colors.transparent,
-
-                          border: Border.all(
-                              color: Colors.black
-                          )
+                        borderRadius: BorderRadius.circular(4),
+                        color: isSelected ? const Color(0xff82A5D2) : Colors.transparent,
+                        border: Border.all(color: Colors.black),
                       ),
-                      child: Center(child: Text((index+1).toString().toPersianDigit()))
-
+                      child: Center(
+                        child: Text(
+                          page.toString().toPersianDigit(),
+                          style: TextStyle(color: ColorPalette.black),
+                        ),
+                      ),
                     ),
                   );
-                },),
-              ),
-              GestureDetector(
-                onTap: selected == lastPage ? null : () => onPageChanged(selected + 1), // پاس دادن صفحه قبلی
-                child: Container(
-                    width: 30.w,
-                    height: 30.h,
-                    // padding: const EdgeInsets.symmetric(vertical: 7),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-
-                        border: Border.all(color:selected == lastPage ? Colors.grey : Colors.black)
-                    ),
-                    child: Icon(Icons.navigate_next,color:selected == lastPage ? Colors.grey : Colors.black)),
+                }).toList(),
               ),
 
+              const SizedBox(width: 4),
+
+              // ۴. دکمه صفحه بعد (>)
+              _buildIconButton(
+                icon: Icons.navigate_next,
+                isDisabled: selected == lastPage,
+                onTap: () => onPageChanged(selected + 1),
+              ),
+
+              // ۵. دکمه رفتن به آخرین صفحه (>>)
+              _buildIconButton(
+                icon: Icons.last_page,
+                isDisabled: selected == lastPage,
+                onTap: () => onPageChanged(lastPage),
+              ),
             ],
           ),
         ],
       ),
-    ):
-    const SizedBox();
+    );
+  }
+
+  /// ویجت ساخت دکمه‌های آیکون‌دار
+  Widget _buildIconButton({
+    required IconData icon,
+    required bool isDisabled,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: isDisabled ? null : onTap,
+      child: Container(
+        width: 30.w,
+        height: 30.h,
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: isDisabled ? ColorPalette.grey : ColorPalette.black,
+          ),
+        ),
+        child: Icon(
+          icon,
+          color: isDisabled ? ColorPalette.grey : ColorPalette.black,
+          size: 18.sp,
+        ),
+      ),
+    );
   }
 }

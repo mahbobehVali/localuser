@@ -13,6 +13,8 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/pump_performance_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/widgets/program_widget.dart';
+import 'package:mahaliii/features/well_feature/presentation/screens/widgets/signal_widget.dart';
+import 'package:mahaliii/features/well_feature/presentation/screens/widgets/switch_pump.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
 import '../../../../bottom_nav/wrapper_bloc.dart';
@@ -120,9 +122,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       ..add(FlowMeterEvent(FlowMeterParams(type: 0, ids: [widget.wellsDataEntity.deviceId!])))
       ..add(GetProgram(widget.wellsDataEntity.id!))
       ..add(FirstSwitch(widget.wellsDataEntity.statusWell == 1))
-      ..add(ChangeUserLocalId(widget.wellsDataEntity.userLocalId,widget.wellsDataEntity.signalLevel))
+      ..add(ChangeUserLocalId(widget.wellsDataEntity.userLocalId))
       ..add(AutoSwitchChange(widget.wellsDataEntity.deviceId!))
-      ..add(SignalQuality());
+      ..add(SignalQuality(widget.wellsDataEntity.signalLevel!));
 
     _controller = AnimationController(
       vsync: this,
@@ -1461,120 +1463,11 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                     SizedBox(height: 32.h),
 
                                     ///switch
-                                    Container(
-                                      height: 70.h,
-                                      padding: EdgeInsets.symmetric(horizontal: 18.w),
-                                      decoration: BoxDecoration(
-                                        color: ColorPalette.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                        children: [
-                                          Row(
-                                            children: [
-                                              IconContainer(
-                                                icon: Image.asset("assets/icons/pomp.png"),
-                                                color: ColorPalette.iconContainerColor,
-                                                width: 24,
-                                                height: 24,
-                                              ),
-                                              SizedBox(width: 9),
-
-                                              Text("کنترل لحظه‌ای پمپ"),
-                                            ],
-                                          ),
-                                          BlocListener<WellDetailBloc, WellDetailState>(
-                                            listenWhen: (previous, current) => previous.isSwitched != current.isSwitched,
-                                            // buildWhen: (previous, current) => previous.isSwitched != current.isSwitched,
-                                            listener: (context, state) {
-                                              if(state.onOffStatus is OnOffSuccess){
-                                                final isSuccess = state.onOffStatus as OnOffSuccess;
-
-                                                // 🟢 دسترسی مستقیم به استیت WrapperBloc بدون نیاز به ساخت BlocListener جدید
-                                                final wrapperState = context.read<WrapperBloc>().state;
-
-                                                // 🟢 جستجو در لیست چاه‌های WrapperBloc
-                                                final bool exists = wrapperState.wells.any(
-                                                      (well) => well.data?.deviceId == isSuccess.offEntity.deviceId,
-                                                );
-
-                                                print("🟢 Socket Switch State Changed: ${state.isSwitched}");
-                                                print("Exist in wells: $exists");
-
-                                                if (exists) {
-                                                  GlobalSnackBar.show(
-                                                    context,
-                                                    message: state.isSwitched == true ? "${isSuccess.offEntity.name} روشن شد" : "${isSuccess.offEntity.name} خاموش شد",
-                                                    duration: 2,
-                                                  );
-                                                }
-                                              }
-
-                                            },
-
-                                            child: CupertinoSwitch(
-                                              activeTrackColor: ColorPalette.lightBlue,
-                                              thumbColor: ColorPalette.darkBlue,
-                                              inactiveThumbColor: ColorPalette.black.withValues(alpha: 0.5),
-                                              value: state.isSwitched,
-                                              onChanged: (value) {
-                                                // print(value);
-                                                ShowDialogs().turnPomp(context,
-                                                  BlocProvider.of<WellDetailBloc>(context),
-                                                  value,widget.wellsDataEntity,);
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                    SwitchPump(widget: widget),
                                     SizedBox(height: 32.h),
 
                                       ///signal
-                                    Container(
-                                      height: 80.h,
-                                      padding: EdgeInsets.symmetric(horizontal: 18.w),
-                                      decoration: BoxDecoration(
-                                        color: ColorPalette.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  IconContainer(
-                                                    icon: Icon(Icons.signal_cellular_alt),
-                                                    color: ColorPalette.iconContainerColor,
-                                                    width: 24,
-                                                    height: 24,
-                                                  ),
-                                                  SizedBox(width: 9),
-
-                                                  Text("وضعیت آنتن دهی دستگاه"),
-                                                ],
-                                              ),
-                                              SizedBox(height: 4.h,),
-                                              BlocBuilder<WellDetailBloc, WellDetailState>(builder: (context, state) {
-                                                return Text(Constants().signalLevel[state.signal].name);
-                                              },)
-                                            ],
-                                          ),
-                                          // اگر عدد 3 پاس داده شود: 3 میله اول سبز و 2 میله بعدی طوسی می‌شوند
-                                          SignalBarChart(value: state.signal)
-
-                                        ],
-                                      ),
-                                    ),
+                                    SignalWidget(),
                                     SizedBox(height: 32.h),
 
                                     ///program
@@ -1674,3 +1567,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
     );
   }
 }
+
+
+
+

@@ -56,9 +56,9 @@ class SignalTodayError extends SignalStatus {
 
 class SignalSuccess extends SignalStatus {
 
-   final SignalLevelEntity signalLevelEntity;
+   final SignalLevelEntity? signalLevelEntity;
 
-  SignalSuccess(this.signalLevelEntity);
+  SignalSuccess([this.signalLevelEntity]);
 
   @override
   // TODO: implement props

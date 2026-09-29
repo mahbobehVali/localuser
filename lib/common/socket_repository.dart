@@ -8,14 +8,7 @@ import 'package:persian_number_utility/persian_number_utility.dart';
 import 'package:socket_io_client/socket_io_client.dart' as i_o;
 
 import '../features/status_summary_feature/data/model/water_model.dart';
-import '../features/well_feature/data/model/well_flowmeter_one_model.dart';
 import '../locator.dart';
-
-// Future<dynamic> getToken() async {
-//   final userToken = locator<SharedPrefOperator>().getUserToken();
-//   print("sdsfs${userToken}");
-//   return userToken;
-// }
 
 enum FingerprintSource {
   requestResponse, // لیسنر اول
@@ -27,37 +20,38 @@ class FingerprintResponse {
   final int? userLocalID;
   final FingerprintSource source;
 
-  FingerprintResponse({required this.status,this.userLocalID, required this.source});
+  FingerprintResponse({required this.status, this.userLocalID, required this.source});
 }
 
 class SocketRepository {
-
   i_o.Socket? _socket;
-  bool isConnecting = false; // جلوگیری از درخواست‌های همزمان اتصال
-  String? _managerPin;       // پین مدیر (همیشه ثابت)
-  String? _currentWellPin;   // پین چاهی که در حال حاضر داخل آن هستیم
+  bool isConnecting = false;
+  String? _managerPin;
+  String? _currentWellPin;
 
-  // استریم کنترلرها برای صفحات مختلف
-   StreamController<dynamic> _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
-   StreamController<dynamic> _waterController = StreamController<dynamic>.broadcast();
-   StreamController<dynamic> _createTimeController = StreamController<dynamic>.broadcast();
-   StreamController<dynamic> _deleteTimeController = StreamController<dynamic>.broadcast();
-   StreamController<dynamic> _onAndOffTimeController = StreamController<dynamic>.broadcast();
-   StreamController<dynamic> _todayController = StreamController<dynamic>.broadcast();
-   StreamController<dynamic> _signalController = StreamController<dynamic>.broadcast();
+  // استریم کنترلرها
+  StreamController<dynamic> _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
+  StreamController<WaterModel> _waterController = StreamController<WaterModel>.broadcast();
+  StreamController<dynamic> _createTimeController = StreamController<dynamic>.broadcast();
+  StreamController<dynamic> _deleteTimeController = StreamController<dynamic>.broadcast();
+  StreamController<dynamic> _onAndOffTimeController = StreamController<dynamic>.broadcast();
+  StreamController<dynamic> _todayController = StreamController<dynamic>.broadcast();
+  StreamController<SignalLevelModel> _signalController = StreamController<SignalLevelModel>.broadcast();
 
-  // گرفتن استریم‌ها در صفحات/بلاک‌ها
+  // Getterهای اصلاح‌شده
   Stream<dynamic> get dashboardStatusCheckFinger => _statusControllerCheckFinger.stream;
-  Stream<dynamic> get waterStream => _waterController.stream;
+  Stream<WaterModel> get waterStream => _waterController.stream;
   Stream<dynamic> get createTimeStream => _createTimeController.stream;
   Stream<dynamic> get deleteTimeStream => _deleteTimeController.stream;
   Stream<dynamic> get onAndOffTimeStream => _onAndOffTimeController.stream;
   Stream<dynamic> get todayStream => _todayController.stream;
-  Stream<dynamic> get signalStream => _todayController.stream;
+
+  // 🟢 اصلاح شد: اتصال درست به _signalController
+  Stream<SignalLevelModel> get signalStream => _signalController.stream;
 
   Completer<bool>? _connectCompleter;
 
-  // 🟢 تابع دریافت توکن همراه با چک کردن مقدار خالی
+  // دریافت توکن
   Future<String> _getOrWaitForToken({int maxRetries = 10, Duration delay = const Duration(milliseconds: 500)}) async {
     for (int i = 0; i < maxRetries; i++) {
       final token = await locator<SharedPrefOperator>().getUserToken();
@@ -66,39 +60,29 @@ class SocketRepository {
         return token;
       }
       print("⏳ Token is empty. Retrying (${i + 1}/$maxRetries)...");
-      await Future.delayed(delay); // ۵۰۰ میلی‌ثانیه صبر تا شارژ/ذخیره شدن توکن
+      await Future.delayed(delay);
     }
-    return ""; // اگر بعد از چند ثانیه بازم خالی بود
+    return "";
   }
 
   Future<bool> initAndConnect(String managerPin, [String? level, int? id]) async {
-    // 🟢 اگر کنترلر بسته شده بود، دوباره آن را بسازید
-    if (_waterController.isClosed) {
-      _waterController = StreamController<WaterModel>.broadcast();
-    }
-    if (_createTimeController.isClosed) {
-      _createTimeController = StreamController<dynamic>.broadcast();
-    }
-    if (_deleteTimeController.isClosed) {
-      _deleteTimeController = StreamController<dynamic>.broadcast();
-    }
-    if (_onAndOffTimeController.isClosed) {
-      _onAndOffTimeController = StreamController<dynamic>.broadcast();
-    }
-    if (_statusControllerCheckFinger.isClosed) {
-      _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
-    }
-    print("_currentWellPin${_currentWellPin}");
+    // 🟢 ۱. چک کردن همه کنترلرها و بازسازی در صورت بسته بودن
+    if (_waterController.isClosed) _waterController = StreamController<WaterModel>.broadcast();
+    if (_createTimeController.isClosed) _createTimeController = StreamController<dynamic>.broadcast();
+    if (_deleteTimeController.isClosed) _deleteTimeController = StreamController<dynamic>.broadcast();
+    if (_onAndOffTimeController.isClosed) _onAndOffTimeController = StreamController<dynamic>.broadcast();
+    if (_statusControllerCheckFinger.isClosed) _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
+    if (_todayController.isClosed) _todayController = StreamController<dynamic>.broadcast();
+    if (_signalController.isClosed) _signalController = StreamController<SignalLevelModel>.broadcast();
 
-    print("initAndConnectCalled---managerPin:$managerPin");
+    print("_currentWellPin: $_currentWellPin");
+    print("initAndConnectCalled --- managerPin: $managerPin");
     _managerPin = managerPin;
 
+    // اگر سوکت وصل است فقط روم‌ها را جوین شو
     if (_socket != null && _socket!.connected) {
       print("Socket already connected.");
-      _socket!.emit("join/room", {'room': _managerPin});
-      if (_currentWellPin != null) {
-        _socket!.emit("join/room", {'room': _currentWellPin});
-      }
+      _joinRooms();
       return true;
     }
 
@@ -108,11 +92,9 @@ class SocketRepository {
 
     isConnecting = true;
     _connectCompleter = Completer<bool>();
-    // 🟢 ۲. منتظر بمانید تا توکن حتماً پر شود (حداکثر ۵ ثانیه صبر می‌کند)
+
     String token = await _getOrWaitForToken(maxRetries: 10, delay: const Duration(milliseconds: 500));
-//  اگر بعد از صبر کردن، همچنان توکن خالی بود اتصال برقرار نشود
-    print('TOKEN BEFORE SOCKET: [$token]');
-    print('TOKEN LENGTH: ${token.length}');
+
     if (token.isEmpty) {
       print("❌ Could not obtain a valid token. Aborting connection.");
       isConnecting = false;
@@ -122,51 +104,44 @@ class SocketRepository {
       return false;
     }
 
-
-    _socket = i_o.io('https://user.abyarinovin.ir',
+    // ساخت سوکت تنها در صورت عدم وجود
+    if (_socket == null) {
+      _socket = i_o.io(
+        'https://user.abyarinovin.ir',
         i_o.OptionBuilder()
             .setTransports(['websocket'])
             .enableWithCredentials()
-            // .setExtraHeaders({'Authorization': 'Bearer $token'})
-            // .setQuery({'token': token})
             .setAuth({'token': token})
             .disableAutoConnect()
             .enableReconnection()
-            .build()
-    );
+            .build(),
+      );
 
-    _socket!.on('unauthorized', (data) => print('❌ Unauthorized: $data'));
+      _socket!.on('unauthorized', (data) => print('❌ Unauthorized: $data'));
+      _socket!.on('error', (data) => print('❌ Socket General Error: $data'));
+      _socket!.on('connect_timeout', (data) => print('⏰ Connect Timeout: $data'));
+      _socket!.onError((data) => print('Socket Error: $data'));
+      _socket!.onDisconnect((data) {
+        print('Socket Disconnected');
+        isConnecting = false;
+      });
 
-    _socket!.on('error', (data) => print('❌ Socket General Error: $data'));
-    _socket!.on('connect_timeout', (data) => print('⏰ Connect Timeout: $data'));
-    _socket!.onConnectError((data) {
-      print('Connect Error: $data');
-      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
-        _connectCompleter!.complete(false);
-      }
-      isConnecting = false;
-    });
-    _socket!.onError((data) => print('Socket Error: $data'));
-    _socket!.onDisconnect((data) {
-      print('Socket Disconnected');
-      isConnecting = false;
-    });
+      setupGlobalListeners();
+    } else {
+      // بروزرسانی توکن در صورت وجود سوکت قدیمی
+      _socket!.io.options?['auth'] = {'token': token};
+    }
 
-    setupGlobalListeners();
+    // 🟢 ۲. پاک کردن لیسنرهای قبلی connect برای جلوگیری از همپوشانی و چند باره صدا زدن
+    _socket!.off('connect');
+    _socket!.off('connect_error');
 
     _socket!.onConnect((_) async {
       print('Socket Connected globally!');
       try {
+        _joinRooms();
         if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
           _connectCompleter!.complete(true);
-        }
-        if (_managerPin != null) {
-          print("joinroom manager: $_managerPin");
-          _socket!.emit("join/room", {'room': _managerPin});
-        }
-        if (_currentWellPin != null) {
-          print("joinroom well: $_currentWellPin");
-          _socket!.emit("join/room", {'room': _currentWellPin});
         }
       } catch (e) {
         print("Error inside onConnect: $e");
@@ -174,11 +149,18 @@ class SocketRepository {
         isConnecting = false;
       }
     });
-    //  آخرین خط
-    print(' Connecting socket...');
+
+    _socket!.onConnectError((data) {
+      print('Connect Error: $data');
+      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
+        _connectCompleter!.complete(false);
+      }
+      isConnecting = false;
+    });
+
+    print('Connecting socket...');
     _socket!.connect();
 
-    // انتظار حداکثر ۸ ثانیه برای نتیجه اتصال
     return _connectCompleter!.future.timeout(
       const Duration(seconds: 16),
       onTimeout: () {
@@ -190,10 +172,25 @@ class SocketRepository {
       },
     );
   }
-  /// متد مخصوص ورود به صفحه یک چاه جدید
+
+  // 🟢 متد اختصاصی برای جوین شدن به روم‌ها
+  void _joinRooms() {
+    if (_socket == null || !_socket!.connected) return;
+
+    if (_managerPin != null) {
+      print("joinroom manager: $_managerPin");
+      _socket!.emit("join/room", {'room': _managerPin});
+    }
+    if (_currentWellPin != null) {
+      print("joinroom well: $_currentWellPin");
+      _socket!.emit("join/room", {'room': _currentWellPin});
+    }
+  }
+
+  /// متد ورود به صفحه یک چاه جدید
   Future<bool> joinWellRoom(String wellPin) async {
     print("joinWellRoomCalled");
-    if (_currentWellPin == wellPin) return _currentWellPin == wellPin;
+    if (_currentWellPin == wellPin) return true;
 
     print("Switching well room from $_currentWellPin to: $wellPin");
     _currentWellPin = wellPin;
@@ -204,210 +201,140 @@ class SocketRepository {
       return true;
     } else {
       print("Socket not connected yet. Initializing connection...");
-      // اگر سوکت وصل نیست، متد اتصال را صدا می‌زنیم.
-      // چون بالا متغیر _currentWellPin پر شده است، به محض اینکه onConnect اجرا شود،
-      // خودکار هم مدیر و هم این چاه جدید جوین خواهند شد.
       initAndConnect(_managerPin ?? "manger");
-
       return false;
     }
   }
 
-  /// ۲. گوش دادن دائمی به رویدادها (گوش‌ها همیشه باز هستند، اما تا درخواستی فرستاده نشود، دیتایی نمی‌آید)
+  /// گوش دادن دائمی به رویدادها
   void setupGlobalListeners() {
     if (_socket == null) return;
 
-    // _socket!.off("dashboard/total/water");
-    // _socket!.off("program/add");
-    // _socket!.off("program/delete");
-    // _socket!.off("motor/status");
-    // _socket?.off("fingerprint/request_response");
     _socket!.off("dashboard/total/water");
-    _socket!.on("dashboard/total/water", (data) {
-      // 🟢 این پرینت‌ها مشخص می‌کنند مشکل از کجاست
-      print("1. Socket event triggered!");
-      print("2. Raw Data: $data");
-      print("3. Is Controller Closed? ${_waterController.isClosed}");
+    _socket!.off("program/add");
+    _socket!.off("program/delete");
+    _socket!.off("motor/status");
+    _socket!.off("fingerprint/request_response");
+    _socket!.off("fingerprint/status");
+    _socket!.off("signal_quality");
 
+    _socket!.on("dashboard/total/water", (data) {
       if (data != null && !_waterController.isClosed) {
-        print("data != null && !_waterController.isClosed");
         try {
           _waterController.add(WaterModel.fromJson(data));
           print('Data Water successfully added to stream');
         } catch (e) {
-          print('JSON 1 Parsing Error: $e');
+          print('JSON Water Parsing Error: $e');
         }
-      } else {
-        print("❌ Condition failed! data is null OR controller is closed.");
       }
     });
 
-    // _socket!.on("flowmeter/today", (data) {
-    //   // print("todayyyyyyyyyy");
-    //   if (data != null && !_todayController.isClosed) {
-    //     // تبدیل به مدل و اضافه کردن به استریم آب
-    //     try {
-    //       final model=WellFlowMeterOneModel.fromJson(data);
-    //
-    //       _todayController.add(model);
-    //
-    //       // print(' flowmeter Today successfully added to stream');
-    //     } catch (e) {
-    //
-    //       print('JSON 2 Parsing Error: $e');
-    //     }      }
-    // });
-
-      _socket!.on("signal_quality", (data) {
-            // print("todayyyyyyyyyy");
-            if (data != null && !_signalController.isClosed) {
-              print("datasignal${data}");
-              // تبدیل به مدل و اضافه کردن به استریم آب
-              try {
-                final model=SignalLevelModel.fromJson(data);
-
-                _signalController.add(model);
-
-                // print(' flowmeter Today successfully added to stream');
-              } catch (e) {
-
-                print('JSON 2 Parsing Error: $e');
-              }      }
-          });
-
+    _socket!.on("signal_quality", (data) {
+      if (data != null && !_signalController.isClosed) {
+        print("datasignal: $data");
+        try {
+          final model = SignalLevelModel.fromJson(data);
+          _signalController.add(model);
+          print('Signal level added to stream successfully');
+        } catch (e) {
+          print('JSON Signal Parsing Error: $e');
+        }
+      }
+    });
 
     _socket!.on("program/add", (data) {
       if (data != null && !_createTimeController.isClosed) {
-        // تبدیل به مدل و اضافه کردن به استریم آب
         try {
           _createTimeController.add(data["status"]);
-          print(' program/add successfully added to stream');
-
+          print('program/add successfully added to stream');
         } catch (e) {
-          print('JSON Parsing Error: $e');
+          print('JSON Program Add Error: $e');
         }
       }
     });
 
     _socket!.on("program/delete", (data) {
       if (data != null && !_deleteTimeController.isClosed) {
-        // تبدیل به مدل و اضافه کردن به استریم آب
         try {
           _deleteTimeController.add(data["status"]);
-
-          print(' program/delete successfully added to stream');
+          print('program/delete successfully added to stream');
         } catch (e) {
-          print('JSON Parsing Error: $e');
-        }      }
+          print('JSON Program Delete Error: $e');
+        }
+      }
     });
 
     _socket!.on("motor/status", (data) {
-      print("data${data}");
-      print("pomplisten");
+      print("motor status data: $data");
       if (data != null && !_onAndOffTimeController.isClosed) {
-        // تبدیل به مدل و اضافه کردن به استریم آب
         try {
-          final model=OnOffModel.fromJson(data);
+          final model = OnOffModel.fromJson(data);
           _onAndOffTimeController.add(model);
-
-          print(' motor/status successfully added to stream');
+          print('motor/status successfully added to stream');
         } catch (e) {
-          print(' JSON Parsing Error: $e');
-        }      }
+          print('JSON Motor Status Error: $e');
+        }
+      }
     });
 
-    // ۱. تعریف لیسنر دوم به صورت یک تابع مستقل
-    void onFingerprintStatus(dynamic statusData) {
-      print("📈 [Socket] fingerprint/status Triggered! Data: $statusData");
-      if (statusData == null) return;
-
-      if (!_statusControllerCheckFinger.isClosed) {
+    // لیسنر اختصاصی اثر انگشت
+    _socket!.on("fingerprint/status", (statusData) {
+      print(" [Socket] fingerprint/status Triggered! Data: $statusData");
+      if (statusData != null && !_statusControllerCheckFinger.isClosed) {
         try {
-          final status = statusData["status"];
-          final userLocalID = statusData["userLocalID"];
           _statusControllerCheckFinger.add(
             FingerprintResponse(
-              status: status,
-              userLocalID: userLocalID,
+              status: statusData["status"],
+              userLocalID: statusData["userLocalID"],
               source: FingerprintSource.statusListener,
             ),
           );
-          print(' Status updated in stream: $status');
         } catch (e) {
-          print('❌ JSON Parsing Error in Status: $e');
+          print('JSON Fingerprint Status Error: $e');
         }
       }
-    }
+    });
 
     _socket!.on("fingerprint/request_response", (data) {
-      print(' fingerprint/request_response listener...');
+      print('fingerprint/request_response listener...');
       if (data == null || _statusControllerCheckFinger.isClosed) return;
 
-        try {
-          print(' Activating fingerprint/request_response listener...');
-
-          var status = data["status"];
-
-          if (status == 1 || status == "1") {
-            print("status == 1");
-            _statusControllerCheckFinger.add(
-              FingerprintResponse(
-                status: status,
-                source: FingerprintSource.requestResponse,
-              ),
-            );
-
-            print(' Activating fingerprint/status listener...');
-
-            _socket!.on("fingerprint/status", onFingerprintStatus);
-
-
-          } else {
-            // 💡 فرستادن حالت‌های غیر از ۱ مربوط به لیسنر اول
-            _statusControllerCheckFinger.add(
-              FingerprintResponse(
-                status: status,
-                source: FingerprintSource.requestResponse,
-              ),
-            );
-            print(' Activating fingerprint/status listener...');
-          }
-          // بخش else اضافی حذف شد چون بالا به استریم add شده است.
-
-        } catch (e) {
-          print(' JSON Parsing Error in Response: $e');
-        }
-      });
+      try {
+        var status = data["status"];
+        _statusControllerCheckFinger.add(
+          FingerprintResponse(
+            status: status,
+            source: FingerprintSource.requestResponse,
+          ),
+        );
+      } catch (e) {
+        print('JSON Fingerprint Response Error: $e');
+      }
+    });
   }
 
   Future<void> safeEmit(String event, Map<String, dynamic> data) async {
     String pin = data["pin"] ?? _managerPin ?? "manger";
 
     if (_socket == null || !_socket!.connected) {
-      print("️ Socket not ready for $event. Triggering background connect...");
+      print("Socket not ready for $event. Triggering background connect...");
       initAndConnect(pin);
-      // به جای مسدود کردن، خروج یا صف‌بندی امن
       return;
     }
-    // چک مجدد بعد از تلاش برای اتصال
+
     if (_socket != null && _socket!.connected) {
       print("🚀 Emitting $event to server...");
       _socket!.emit(event, data);
     } else {
-      print("❌ Failed to emit $event, socket still disconnected.");
+      print("Failed to emit $event, socket still disconnected.");
     }
-    // print("🚀 Emitting $event to server...");
-    // _socket!.emit(event, data);
   }
 
   void requestWaterData(dynamic level, dynamic areaId) {
-    print(' dashboard/data Request');
-    safeEmit("dashboard/data/request", {"level": level, "id": areaId,"pin": "manger"});
+    safeEmit("dashboard/data/request", {"level": level, "id": areaId, "pin": "manger"});
   }
 
   void requestCreateTimeData(CreateTimeParams params) {
-    print(' program/add Request');
-
     safeEmit("program/add", {
       "pin": params.pin,
       "code": params.code,
@@ -420,22 +347,13 @@ class SocketRepository {
   }
 
   Future<void> requestFinger(dynamic deviceId, String pin) async {
-    print(' fingerprint/add_request Request');
-
-    // اگر سوکت کلاً ساخته نشده، اول وصلش کن
     if (_socket == null) {
-      print("_socketnull");
       await initAndConnect(pin);
     }
-    print("nonull");
-
-    // _socket?.off("fingerprint/request_response");
-    await safeEmit("fingerprint/add_request", {"deviceID": deviceId , "pin": pin});
+    await safeEmit("fingerprint/add_request", {"deviceID": deviceId, "pin": pin});
   }
 
   Future<void> requestDeleteTimeData(CreateTimeParams params) async {
-
-    print(' program/delete Request');
     safeEmit("program/delete", {
       "pin": params.pin,
       "code": params.code,
@@ -444,13 +362,10 @@ class SocketRepository {
       "weekDay": params.day,
       "startTime": params.startTime.toString().toEnglishDigit(),
       "endTime": params.endTime.toString().toEnglishDigit(),
-
     });
   }
 
   void onAndOff(CreateTimeParams params) {
-    print(' motor/change/status Request');
-
     safeEmit("motor/change/status", {
       "pin": params.pin,
       "code": params.code,
@@ -461,21 +376,22 @@ class SocketRepository {
   }
 
   void dispose() {
-    print("dispose");
+    print("dispose socket repository");
     _socket?.off("dashboard/total/water");
     _socket?.off("program/add");
     _socket?.off("program/delete");
     _socket?.off("motor/status");
     _socket?.off("fingerprint/request_response");
     _socket?.off("fingerprint/status");
-    // _socket?.disconnect();
-    // _socket?.dispose();
+    _socket?.off("signal_quality");
 
     if (!_waterController.isClosed) _waterController.close();
     if (!_createTimeController.isClosed) _createTimeController.close();
     if (!_deleteTimeController.isClosed) _deleteTimeController.close();
     if (!_onAndOffTimeController.isClosed) _onAndOffTimeController.close();
     if (!_statusControllerCheckFinger.isClosed) _statusControllerCheckFinger.close();
+    if (!_todayController.isClosed) _todayController.close();
+    if (!_signalController.isClosed) _signalController.close();
 
     print("✅ All Socket Resources Disposed Safely.");
   }
