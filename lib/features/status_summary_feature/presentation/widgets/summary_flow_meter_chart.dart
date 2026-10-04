@@ -98,7 +98,6 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                               widget: Text("هفته",style: TextStyle(color: ColorPalette.black),),
                               onTap:(state.reportFlowMeterStatus is ReportFlowMeterLoading ||
                                   state.selectedChartTab == 6)?null: () {
-                                print("zczfc${int.parse(widget.info[6])}");
                                 BlocProvider.of<StatusSummaryBloc>(context).add(ReportFlowMeter(FlowMeterParams(
                                   type: 6,
                                   ids:int.parse(widget.info[6]),
@@ -736,7 +735,7 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                         );
                       }
                       else if (state.reportFlowMeterStatus is SummaryFlowMeterLoading) {
-                        return ShimmerClass.lineChartShimmer();
+                        return state.selectedChartTab==1?ShimmerClass.lineChartShimmer():ShimmerClass.barChartShimmer();
                       } else if (state.reportFlowMeterStatus is SummaryFlowMeterError) {
                         SummaryFlowMeterError reportFlowMeterError = state.reportFlowMeterStatus as SummaryFlowMeterError;
                         return Center(child: Text(reportFlowMeterError.error));

@@ -36,9 +36,6 @@ class StatusSummaryApiProvider {
       return response;
     } on DioException catch (e) {
 
-      if (e.type == DioExceptionType.connectionError) {
-        print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");
-      }
 
       return CheckExceptions.response(e.response);
     }
@@ -73,9 +70,6 @@ class StatusSummaryApiProvider {
 
       return response;
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionError) {
-        print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");
-      }
 
       return CheckExceptions.response(e.response);
     }

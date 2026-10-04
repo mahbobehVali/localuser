@@ -227,6 +227,7 @@ class ReportScreen extends StatelessWidget {
                                 context,
                                 message: "ساعت شروع باید کوچکتر از ساعت پایان باشد",
                                 duration: 3,
+                                success: false
                               );
                             }
                           }
@@ -284,6 +285,7 @@ class ReportScreen extends StatelessWidget {
                                 context,
                                 message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",
                                 duration: 3,
+                                success: false
                               );
                             }
                           }
@@ -362,7 +364,7 @@ class ReportScreen extends StatelessWidget {
 
                     }
                         : () {
-                      GlobalSnackBar.show(context, message: "تاریخ و چاه مورد نظر را انتخاب کنید");
+                      GlobalSnackBar.show(context, message: "تاریخ و چاه مورد نظر را انتخاب کنید",success: false);
                     },
                   );
                 },

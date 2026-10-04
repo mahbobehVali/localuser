@@ -9,8 +9,6 @@ class LoginUseCase extends UseCase<DataState<dynamic>, LoginParams> {
 
   LoginUseCase(this.authRepository);
 
-  // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
-
   @override
   Future<DataState> call(loginParams) {
     return authRepository.login(loginParams);

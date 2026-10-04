@@ -2,8 +2,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:mahaliii/features/well_feature/domain/entity/signal_level_entity.dart';
 
-import '../../../domain/entity/well_flowmeter_one_entity.dart';
-
 abstract class SignalStatus extends Equatable {
   const SignalStatus();
 }

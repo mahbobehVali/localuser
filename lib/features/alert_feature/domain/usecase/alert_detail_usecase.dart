@@ -8,8 +8,6 @@ class AlertDetailUseCase extends UseCase<DataState<dynamic>, int> {
 
   AlertDetailUseCase(this.alertRepository);
 
-  // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
-
   @override
   Future<DataState> call(int id) {
     return alertRepository.detailAlert(id);

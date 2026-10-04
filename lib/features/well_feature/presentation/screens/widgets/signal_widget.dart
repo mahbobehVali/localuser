@@ -25,9 +25,10 @@ class SignalWidget extends StatelessWidget {
         ),
 
         child:BlocBuilder<WellDetailBloc, WellDetailState>(
-          buildWhen: (previous, current) =>
-          previous.signalStatus != current.signalStatus ||
-              previous.signal != current.signal,
+          buildWhen: (previous, current) {
+            return previous.signalStatus != current.signalStatus ||
+              previous.signal != current.signal;
+          },
           builder: (context, state) {
             if (state.signalStatus is SignalSuccess) {
               return Row(

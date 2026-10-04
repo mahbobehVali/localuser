@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
-
 import '../../../../../common/widgets/show_dialogs.dart';
 import '../../../../../config/color_palette.dart';
 import '../../bloc/alert_bloc.dart';
+import 'filter_chip_widget.dart';
 
 class FilterWidget extends StatelessWidget {
   const FilterWidget({
@@ -98,28 +98,5 @@ class FilterWidget extends StatelessWidget {
             ],
           );
         });
-  }
-}
-
-class FilterChipWidget extends StatelessWidget {
-  final String label;
-  final VoidCallback onDeleted;
-
-  const FilterChipWidget({
-    super.key,
-    required this.label,
-    required this.onDeleted,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4.0),
-      child: Chip(
-        backgroundColor: Colors.white,
-        label: Text(label),
-        onDeleted: onDeleted,
-      ),
-    );
   }
 }

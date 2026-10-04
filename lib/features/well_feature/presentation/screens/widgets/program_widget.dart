@@ -41,6 +41,7 @@ class Program extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: ColorPalette.white,
                     borderRadius: BorderRadius.circular(8),
+
                   ),
 
                   child: Row(
@@ -119,6 +120,7 @@ class Program extends StatelessWidget {
                     decoration: BoxDecoration(
                     color: ColorPalette.white,
                     borderRadius: BorderRadius.circular(8),
+
                     ),
                     padding: EdgeInsets.all(10.sp),
                     child: Column(
@@ -132,42 +134,46 @@ class Program extends StatelessWidget {
                             return _header(day.dayName!);
                           }).toList(),
                         ),
-                        ListView.builder(
-                          padding: EdgeInsets.zero,
-                          physics: NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: maxRows,
-                          itemBuilder: (context, row) {
-                            return Row(
-                              children: List.generate(displayDays.length, (col) {
-                                final day = displayDays[col];
+                        Container(
+                          decoration: BoxDecoration(border: BoxBorder.all(color: ColorPalette.lightGrey)),
 
-                                if (row >= day.periods!.length) {
-                                  return _cell("-",0,0);
-                                }
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: maxRows,
+                            itemBuilder: (context, row) {
+                              return Row(
+                                children: List.generate(displayDays.length, (col) {
+                                  final day = displayDays[col];
 
-                                final p = day.periods![row];
-                               int d= Constants().weekDayNames.firstWhere((element) => element.name==day.dayName,
-                                   orElse: () => state.daySelected).id;
+                                  if (row >= day.periods!.length) {
+                                    return _cell("-",0,0);
+                                  }
+
+                                  final p = day.periods![row];
+                                 int d= Constants().weekDayNames.firstWhere((element) => element.name==day.dayName,
+                                     orElse: () => state.daySelected).id;
 
 
-                                return GestureDetector(
-                                    onTap:p.own==0?() {
-                                      ShowDialogs().customDialog(context);
-                                    }: () {
-                                      ShowDialogs().deleteClock(context: context,wellDetailBloc: BlocProvider.of<WellDetailBloc>(context),
-                                          wellsDataEntity:wellsDataEntity,startTime:p.startTime.toString().toPersianDigit(),
-                                         endTime: p.endTime.toString().toPersianDigit(),
-                                          dayName: day.dayName!,userLocalId: p.userLocalID!,day: d );
-                                    },
-                                  child: _cell(
-                                      "${p.endTime.toString().toPersianDigit()} _ ${p.startTime.toString().toPersianDigit()}",
-                                     1,d
-                                  ),
-                                );
-                              }),
-                            );
-                          },
+                                  return GestureDetector(
+                                      onTap:p.own==0?() {
+                                        ShowDialogs().customDialog(context);
+                                      }: () {
+                                        ShowDialogs().deleteClock(context: context,wellDetailBloc: BlocProvider.of<WellDetailBloc>(context),
+                                            wellsDataEntity:wellsDataEntity,startTime:p.startTime.toString().toPersianDigit(),
+                                           endTime: p.endTime.toString().toPersianDigit(),
+                                            dayName: day.dayName!,userLocalId: p.userLocalID!,day: d );
+                                      },
+                                    child: _cell(
+                                        "${p.endTime.toString().toPersianDigit()} _ ${p.startTime.toString().toPersianDigit()}",
+                                       1,d
+                                    ),
+                                  );
+                                }),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -196,6 +202,7 @@ class Program extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: ColorPalette.lightGrey,
+
         
       ),
       child: Text(
@@ -211,7 +218,7 @@ class Program extends StatelessWidget {
       height: 70,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        border: BoxBorder.fromLTRB(bottom: BorderSide( color: ColorPalette.lightGrey))
+        border: BoxBorder.fromLTRB(bottom: BorderSide( color: ColorPalette.lightGrey),)
         // color: Colors.red
       ),
       child: Container(

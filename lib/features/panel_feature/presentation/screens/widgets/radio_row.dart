@@ -32,7 +32,7 @@ class RadioRow extends StatelessWidget {
         }
         if(state.changeAlertStatus is ChangeAlertError){
           ChangeAlertError changeAlertError=state.changeAlertStatus as ChangeAlertError;
-          GlobalSnackBar.show( context,message: changeAlertError.error);
+          GlobalSnackBar.show( context,message: changeAlertError.error,success: false);
 
 
         }

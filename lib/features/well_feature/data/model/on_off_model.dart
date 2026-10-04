@@ -1,6 +1,4 @@
 
-import 'package:mahaliii/features/well_feature/domain/entity/alert_count_by_date_entity.dart';
-
 import '../../domain/entity/on_off_entity.dart';
 
 class OnOffModel extends OnOffEntity {

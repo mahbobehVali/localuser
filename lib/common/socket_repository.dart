@@ -66,26 +66,24 @@ class SocketRepository {
   }
 
   Future<bool> initAndConnect(String managerPin, [String? level, int? id]) async {
-    // 🟢 ۱. چک کردن همه کنترلرها و بازسازی در صورت بسته بودن
+    // بازسازی استریم‌ها در صورت بسته بودن
     if (_waterController.isClosed) _waterController = StreamController<WaterModel>.broadcast();
     if (_createTimeController.isClosed) _createTimeController = StreamController<dynamic>.broadcast();
     if (_deleteTimeController.isClosed) _deleteTimeController = StreamController<dynamic>.broadcast();
     if (_onAndOffTimeController.isClosed) _onAndOffTimeController = StreamController<dynamic>.broadcast();
     if (_statusControllerCheckFinger.isClosed) _statusControllerCheckFinger = StreamController<dynamic>.broadcast();
-    if (_todayController.isClosed) _todayController = StreamController<dynamic>.broadcast();
     if (_signalController.isClosed) _signalController = StreamController<SignalLevelModel>.broadcast();
 
-    print("_currentWellPin: $_currentWellPin");
-    print("initAndConnectCalled --- managerPin: $managerPin");
     _managerPin = managerPin;
 
-    // اگر سوکت وصل است فقط روم‌ها را جوین شو
+    // اگر متصل است، روم‌ها را جوین شو و خروج کن
     if (_socket != null && _socket!.connected) {
       print("Socket already connected.");
       _joinRooms();
       return true;
     }
 
+    // اگر در حال اتصال است، منتظر همان Completer قبلی بمان
     if (isConnecting && _connectCompleter != null) {
       return _connectCompleter!.future;
     }
@@ -93,9 +91,10 @@ class SocketRepository {
     isConnecting = true;
     _connectCompleter = Completer<bool>();
 
+    // دریافت توکن جدید
     String token = await _getOrWaitForToken(maxRetries: 10, delay: const Duration(milliseconds: 500));
 
-    if (token.isEmpty) {
+    if (token.trim().isEmpty) {
       print("❌ Could not obtain a valid token. Aborting connection.");
       isConnecting = false;
       if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
@@ -104,37 +103,46 @@ class SocketRepository {
       return false;
     }
 
-    // ساخت سوکت تنها در صورت عدم وجود
-    if (_socket == null) {
-      _socket = i_o.io(
-        'https://user.abyarinovin.ir',
-        i_o.OptionBuilder()
-            .setTransports(['websocket'])
-            .enableWithCredentials()
-            .setAuth({'token': token})
-            .disableAutoConnect()
-            .enableReconnection()
-            .build(),
-      );
-
-      _socket!.on('unauthorized', (data) => print('❌ Unauthorized: $data'));
-      _socket!.on('error', (data) => print('❌ Socket General Error: $data'));
-      _socket!.on('connect_timeout', (data) => print('⏰ Connect Timeout: $data'));
-      _socket!.onError((data) => print('Socket Error: $data'));
-      _socket!.onDisconnect((data) {
-        print('Socket Disconnected');
-        isConnecting = false;
-      });
-
-      setupGlobalListeners();
-    } else {
-      // بروزرسانی توکن در صورت وجود سوکت قدیمی
-      _socket!.io.options?['auth'] = {'token': token};
+    // تمیزکاری سوکت مرده قبل از ساخت سوکت جدید
+    if (_socket != null) {
+      _socket!.clearListeners();
+      _socket!.dispose();
+      _socket = null;
     }
 
-    // 🟢 ۲. پاک کردن لیسنرهای قبلی connect برای جلوگیری از همپوشانی و چند باره صدا زدن
-    _socket!.off('connect');
-    _socket!.off('connect_error');
+    print("token.isNotEmpty: $token");
+
+    // ساخت نمونه جدید سوکت با ساختار صحیح
+    _socket = i_o.io(
+      'https://user.abyarinovin.ir',
+      i_o.OptionBuilder()
+          .setTransports(['websocket']) // اجبار استفاده از WebSocket
+          .setAuth({'token': token})
+          .enableAutoConnect() // متصل شدن خودکار
+          .enableReconnection()
+          .enableForceNew()
+          .build(),
+    );
+
+    _socket!.on('unauthorized', (data) => print('❌ Unauthorized: $data'));
+    _socket!.on('error', (data) => print('❌ Socket General Error: $data'));
+    _socket!.on('connect_timeout', (data) => print('⏰ Connect Timeout: $data'));
+
+    _socket!.onConnectError((data) {
+      print('Connect Error: $data');
+      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
+        _connectCompleter!.complete(false);
+      }
+      isConnecting = false;
+    });
+
+    _socket!.onError((data) => print('Socket Error: $data'));
+    _socket!.onDisconnect((data) {
+      print('Socket Disconnected: $data');
+      isConnecting = false;
+    });
+
+    setupGlobalListeners();
 
     _socket!.onConnect((_) async {
       print('Socket Connected globally!');
@@ -150,15 +158,8 @@ class SocketRepository {
       }
     });
 
-    _socket!.onConnectError((data) {
-      print('Connect Error: $data');
-      if (_connectCompleter != null && !_connectCompleter!.isCompleted) {
-        _connectCompleter!.complete(false);
-      }
-      isConnecting = false;
-    });
-
     print('Connecting socket...');
+    // در صورتی که enableAutoConnect فعال باشد نیاز به فراخوانی مجدد connect نیست اما فراخوانی آن مشکلی ایجاد نمی‌کند:
     _socket!.connect();
 
     return _connectCompleter!.future.timeout(
@@ -172,7 +173,6 @@ class SocketRepository {
       },
     );
   }
-
   // 🟢 متد اختصاصی برای جوین شدن به روم‌ها
   void _joinRooms() {
     if (_socket == null || !_socket!.connected) return;
@@ -323,6 +323,7 @@ class SocketRepository {
     }
 
     if (_socket != null && _socket!.connected) {
+      print("datapin${data["pin"]}");
       print("🚀 Emitting $event to server...");
       _socket!.emit(event, data);
     } else {
@@ -395,4 +396,36 @@ class SocketRepository {
 
     print("✅ All Socket Resources Disposed Safely.");
   }
+
+  Future<void> logout() async {
+    print("🔄 Socket Logout: Disconnecting and cleaning up...");
+
+    if (_socket != null) {
+      try {
+        _socket!.emit("leave/room", {'room': _managerPin ?? "manger"});
+        if (_currentWellPin != null) {
+          _socket!.emit("leave/room", {'room': _currentWellPin});
+        }
+      } catch (_) {}
+
+      _socket!.clearListeners();
+      _socket!.disconnect();
+
+      // 🔑 پاک کردن هدرها و گزینه‌های اتصال قدیمی
+      // _socket!.io.options?['extraHeaders'] = {};
+      _socket!.auth = null;
+
+      // _socket!.destroy(); // 👈 استفاده از destroy به همراه dispose
+      _socket!.dispose();
+      _socket = null;
+    }
+
+    isConnecting = false;
+    _managerPin = null;
+    _currentWellPin = null;
+    _connectCompleter = null;
+
+    print("✅ Socket successfully logged out & cleared.");
+  }
+
 }

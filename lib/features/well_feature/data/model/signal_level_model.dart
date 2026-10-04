@@ -1,5 +1,4 @@
 
-import 'package:mahaliii/features/well_feature/domain/entity/alert_count_by_date_entity.dart';
 import 'package:mahaliii/features/well_feature/domain/entity/signal_level_entity.dart';
 
 class SignalLevelModel extends SignalLevelEntity {

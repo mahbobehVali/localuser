@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:mahaliii/common/utils/use_case.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/repository/status_summary_repository.dart';
@@ -9,14 +10,13 @@ import 'package:mahaliii/features/status_summary_feature/presentation/bloc/statu
 import '../../../../../common/params/flowmeter_params.dart';
 import '../../../../../common/socket_repository.dart';
 import '../../../../../common/utils/data_state.dart';
-import '../../../../../common/widgets/stream_extension.dart';
 import '../../../../../locator.dart';
 import '../../../domain/entity/last_activity_data_entity.dart';
 import '../../../domain/usecase/report_flowmeter_usecase.dart';
 import '../../../domain/usecase/wells_list_usecase.dart';
 import 'last_activity_status.dart';
 import 'status_summary_status.dart';
-import 'package:bloc_concurrency/bloc_concurrency.dart';
+
 part 'status_summary_event.dart';
 part 'status_summary_state.dart';
 
@@ -33,7 +33,7 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
       this.reportFlowMeterUseCase,this.socketRepository)
       : super(StatusSummaryState(statusSummaryStatus: StatusSummaryLoading(),
     lastActivityStatus: LastActivityLoading(),
-    waterStatus: WaterLoading(),
+    waterStatus: WaterInitial(),
     reportFlowMeterStatus: SummaryFlowMeterInitial(),
     selectedPage: 1,
     selectedChartTab: 0
@@ -114,7 +114,7 @@ class StatusSummaryBloc extends Bloc<StatusSummaryEvent, StatusSummaryState> {
         print("connect");
       }
       // socketRepository.requestWaterData(event.level,event.areaId);
-      Future.microtask(() {
+      Future.delayed(const Duration(milliseconds: 100), () {
         socketRepository.requestWaterData(event.level, event.areaId);
       });
       // ببینید چقدر تمیز شد! مستقیماً روی خود استریم صدا می‌زنیم

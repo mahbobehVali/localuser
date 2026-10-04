@@ -222,7 +222,7 @@ class SupportAnswerScreen extends StatelessWidget {
                                            prefixIcon:  BlocConsumer<SupportBloc, SupportState>(
                                              listener: (context, state) {
                                                if(state.overImage==true) {
-                                                 GlobalSnackBar.show(context, message: "حجم فایل بیشتر از یک مگابایت نباشد.");
+                                                 GlobalSnackBar.show(context, message: "حجم فایل بیشتر از یک مگابایت نباشد.",success: false);
                                                }
                                              },
                                              listenWhen: (previous, current) => state.overImage==true,
@@ -297,7 +297,7 @@ class SupportAnswerScreen extends StatelessWidget {
                                    GlobalSnackBar.show(context, message: "ارسال شد");
                                  }
                                  if(state.sendAnswerStatus is SendAnswerError){
-                                   GlobalSnackBar.show(context, message: "خطایی رخ داده");
+                                   GlobalSnackBar.show(context, message: "خطایی رخ داده",success: false);
                                  }
 
                                },
@@ -323,7 +323,7 @@ class SupportAnswerScreen extends StatelessWidget {
                                        }
                                      }
                                      if (state.supportCloseStatus is SupportCloseError) {
-                                       GlobalSnackBar.show(context, message: "خطایی رخ داده");
+                                       GlobalSnackBar.show(context, message: "خطایی رخ داده",success: false);
                                      }
 
                                    },

@@ -85,16 +85,12 @@ class _CustomTimePickerState extends State<CustomTimePicker> {
     // متغیرهای داخلی را با زمان محاسبه شده (به صورت استرینگ فرمت‌شده) به‌روز می‌کند
     endHour = newHour.toString().padLeft(2, '0');
     endMinute = newMinute.toString().padLeft(2, '0');
-
-    // print("endhour${endHour}");
-    // print("endminute${endMinute}");
   }
 
   void _updateTime(int hour, int minute) {
     _hourController.text = hour.toString().padLeft(2, '0').toPersianDigit();
     _minuteController.text = minute.toString().padLeft(2, '0').toPersianDigit();
-    // print("hour${_hourController.text}");
-    // print("minut${_minuteController.text}");
+
     _notifyParent();
   }
 
@@ -219,33 +215,17 @@ class _CustomTimePickerState extends State<CustomTimePicker> {
             ),
           ),
         ),
-        // const SizedBox(width: 8),
-        // Column(
-        //   mainAxisSize: MainAxisSize.min,
-        //   children: [
-        //     _buildButton(Icons.add, _incrementMinute),
-        //     _buildButton(Icons.remove, _decrementMinute),
-        //   ],
-        // ),
+
       ],
     );
   }
 
   Widget _buildHourField() {
-    // print("hourfield${_hourController.text}");
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       textDirection: TextDirection.ltr,
       children: [
-        // Column(
-        //   mainAxisSize: MainAxisSize.min,
-        //   children: [
-        //     _buildButton(Icons.add, _incrementHour),
-        //     _buildButton(Icons.remove, _decrementHour),
-        //   ],
-        // ),
-        // const SizedBox(width: 8),
 
         SizedBox(
           width: 50,

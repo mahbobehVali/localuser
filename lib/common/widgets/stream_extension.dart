@@ -13,7 +13,7 @@ extension FirstTimeoutStreamExt<T> on Stream<T> {
 
         final timer = Timer(duration, () {
           if (!isFirstEventReceived && !controller.isClosed) {
-            controller.addError(TimeoutException('زمان پاسخگویی سرور به پایان رسید', duration));
+            controller.addError(TimeoutException(' پاسخی از سمت دستگاه دریافت نشد.'));
             controller.close();
           }
         });

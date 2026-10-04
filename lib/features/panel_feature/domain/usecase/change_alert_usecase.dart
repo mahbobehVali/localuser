@@ -8,8 +8,6 @@ class ChangeAlertUseCase extends UseCase<DataState<dynamic>, int> {
 
   ChangeAlertUseCase(this.panelRepository);
 
-  // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
-
   @override
   Future<DataState> call(type) {
     return panelRepository.changeAlert(type);

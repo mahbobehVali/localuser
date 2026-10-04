@@ -14,8 +14,6 @@ class AlertsModel extends AlertsEntity {
     List<AlertDataEntity>? data,
     required AlertMetaEntity meta,
 
-
-
   }) : super(data,meta);
 
   factory AlertsModel.fromJson(dynamic json) {
@@ -26,6 +24,4 @@ class AlertsModel extends AlertsEntity {
 
     );
   }
-
-
 }

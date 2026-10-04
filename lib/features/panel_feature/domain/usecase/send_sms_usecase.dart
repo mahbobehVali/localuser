@@ -8,8 +8,6 @@ class SendSmsUseCase extends UseCase<DataState<dynamic>, NoParams> {
 
   SendSmsUseCase(this.panelRepository);
 
-  // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
-
   @override
   Future<DataState> call(noParams) {
     return panelRepository.sendSms();

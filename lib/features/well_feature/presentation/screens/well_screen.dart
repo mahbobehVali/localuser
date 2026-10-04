@@ -70,8 +70,6 @@ class _WellScreenState extends State<WellScreen> {
                                 if (result != null && result is Map) {
                                   final bool updatedSwitchStatus = result['isSwitched'];
                                   final dynamic updatedUserLocalId = result['userLocalId'];
-                                  print("updatedSwitchStatus${updatedSwitchStatus}");
-                                  print("updatedUserLocalId${updatedUserLocalId}");
 
                                   setState(() {
                                     statusSummarySuccess.wellsEntity[index].data!.statusWell = updatedSwitchStatus ? 1 : 0;

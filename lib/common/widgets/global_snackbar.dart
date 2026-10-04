@@ -7,6 +7,7 @@ class GlobalSnackBar {
       BuildContext context, {
         required String message,
         int duration = 3,
+        bool success=true
       }) {
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;
@@ -36,13 +37,15 @@ class GlobalSnackBar {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.check_circle_outline, color: Colors.green),
+                 Icon(
+                    success?Icons.check_circle_outline:Icons.cancel_outlined,
+                    color: success?Colors.green:Colors.red),
                 SizedBox(width: 8.w),
                 Text(
                   message,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 14.sp,
+                    fontSize: 12.sp,
                     fontFamily: 'IranYekan',
                     color: Colors.black,
                   ),

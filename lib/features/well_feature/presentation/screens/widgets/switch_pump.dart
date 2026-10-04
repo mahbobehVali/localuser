@@ -62,9 +62,6 @@ class SwitchPump extends StatelessWidget {
                       (well) => well.data?.deviceId == isSuccess.offEntity.deviceId,
                 );
 
-                print("🟢 Socket Switch State Changed: ${state.isSwitched}");
-                print("Exist in wells: $exists");
-
                 if (exists) {
                   GlobalSnackBar.show(
                     context,
@@ -81,19 +78,29 @@ class SwitchPump extends StatelessWidget {
             buildWhen: (previous, current) => previous.isSwitched != current.isSwitched,
             builder: (context, state) {
               // 🟢 اینجا state به راحتی در دسترس است
-              return CupertinoSwitch(
-                activeTrackColor: ColorPalette.lightBlue,
-                thumbColor: ColorPalette.darkBlue,
-                inactiveThumbColor: ColorPalette.black.withValues(alpha: 0.5),
-                value: state.isSwitched,
-                onChanged: (value) {
-                  ShowDialogs().turnPomp(
-                    context,
-                    BlocProvider.of<WellDetailBloc>(context),
-                    value,
-                    widget.wellsDataEntity,
-                  );
-                },
+              return Column(
+               mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                  CupertinoSwitch(
+                    activeTrackColor: ColorPalette.lightBlue,
+                    thumbColor: ColorPalette.darkBlue,
+                    inactiveThumbColor: ColorPalette.black.withValues(alpha: 0.5),
+                    value: state.isSwitched,
+                    onChanged: (value) {
+                      ShowDialogs().turnPomp(
+                        context,
+                        BlocProvider.of<WellDetailBloc>(context),
+                        value,
+                        widget.wellsDataEntity,
+                      );
+                    },
+                  ),
+                  Text(
+                    state.isSwitched == true ? "روشن" : "خاموش",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ],
               );
             },
           )

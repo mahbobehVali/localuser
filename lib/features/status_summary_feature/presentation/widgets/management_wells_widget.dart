@@ -7,9 +7,12 @@ import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/well_detail_screen.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
+import '../../../../common/socket_repository.dart';
+import '../../../../common/utils/sharedpreference.dart';
 import '../../../../common/widgets/icon_container.dart';
 import '../../../../config/color_palette.dart';
 import '../../../../config/texts_style.dart';
+import '../../../../locator.dart';
 import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../bloc/status_summary_bloc/status_summary_bloc.dart';
 import '../bloc/status_summary_bloc/status_summary_status.dart';
@@ -54,11 +57,20 @@ class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
 
             // ۱. لیسنر برای مواقعی که دیتا بعد از ساخته شدن این صفحه از API می‌رسد
             BlocListener<StatusSummaryBloc, StatusSummaryState>(
-              listener: (context, state) {
+              listener: (context, state) async {
                 if (state.statusSummaryStatus is StatusSummaryExit) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  );
+                  // ۱. قطع سوکت و پاک‌سازی هدرها
+                  await locator<SocketRepository>().logout();
+
+                  // ۲. 🔑 پاک کردن توکن و اطلاعات کاربر از SharedPreferences (بسیار مهم)
+                  await locator<SharedPrefOperator>().logout();
+
+                  // ۳. هدایت به صفحه لاگین
+                  if (context.mounted) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  }
                 }
 
                 if (state.statusSummaryStatus is StatusSummarySuccess) {
@@ -84,11 +96,9 @@ class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
 
                   // ۴. ساخت لیست از WrapperBloc (که چاه‌ها را با سوکت به‌روز نگه می‌دارد)
                   if(statusState.statusSummaryStatus is StatusSummarySuccess){
-                    print("yesss");
                     return BlocBuilder<WrapperBloc, WrapperState>(
                       builder: (context, wrapperState) {
                         if (wrapperState.wells.isEmpty) {
-                          print("emty");
                           return ShimmerClass.shimmerListviewVertical(height: 70, count: 4);
                         }
 
@@ -183,11 +193,16 @@ class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
                                         dashColor: ColorPalette.inverseGrey,
                                       ),
                                     ),
-                                    const Row(
+                                    Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text("مشاهده چاه"),
-                                        Icon(Icons.navigate_next)
+                                        const Text("مشاهده چاه"),
+                                        Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(8),
+                                              border: BoxBorder.all()
+                                            ),
+                                            child: const Icon(Icons.navigate_next))
                                       ],
                                     )
                                   ],

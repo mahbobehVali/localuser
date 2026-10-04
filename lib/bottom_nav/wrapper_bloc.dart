@@ -20,11 +20,11 @@ class WrapperBloc extends Bloc<WrapperEvent, WrapperState> {
       await emit.forEach<dynamic>(
         socketRepository.onAndOffTimeStream,
         onData: (onOff) {
-          final int socketWellId = onOff.deviceId; // یا onOff['well_id']
+          final int socketDeviceId = onOff.deviceId; // یا onOff['well_id']
           final int newStatus = onOff.status;
           print("Socket Data Received: $onOff");
           final updatedWells = state.wells.map((well) {
-            if (well.data?.deviceId == socketWellId) {
+            if (well.data?.deviceId == socketDeviceId) {
               // تغییر وضعیت فقط برای چاهی که well_id آن برابر با سوکت است
               well.data?.statusWell = newStatus;
             }
@@ -60,20 +60,7 @@ class WrapperBloc extends Bloc<WrapperEvent, WrapperState> {
 
     });
 
-    // // ۱. هندلر مقداردهی اولیه
-    // on<SetInitialWellsEvent>((event, emit) {
-    //   final Map<int, bool> newMap = {};
-    //
-    //   for (var well in event.wellsList) {
-    //     // مثلاً فیلد id و status اولیه چاه
-    //     newMap[well.data!.deviceId!] = well.data!.statusWell==1 ;
-    //   }
-    //
-    //   emit(state.copyWith(newWellsStatusMap: newMap));
-    // });
-
     on<SetInitialWellsEvent>((event, emit) {
-      print("SetInitialWellsEvent");
       emit(state.copyWith(newWells: List.from(event.wellsList)));
     });
 

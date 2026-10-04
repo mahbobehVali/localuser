@@ -9,9 +9,7 @@ class AlertDetailModel extends AlertDetailEntity {
     String? alertId,
     String? userId,
     int? status,
-
     String? message,
-
     String? date,
     String? clock,
     String? createdAt,

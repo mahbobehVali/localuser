@@ -68,5 +68,6 @@ class AccountBoxTitle extends StatelessWidget {
          divider?Divider(height: 20):SizedBox(), // خط جداکننده زیر ردیف
       ],
     );
+    
   }
 }

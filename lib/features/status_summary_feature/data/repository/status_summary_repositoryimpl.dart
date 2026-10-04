@@ -17,7 +17,6 @@ import '../model/wells_model.dart';
 
 class StatusSummaryRepositoryImpl extends StatusSummaryRepository {
   final StatusSummaryApiProvider statusSummaryApiProvider;
-  // static ValueNotifier<AuthEntity?> authNotifier = ValueNotifier(null);
 
   StatusSummaryRepositoryImpl({required this.statusSummaryApiProvider});
 

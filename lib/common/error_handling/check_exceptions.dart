@@ -69,7 +69,6 @@ class CheckExceptions {
 
       case UnauthenticatedException:
         final data = appException.response?.data;
-        print("data${appException.response??""}");
         final errorMessage = (data is Map && data.containsKey('message') && data['message'] != null)
             ? data['message']
             : 'خطایی رخ داده'; // پیام پیش‌فرض در صورت نبود کلید message

@@ -234,7 +234,8 @@ class FlowMeterEvent extends WellDetailEvent {
 
 class SignalQuality extends WellDetailEvent {
   final int initialSignal;
-  SignalQuality(this.initialSignal);
+  final int device;
+  SignalQuality(this.initialSignal,this.device);
 
   @override
   // TODO: implement props

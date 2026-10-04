@@ -4,8 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mahaliii/bottom_nav/wrapper_bloc.dart';
 import 'package:mahaliii/config/color_palette.dart';
 
-import 'bottom_nav_cubit.dart';
-
 class BottomNavWidget extends StatelessWidget {
 
   const BottomNavWidget({super.key,required this.pageController});

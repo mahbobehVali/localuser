@@ -77,7 +77,6 @@ class SupportApiProvider {
       final response = await dio.post("support/close",
       data: {
         "support_id":id,
-        // "status":3
       });
       print(response.data);
       return response;

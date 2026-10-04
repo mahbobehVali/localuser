@@ -11,6 +11,10 @@ class WaterLoading extends WaterStatus {
   @override
   List<Object> get props => [];
 }
+class WaterInitial extends WaterStatus {
+  @override
+  List<Object> get props => [];
+}
 
 class WaterError extends WaterStatus {
   final String error;

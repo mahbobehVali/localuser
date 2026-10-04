@@ -159,7 +159,6 @@ class Constants {
     }
   }
 
-
   final monthNames = [
     'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
     'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
@@ -184,9 +183,6 @@ class Constants {
     ColorPalette.textBlue,
     ColorPalette.lightGreen,
     ColorPalette.primaryTextGreen,
-
-
-
 
   ];
 
@@ -232,9 +228,7 @@ class Constants {
       "title": "درخواست به مدیر",
       "icon":Icon(Icons.contact_support_outlined),
       "part":1
-
     },
-
 
   ];
   final signalLevel = [
@@ -512,14 +506,11 @@ class Constants {
 
         // ۲. تصمیم‌گیری بر اساس یکسان بودن یا نبودن ماه در کل بازه
         if (leng<=31) {
-          print("customTitles.lengthyes");
           displayText = parts.length > 2 ? "${parts[1]}/${parts[2]}" : titleString;
         } else {
-          print("customTitles.lengthno");
-          print("x,zlsmdslkc");
+
           // دریافت نام ماه برای ایندکس فعلی
           final monthNum = int.tryParse(parts[1]) ?? 0;
-          print("monthNum----------${monthNum}");
           final String currentMonthName = (monthNum >= 1 && monthNum <= 12)
               ? Constants().monthNames[monthNum - 1]
               : titleString;

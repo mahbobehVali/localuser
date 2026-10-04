@@ -110,7 +110,7 @@ Future<void> setup() async {
   locator.registerFactory<WellFlowMeterUseCase>(() =>WellFlowMeterUseCase(locator()));
   locator.registerFactory<GetProgramUseCase>(() =>GetProgramUseCase(locator()));
   locator.registerFactory<AlertCountUseCase>(() =>AlertCountUseCase(locator()));
-// در فایل locator.dart
+
   locator.registerFactory<WellDetailBloc>(
         () => WellDetailBloc(
       locator<WellsRepository>(),
@@ -150,7 +150,7 @@ Future<void> setup() async {
   locator.registerFactory<AlertDetailUseCase>(() =>AlertDetailUseCase(locator()));
   locator.registerFactory<AlertCreateUseCase>(() =>AlertCreateUseCase(locator()));
 
-
+  ///support
   locator.registerFactory<SupportApiProvider>(() =>SupportApiProvider(dio));
   locator.registerFactory<SupportRepository>(() =>SupportRepositoryImpl(supportApiProvider: locator()));
   locator.registerFactory<SupportUseCase>(() =>SupportUseCase(locator()));

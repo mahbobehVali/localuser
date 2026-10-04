@@ -9,9 +9,6 @@ class GetCodeUseCase extends UseCase<DataState<dynamic>, String> {
 
   GetCodeUseCase(this.authRepository);
 
-
-  // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
-
   @override
   Future<DataState> call(String mobile) {
     print("use");

@@ -15,6 +15,7 @@ import 'package:persian_number_utility/persian_number_utility.dart';
 import '../../../../common/utils/sharedpreference.dart';
 import '../../../../common/widgets/account_box.dart';
 import '../../../../common/widgets/account_box_title.dart';
+import '../../../../config/color_palette.dart';
 import '../../../../config/texts_style.dart';
 import '../../../../locator.dart';
 import '../../../auth_feature/presentation/screens/login_screen.dart';
@@ -139,15 +140,54 @@ class _AccountScreenState extends State<AccountScreen>{
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                          Container(
+                            padding: EdgeInsets.all(4),
+                            height: 29.h,
+                            decoration: BoxDecoration(
+                              color: ColorPalette.lightBlue,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10), // فاصله از چپ و راست
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min, // حیاتی: برای اینکه کانتینر عرض کل را نگیرد
+                                children: [
+                                  // باکس آیکون با ابعاد دقیق
+                                  SizedBox(
+                                    width: 16.w,
+                                    // height: 16,
+                                    child: Image.asset(
+                                      "assets/icons/Password.png",
+                                      fit: BoxFit.contain, // مهار کردن عکس در باکس ۱۶ در ۱۶
+                                    ),
+                                  ),
 
-                          AccountBoxTitle(title: "رمز عبور",titleIcon: "assets/icons/Password.png"),
+                                  // ایجاد فاصله بین آیکون و متن
+                                  SizedBox(width: 8),
+
+                                  // نمایش عنوان
+                                  Text(
+                                    "رمز عبور",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+
                           BlocBuilder<AccountBloc,AccountState>(
                             buildWhen: (previous, current) => previous.edit!=current.edit,
 
                             builder: (context, state) {
                            return state.edit?
                            Row(
+                             crossAxisAlignment: CrossAxisAlignment.center,
                              children: [
                                BlocConsumer<AccountBloc, AccountState>(
                                  listenWhen: (previous, current) => previous.sendSmsStatus!=current.sendSmsStatus,
@@ -168,29 +208,35 @@ class _AccountScreenState extends State<AccountScreen>{
 
                                   if(state.sendSmsStatus is SendSmsError){
                                     SendSmsError sendSmsError=state.sendSmsStatus as SendSmsError;
-                                    GlobalSnackBar.show(context,message: sendSmsError.error);
+                                    GlobalSnackBar.show(context,message: sendSmsError.error,success: false);
 
                                   }
                                 },
                                 builder: (context, state) {
                                   return state.sendSmsStatus is SendSmsLoading?
                                   Center(child: CircularProgressIndicator(),):
-                                  IconButton(onPressed: () {
+                                  IconButton(
+                                      padding: EdgeInsets.zero, // 👈 حذف پدینگ اضافی برای تراز دقیق
+                                      constraints: const BoxConstraints(),
+                                      onPressed: () {
                                   if(passwordKey.currentState!.validate()){
                                   BlocProvider.of<AccountBloc>(context).add(SendSmsEvent());
                                   }
 
-                                  }, icon: Icon(Icons.check_box_outlined));
+                                  }, icon: Icon(Icons.check_box_outlined,size: 30,));
                                             },
                                           ),
-                               IconButton(onPressed: () {
+                               IconButton(
+                                   padding: EdgeInsets.zero, // 👈 حذف پدینگ اضافی
+                                   constraints: const BoxConstraints(),
+                                   onPressed: () {
                                  passwordKey.currentState?.reset();
 
                                  oldPassword.clear();
                                  newPassword.clear();
                                  BlocProvider.of<AccountBloc>(context).add(ChangeEditEvent(false));
 
-                               }, icon: Icon(Icons.cancel_presentation))
+                               }, icon: Icon(Icons.cancel_presentation,size: 30,))
                              ],
                            ):
                            GestureDetector(
@@ -205,6 +251,7 @@ class _AccountScreenState extends State<AccountScreen>{
 
                         ],
                       ),
+                      Divider(height: 20),
                       Form(
                         key: passwordKey,
                           child: BlocBuilder<AccountBloc, AccountState>(
@@ -259,7 +306,7 @@ class _AccountScreenState extends State<AccountScreen>{
                       );
                   },
                 )),
-                      
+
                     ],
                   ),
                 ),

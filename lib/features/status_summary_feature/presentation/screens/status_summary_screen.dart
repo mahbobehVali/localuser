@@ -14,7 +14,6 @@ import '../../../../common/utils/constants.dart';
 import '../../../../common/utils/sharedpreference.dart';
 import '../../../../common/widgets/last_activity_widget.dart';
 import '../../../../common/widgets/pagination_widget.dart';
-import '../../../../common/widgets/water_amount_container.dart';
 import '../../../../config/color_palette.dart';
 import '../../../../locator.dart';
 import '../../../../main.dart';
@@ -172,6 +171,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                                 children: [
                                   BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
                                     builder: (context, state) {
+                                      print(state.waterStatus);
                                       if (state.waterStatus is WaterSuccess) {
                                         final waterSuccess = state.waterStatus as WaterSuccess;
                                         final totalValue = waterSuccess.waterData?.today ?? 0;
@@ -184,7 +184,8 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                                           style: TextStyleP.f16Bold,
                                           textAlign: TextAlign.center,
                                         );
-                                      } else if (state.waterStatus is WaterLoading) {
+                                      }
+                                      else if (state.waterStatus is WaterLoading) {
                                         return Padding(
                                           padding: EdgeInsets.only(top: 10.h),
                                           child: SizedBox(
@@ -341,64 +342,6 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                     ),
                   ),
 
-                  // BlocBuilder<StatusSummaryBloc, StatusSummaryState>(
-                  //   builder: (context, state) {
-                  //     if (state.waterStatus is WaterSuccess) {
-                  //       final waterSuccess = state.waterStatus as WaterSuccess;
-                  //
-                  //       if (waterSuccess.waterData != null) {
-                  //         return Column(
-                  //
-                  //           children: [
-                  //
-                  //             Row(
-                  //               children: [
-                  //
-                  //
-                  //                 Expanded(
-                  //                   child: WaterAmountContainer(
-                  //                     image: "assets/icons/flowmeter.png",
-                  //
-                  //                     title: "امروز",
-                  //                     amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.today!.toDouble().round())} m³",
-                  //                   ),
-                  //                 ),
-                  //
-                  //                  SizedBox(width: 8.w),
-                  //                 Expanded(
-                  //                   child: WaterAmountContainer(
-                  //                     image: "assets/icons/flowmeter.png",
-                  //
-                  //                     title: "این ماه",
-                  //                     amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.monthly!.toDouble().round())} m³",
-                  //                   ),
-                  //                 ),
-                  //
-                  //               ],
-                  //             ),
-                  //              SizedBox(height: 8.h),
-                  //             WaterAmountContainer(
-                  //               image: "assets/icons/flowmeter.png",
-                  //               title: "از ابتدای سال",
-                  //               amount:"${NumberFormat.decimalPattern().format(waterSuccess.waterData!.total!.toDouble().round())} m³",
-                  //               year: true,
-                  //
-                  //             ),
-                  //           ],
-                  //         );
-                  //       } else {
-                  //         return const SizedBox();
-                  //       }
-                  //     }
-                  //     else if (state.waterStatus is WaterLoading) {
-                  //       return ShimmerClass.shimmerListviewHor(height: 100);
-                  //     }else if (state.waterStatus is WaterError) {
-                  //       return Center(child: Text((state.waterStatus as WaterError).error),);
-                  //     } else {
-                  //       return const SizedBox();
-                  //     }
-                  //   },
-                  // ),
                   SizedBox(height: 16.h),
 
                   ///chart
@@ -409,7 +352,7 @@ class _StatusSummaryScreenState extends State<StatusSummaryScreen> with RouteAwa
                   SizedBox(height: 16.h,),
 
                   Container(
-                  padding: EdgeInsets.all(12),
+                  padding: EdgeInsets.only(right: 12,top: 12),
                   decoration: Constants().whiteFiveRadiusDecoration,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

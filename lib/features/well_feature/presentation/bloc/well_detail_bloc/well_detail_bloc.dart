@@ -18,7 +18,6 @@ import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_blo
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_status.dart';
 
 import '../../../../../common/utils/data_state.dart';
-import '../../../../../common/utils/sharedpreference.dart';
 import '../../../../../common/utils/use_case.dart';
 import '../../../../../common/widgets/stream_extension.dart';
 import '../../../../../locator.dart';
@@ -180,7 +179,7 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       socketRepository.onAndOff(event.createTimeParams);
 
       await emit.forEach<dynamic>(
-        socketRepository.onAndOffTimeStream.timeoutFirst(const Duration(seconds: 10)),
+        socketRepository.onAndOffTimeStream.timeoutFirst(const Duration(seconds: 60)),
         onData: (onOff) {
           if (onOff.deviceId != event.deviceId) {
             // اگر مربوط به چاه دیگری است، هیچ تغییری در استیت این صفحه ایجاد نکن
@@ -203,6 +202,14 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
           );
         },
         onError: (error, stackTrace) {
+          if (error is TimeoutException) {
+            return state.copyWith(
+              newOnOffStatus: OnOffError(
+                error.message ?? " پاسخی از سمت دستگاه دریافت نشد.",
+              ),
+            );
+          }
+
           return state.copyWith(
             newOnOffStatus: OnOffError(error.toString()),
           );
@@ -212,14 +219,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
     on<AutoSwitchChange>((event, emit) async {
       print("AutoSwitchChange");
-      // اگر از قبل متصل هستیم و فقط می‌خواهیم دیتا بگیریم، لودینگ نشان ندهیم
-      // if (state.onOffStatus is! OnOffSuccess) {
-      //   emit(state.copyWith(newOnOffStatus: OnOffSuccess()));
-      // }
-      // ارسال درخواست مخصوص این صفحه
-      // emit(state.copyWith(newOnOffStatus: OnOffLoading()));
-
-      // socketRepository.onAndOff(event.createTimeParams);
 
       // ۲. مدیریت استریم با emit.forEach
       await emit.forEach<dynamic>(
@@ -267,7 +266,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
 
     on<WellWorkHourStart>((event, emit) async {
-      // print("event.flowMeterParams.type${event.flowMeterParams.type}");
       emit(state.copyWith(newWeekWellWorkStatus: WeekWellWorkLoading(),
           newSelectedChartTab: event.flowMeterParams.type));
       if(event.flowMeterParams.type==0){
@@ -358,7 +356,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
     });
 
     on<SignalQuality>((event, emit) async {
-      print("SignalQuality");
       emit(state.copyWith(
         newSignalStatus: SignalSuccess(),
         newSignal: event.initialSignal, // یا state.signal اگر از قبل مقداردهی شده
@@ -368,13 +365,15 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       await emit.forEach<dynamic>(
         socketRepository.signalStream,
         onData: (signal) {
-          print("SignalQuality$signal");
-          print("signal_level${signal["signal_level"]}");
+          if (signal.deviceId != event.device) {
+            // اگر مربوط به چاه دیگری است، هیچ تغییری در استیت این صفحه ایجاد نکن
+            return state;
+          }
+
           // دیتای دریافتی را به وضعیت موفقیت می‌بریم
           return state.copyWith(
               newSignalStatus: SignalSuccess(signal),
-              newSignal: signal["signal_level"]);
-
+              newSignal: signal.signalLevel);
 
         },
         onError: (error, stackTrace) {

@@ -25,16 +25,12 @@ class AuthApiProvider {
     } on DioException catch (e) {
       print(e.response);
       print(e.response?.statusCode);
-      if (e.type == DioExceptionType.connectionError) {
-        print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");
-      }
 
       return CheckExceptions.response(e.response);
     }
   }
 
   Future<dynamic> getCode(String mobile) async {
-    print("sfsdf${mobile.toString().toEnglishDigit()}");
 
     try {
       var response = await dio.post(
@@ -49,9 +45,6 @@ class AuthApiProvider {
     } on DioException catch (e) {
       print(e.response?.statusCode);
       print(e.response);
-      if (e.type == DioExceptionType.connectionError) {
-        print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");
-      }
 
       return CheckExceptions.response(e.response);
     }
@@ -71,11 +64,6 @@ class AuthApiProvider {
 
       return response;
     } on DioException catch (e) {
-      print(e.response);
-      print(e.response?.statusCode);
-      if (e.type == DioExceptionType.connectionError) {
-        print("خطا در اتصال: احتمالاً مشکل CORS یا اینترنت است");
-      }
 
       return CheckExceptions.response(e.response);
     }

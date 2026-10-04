@@ -175,7 +175,7 @@ class ShowDialogs {
                             Navigator.of(context).pop();
 
                             ChangePasswordError changePasswordError=state.changePasswordStatus as ChangePasswordError;
-                            GlobalSnackBar.show(context,message: changePasswordError.error);
+                            GlobalSnackBar.show(context,message: changePasswordError.error,success: false);
 
                           }
 
@@ -349,7 +349,7 @@ class ShowDialogs {
                                             ChangeEndClock("${p(picked.hour)}:${p(picked.minute)}"),
                                           );
                                         } else {
-                                          GlobalSnackBar.show(scaffoldContext, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد");
+                                          GlobalSnackBar.show(scaffoldContext, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",success: false);
                                         }
                                       }
                                     },
@@ -381,7 +381,11 @@ class ShowDialogs {
                                 //     duration: const Duration(seconds: 3),
                                 //   ),
                                 // );
-                                GlobalSnackBar.show(context, message: createTimeSuccess.status==1?  "برنامه با موفقیت ثبت شد":"پاسخی از سمت دستگاه دریافت نشد");
+                                GlobalSnackBar.show(context,
+                                    message: createTimeSuccess.status==1?  "برنامه با موفقیت ثبت شد":"پاسخی از سمت دستگاه دریافت نشد",
+                                    success: createTimeSuccess.status==1?  true:false
+
+                                );
 
                                 // بستن دیالوگ
                                 Navigator.of(dialogContext).pop();
@@ -448,14 +452,14 @@ class ShowDialogs {
                                   CircularProgressIndicator(): Text("ثبت زمان",style: TextStyle(color: ColorPalette.black),),
                                     onTap:(state.daySelected.id==-1) ||
                                         state.startHour!.isEmpty || state.endHour!.isEmpty ? (){
-                                      GlobalSnackBar.show(scaffoldContext, message: "روز هفته و ساعت شروع و پایان را مشخص کنید");
+                                      GlobalSnackBar.show(scaffoldContext, message: "روز هفته و ساعت شروع و پایان را مشخص کنید",success: false);
 
                                     }:isLoading? null:() {
                                       bool hasConflict = checkConflictForDay(programDayEntity: programDayEntity,
                                           targetDayName: state.daySelected.name, newStart: state.startHour!, newEnd: state.endHour!);
                                       if (hasConflict) {
                                         Navigator.of(context).pop();
-                                        GlobalSnackBar.show(scaffoldContext, message: "این زمان با برنامه‌های قبلی این روز تداخل دارد!");
+                                        GlobalSnackBar.show(scaffoldContext, message: "این زمان با برنامه‌های قبلی این روز تداخل دارد!",success: false);
                                       } else {
                                         wellDetailBloc.add(CreateNewTime(CreateTimeParams(
                                             code: wellsDataEntity.code,
@@ -561,7 +565,11 @@ class ShowDialogs {
                               //     duration: const Duration(seconds: 3),
                               //   ),
                               // );
-                              GlobalSnackBar.show(context, message: deleteTimeSuccess.status==1?  "برنامه با موفقیت حذف شد":"پاسخی از سمت دستگاه دریافت نشد");
+                              GlobalSnackBar.show(context,
+                                  message: deleteTimeSuccess.status==1?  "برنامه با موفقیت حذف شد":"پاسخی از سمت دستگاه دریافت نشد",
+                                  success: deleteTimeSuccess.status==1?  true:false,
+
+                              );
 
                               // بستن دیالوگ
                               Navigator.of(dialogContext).pop();
@@ -799,7 +807,7 @@ class ShowDialogs {
                     }
 
                     if (context.mounted) {
-                      GlobalSnackBar.show(context, message: errorMsg);
+                      GlobalSnackBar.show(context, message: errorMsg,success: false);
                     }
                   }
                 }

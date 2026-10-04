@@ -10,8 +10,6 @@ class ForgetPassUseCase extends UseCase<DataState<dynamic>, ForgetPasswordParams
 
   ForgetPassUseCase(this.authRepository);
 
-  // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
-
   @override
   Future<DataState> call(ForgetPasswordParams forgetPasswordParams) {
     return authRepository.forgetPass(forgetPasswordParams);

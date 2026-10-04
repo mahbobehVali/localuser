@@ -10,8 +10,6 @@ class ChangePasswordUseCase extends UseCase<DataState<dynamic>, ChangePasswordPa
 
   ChangePasswordUseCase(this.panelRepository);
 
-  // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
-
   @override
   Future<DataState> call(changePasswordParams) {
     return panelRepository.changePassword(changePasswordParams);

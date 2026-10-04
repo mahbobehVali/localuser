@@ -9,8 +9,7 @@ class WellsApiProvider {
   WellsApiProvider(this.dio);
 
   Future<dynamic> wellWorkHour(FlowMeterParams flowMeterParams) async {
-    // print("flowMeterParams${flowMeterParams.type}");
-    // print("flowMeterParams${flowMeterParams.ids}");
+
     var data =flowMeterParams.type==5?{
       "type":flowMeterParams.type,
       "ids":flowMeterParams.ids,
@@ -27,7 +26,6 @@ class WellsApiProvider {
 
     try {
       final response = await dio.post("report/command/count",data: data);
-      // print("addsedd${response.data}");
       return response;
     } on DioException catch (e) {
       return CheckExceptions.response(e.response);

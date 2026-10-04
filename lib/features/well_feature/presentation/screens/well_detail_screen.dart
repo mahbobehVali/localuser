@@ -1,5 +1,4 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,7 +8,6 @@ import 'package:mahaliii/common/widgets/global_elevated_button.dart';
 import 'package:mahaliii/common/widgets/shimmer_class.dart';
 import 'package:mahaliii/features/status_summary_feature/domain/entity/wells_data_entity.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/flowmeter_status.dart';
-import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/flowmeter_today_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/pump_performance_status.dart';
 import 'package:mahaliii/features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 import 'package:mahaliii/features/well_feature/presentation/screens/widgets/program_widget.dart';
@@ -17,19 +15,14 @@ import 'package:mahaliii/features/well_feature/presentation/screens/widgets/sign
 import 'package:mahaliii/features/well_feature/presentation/screens/widgets/switch_pump.dart';
 import 'package:persian_number_utility/persian_number_utility.dart';
 
-import '../../../../bottom_nav/wrapper_bloc.dart';
 import '../../../../common/utils/constants.dart';
-import '../../../../common/widgets/global_snackbar.dart';
 import '../../../../common/widgets/icon_container.dart';
 import '../../../../common/widgets/indicator_widget.dart';
-import '../../../../common/widgets/show_dialogs.dart';
-import '../../../../common/widgets/signal_chart.dart';
 import '../../../../config/color_palette.dart';
 import '../../../../config/texts_style.dart';
 import '../../../../locator.dart';
 import '../../../auth_feature/presentation/screens/login_screen.dart';
 import '../bloc/well_detail_bloc/finger_status.dart';
-import '../bloc/well_detail_bloc/on_off_status.dart';
 import '../bloc/well_detail_bloc/week_well_work_status.dart';
 
 class WellDetailScreen extends StatefulWidget {
@@ -61,7 +54,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
         0 => PieChartSectionData(
           color: ColorPalette.darkGreen,
           value: onValue,
-          title: onValue > 0 ? '${onValue.toString().toPersianDigit()}' : '',
+          title: onValue > 0 ? '${onValue.toStringAsFixed(2).toPersianDigit()}' : '',
 
           radius: radius,
           titleStyle: TextStyle(
@@ -74,7 +67,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
         1 => PieChartSectionData(
           color: ColorPalette.darkRed,
           value: offValue,
-          title: offValue > 0 ? '${offValue.toString().toPersianDigit()}' : '',
+          title: offValue > 0 ? '${offValue.toStringAsFixed(2).toPersianDigit()}' : '',
+
           radius: radius,
           titleStyle: TextStyle(
             fontSize:  13.0,
@@ -86,7 +80,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
         2 => PieChartSectionData(
           color: ColorPalette.lightGrey,
           value: remainingValue,
-          title: remainingValue > 0 ? '${remainingValue.toString().toPersianDigit()}' : '',
+          title: remainingValue > 0
+              ? remainingValue.toStringAsFixed(2).toPersianDigit()
+              : '',
           radius: radius,
           titleStyle: TextStyle(
             fontSize: 13.0,
@@ -124,7 +120,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
       ..add(FirstSwitch(widget.wellsDataEntity.statusWell == 1))
       ..add(ChangeUserLocalId(widget.wellsDataEntity.userLocalId))
       ..add(AutoSwitchChange(widget.wellsDataEntity.deviceId!))
-      ..add(SignalQuality(widget.wellsDataEntity.signalLevel!));
+      ..add(SignalQuality(widget.wellsDataEntity.signalLevel!,widget.wellsDataEntity.deviceId!));
 
     _controller = AnimationController(
       vsync: this,
@@ -166,94 +162,61 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
     return BlocProvider.value(
       value: _bloc,
-      child: BlocListener<WellDetailBloc, WellDetailState>(
-        listenWhen: (previous, current) => previous.onOffStatus != current.onOffStatus,
-        listener: (context, state) {
-          // print("--- State Changed: ${state.onOffStatus} ---"); // این خط را اضافه کنید
-          // if (state.onOffStatus is OnOffSuccess) {
-          //   print("--- OnOffSuccess Triggered! ---"); // و این خط
-          //   ScaffoldMessenger.of(context).clearSnackBars();
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     SnackBar(
-          //       behavior: SnackBarBehavior.floating,
-          //       margin: EdgeInsets.only(
-          //         // دکمه شما در بالای صفحه (Top SnackBar) نمایش داده می‌شود
-          //         // top: MediaQuery.sizeOf(context).height - 300.h,
-          //         left: 20.w,
-          //         right: 20.w,
-          //       ),
-          //       content: Text(state.isSwitched == true ? "پمپ روشن شد" : "پمپ خاموش شد"),
-          //       backgroundColor: Colors.green,
-          //       duration: const Duration(seconds: 3),
-          //     ),
-          //   );
-          //   BlocProvider.of<WellDetailBloc>(context).add(ResetOnOffStatus());
-          // }
-          //
-          // if (state.onOffStatus is OnOffError) {
-          //   final errorState = state.onOffStatus as OnOffError;
-          //   ScaffoldMessenger.of(context).clearSnackBars();
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     SnackBar(
-          //       content: Text(errorState.error),
-          //       backgroundColor: Colors.red,
-          //       duration: const Duration(seconds: 3),
-          //     ),
-          //   );
-          // }
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          // برگرداندن وضعیت فعلی سوئیچ هنگام خروج
+          Navigator.of(context).pop({
+            'isSwitched': _bloc.state.isSwitched,
+            'userLocalId': _bloc.state.userLocalId, //  برگرداندن userLocalId واقعی که ثبت شده است
+
+          });
+          // Navigator.of(context).pop( _bloc.state.userLocalId);
+
         },
-        child: PopScope(
-          canPop: false,
-          onPopInvokedWithResult: (didPop, result) {
-            if (didPop) return;
-            // برگرداندن وضعیت فعلی سوئیچ هنگام خروج
-            Navigator.of(context).pop({
-                'isSwitched': _bloc.state.isSwitched,
-                'userLocalId': _bloc.state.userLocalId, //  برگرداندن userLocalId واقعی که ثبت شده است
+        child: Scaffold(
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(60.h),
+              child: Container(
+                color: ColorPalette.white,
+                padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 8.h, bottom: 8.h),
+                child: SafeArea(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      BlocBuilder<WellDetailBloc, WellDetailState>(
+                        builder: (context, state) {
+                          return SegmentedButton(
+                            style: SegmentedButton.styleFrom(
+                              backgroundColor: ColorPalette.lightGrey,
+                            ),
+                            onSelectionChanged: (Set<int> newSelected) {
+                              BlocProvider.of<WellDetailBloc>(context)
+                                  .add(ChangeWellTab(newSelected.first));
+                            },
+                            segments: const [
+                              ButtonSegment(value: 0, label: Text("وضعیت کلی")),
+                              ButtonSegment(value: 1, label: Text("کنترل چاه")),
+                            ],
+                            selected: {state.selectedWellTab},
+                          );
+                        },
+                      ),
 
-            });
-            // Navigator.of(context).pop( _bloc.state.userLocalId);
-
-          },
-          child: Scaffold(
-              appBar: PreferredSize(
-                preferredSize: Size.fromHeight(60.h),
-                child: Container(
-                  color: ColorPalette.white,
-                  padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 8.h, bottom: 8.h),
-                  child: SafeArea(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        BlocBuilder<WellDetailBloc, WellDetailState>(
-                          builder: (context, state) {
-                            return SegmentedButton(
-                              style: SegmentedButton.styleFrom(
-                                backgroundColor: ColorPalette.lightGrey,
-                              ),
-                              onSelectionChanged: (Set<int> newSelected) {
-                                BlocProvider.of<WellDetailBloc>(context)
-                                    .add(ChangeWellTab(newSelected.first));
-                              },
-                              segments: const [
-                                ButtonSegment(value: 0, label: Text("وضعیت کلی")),
-                                ButtonSegment(value: 1, label: Text("کنترل چاه")),
-                              ],
-                              selected: {state.selectedWellTab},
-                            );
-                          },
+                      Container(
+                        width: 30,
+                        height: 30,
+                        padding: EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: BoxBorder.all(),
                         ),
-                        IconButton(
-                          style: ButtonStyle(
-                            shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            side: const WidgetStatePropertyAll(
-                              BorderSide(),
-                            ),
-                          ),
+
+                        child: IconButton(
+
+                          padding: EdgeInsets.zero,
+
                           icon: const Icon(Icons.navigate_next),
                           onPressed: () {
                             Navigator.of(context).pop({
@@ -261,13 +224,14 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                               'userLocalId': _bloc.state.userLocalId, //  برگرداندن userLocalId واقعی که ثبت شده است
 
                             });
-                            },
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+            ),
             body:  SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,7 +270,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text("میزان مصرف آب", style: TextStyleP.f12Regular),
+                                            Text("حجم مصرف آب", style: TextStyleP.f12Regular),
                                             BlocBuilder<WellDetailBloc, WellDetailState>(
                                               buildWhen: (previous, current) =>
                                               current.selectedChartVolumeTab!=previous.selectedChartVolumeTab ||
@@ -377,26 +341,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                               }
                                             }
 
-                                            // ۲. اضافه کردن دیتای جدید سوکت به لیست کش شده (بدون پاک شدن قبلی‌ها)
-                                            // if (state.selectedChartVolumeTab == 0 && state.flowMeterTodayStatus is FlowMeterTodaySuccess) {
-                                            //   final todayEntity = (state.flowMeterTodayStatus as FlowMeterTodaySuccess).wellFlowMeterTodayOneEntity;
-                                            //
-                                            //   if (todayEntity != null && todayEntity.deviceId == widget.wellsDataEntity.deviceId) {
-                                            //     final socketX = todayEntity.xAxis.toString();
-                                            //     final socketY = todayEntity.yAxis!.toDouble();
-                                            //
-                                            //     if (liveXLabels.isNotEmpty && liveXLabels.last == socketX) {
-                                            //       final lastY = liveYValues.last;
-                                            //       if (lastY != socketY) {
-                                            //         liveYValues[liveYValues.length - 1] = (lastY + socketY) / 2;
-                                            //       }
-                                            //     } else if (!liveXLabels.contains(socketX)) {
-                                            //       // دیتای جدید سوکت به لیست اضافه می‌شود و ماندگار خواهد بود
-                                            //       liveXLabels.add(socketX);
-                                            //       liveYValues.add(socketY);
-                                            //     }
-                                            //   }
-                                            // }
                                           },
                                           builder: (context, state) {
                                             final status = state.flowMeterStatus;
@@ -435,7 +379,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                 barRods: [
                                                   BarChartRodData(
                                                     toY: liveYValues[index],
-                                                    color: ColorPalette.darkBlue,
+                                                    color: ColorPalette.chartBlue,
                                                     width: 15.w,
                                                     borderRadius: BorderRadius.circular(2),
                                                   ),
@@ -453,167 +397,167 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   child: SingleChildScrollView(
                                                     scrollDirection: Axis.horizontal,
                                                     child: Container(
-                                                      width: calculatedChartWidth,
-                                                      height: 250.h,
-                                                      padding: const EdgeInsets.only(top: 40, right: 18.0, bottom: 10),
-                                                      child: state.selectedChartVolumeTab == 0
-                                                          ? LineChart(
-                                                        LineChartData(
-                                                          extraLinesData: ExtraLinesData(
-                                                            horizontalLines: Constants().generateHorizontalLines(
-                                                              (scale['step'] as num).toDouble(),
-                                                              scale["maxY"]!,
-                                                              scale["minY"]!,
+                                                        width: calculatedChartWidth,
+                                                        height: 250.h,
+                                                        padding: const EdgeInsets.only(top: 40, right: 18.0, bottom: 10),
+                                                        child: state.selectedChartVolumeTab == 0
+                                                            ? LineChart(
+                                                          LineChartData(
+                                                            extraLinesData: ExtraLinesData(
+                                                              horizontalLines: Constants().generateHorizontalLines(
+                                                                (scale['step'] as num).toDouble(),
+                                                                scale["maxY"]!,
+                                                                scale["minY"]!,
+                                                              ),
                                                             ),
-                                                          ),
-                                                          borderData: FlBorderData(
-                                                            show: true,
-                                                            border: Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
-                                                          ),
-                                                          titlesData: FlTitlesData(
-                                                            bottomTitles: Constants().axisBottomTitles(liveXLabels, "day"),
-                                                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                                            leftTitles: Constants().leftTitles(
-                                                              interval: scale["maxY"]! > 1000 ? 55.w : 40.w,
-                                                              scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                                            borderData: FlBorderData(
+                                                              show: true,
+                                                              border: Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
                                                             ),
-                                                          ),
-                                                          gridData: const FlGridData(show: false),
-                                                          lineTouchData: LineTouchData(
-                                                            touchTooltipData: LineTouchTooltipData(
-                                                              maxContentWidth: 250.w,
-                                                              getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
-                                                              fitInsideHorizontally: true,
-                                                              fitInsideVertically: true,
-                                                              getTooltipItems: (List<LineBarSpot> touchedSpots) {
-                                                                if (touchedSpots.isEmpty) return [];
-                                                                final spot = touchedSpots.first;
-                                                                final int xIndex = spot.x.toInt();
-                                                                if (xIndex < 0 || xIndex >= liveXLabels.length) return [];
+                                                            titlesData: FlTitlesData(
+                                                              bottomTitles: Constants().axisBottomTitles(liveXLabels, "day"),
+                                                              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                              leftTitles: Constants().leftTitles(
+                                                                interval: scale["maxY"]! > 1000 ? 55.w : 40.w,
+                                                                scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                                              ),
+                                                            ),
+                                                            gridData: const FlGridData(show: false),
+                                                            lineTouchData: LineTouchData(
+                                                              touchTooltipData: LineTouchTooltipData(
+                                                                maxContentWidth: 250.w,
+                                                                getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
+                                                                fitInsideHorizontally: true,
+                                                                fitInsideVertically: true,
+                                                                getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                                                                  if (touchedSpots.isEmpty) return [];
+                                                                  final spot = touchedSpots.first;
+                                                                  final int xIndex = spot.x.toInt();
+                                                                  if (xIndex < 0 || xIndex >= liveXLabels.length) return [];
 
-                                                                final String values = liveYValues[xIndex].toStringAsFixed(2).toString().toPersianDigit();
-                                                                List<TextSpan> spans = [
-                                                                  TextSpan(
-                                                                    text: "حجم آب عبوری دبی سنج: ${values}\n",
-                                                                    style: const TextStyle(
-                                                                      color: Colors.black87,
-                                                                      fontWeight: FontWeight.bold,
-                                                                      fontSize: 12,
+                                                                  final String values = liveYValues[xIndex].toStringAsFixed(2).toString().toPersianDigit();
+                                                                  List<TextSpan> spans = [
+                                                                    TextSpan(
+                                                                      text: "حجم آب عبوری دبی سنج: ${values}\n",
+                                                                      style: const TextStyle(
+                                                                        color: Colors.black87,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        fontSize: 12,
+                                                                      ),
                                                                     ),
-                                                                  ),
-                                                                ];
+                                                                  ];
 
-                                                                return touchedSpots.map((s) {
-                                                                  if (s == spot) {
-                                                                    return LineTooltipItem(
-                                                                      textAlign: TextAlign.right,
-                                                                      "",
-                                                                      const TextStyle(),
-                                                                      children: spans,
-                                                                    );
-                                                                  }
-                                                                  return null;
-                                                                }).toList();
-                                                              },
+                                                                  return touchedSpots.map((s) {
+                                                                    if (s == spot) {
+                                                                      return LineTooltipItem(
+                                                                        textAlign: TextAlign.right,
+                                                                        "",
+                                                                        const TextStyle(),
+                                                                        children: spans,
+                                                                      );
+                                                                    }
+                                                                    return null;
+                                                                  }).toList();
+                                                                },
+                                                              ),
+                                                              handleBuiltInTouches: true,
                                                             ),
-                                                            handleBuiltInTouches: true,
+                                                            lineBarsData: [
+                                                              LineChartBarData(
+                                                                preventCurveOverShooting: true,
+                                                                preventCurveOvershootingThreshold: 0,
+                                                                dotData: const FlDotData(show: false),
+                                                                isCurved: true,
+                                                                color: ColorPalette.darkBlue,
+                                                                barWidth: 2.5,
+                                                                isStrokeCapRound: true,
+                                                                spots: spots,
+                                                              ),
+                                                            ],
+                                                            maxY: scale["maxY"],
+                                                            minY: scale["minY"],
                                                           ),
-                                                          lineBarsData: [
-                                                            LineChartBarData(
-                                                              preventCurveOverShooting: true,
-                                                              preventCurveOvershootingThreshold: 0,
-                                                              dotData: const FlDotData(show: false),
-                                                              isCurved: true,
-                                                              color: ColorPalette.darkBlue,
-                                                              barWidth: 2.5,
-                                                              isStrokeCapRound: true,
-                                                              spots: spots,
+                                                          duration: const Duration(milliseconds: 250),
+                                                        )
+                                                            : BarChart(
+                                                          BarChartData(
+                                                            extraLinesData: ExtraLinesData(
+                                                              horizontalLines: Constants().generateHorizontalLines(
+                                                                (scale['step'] as num).toDouble(),
+                                                                scale["maxY"]!,
+                                                                scale["minY"]!,
+                                                              ),
                                                             ),
-                                                          ],
-                                                          maxY: scale["maxY"],
-                                                          minY: scale["minY"],
-                                                        ),
-                                                        duration: const Duration(milliseconds: 250),
-                                                      )
-                                                          : BarChart(
-                                                        BarChartData(
-                                                          extraLinesData: ExtraLinesData(
-                                                            horizontalLines: Constants().generateHorizontalLines(
-                                                              (scale['step'] as num).toDouble(),
-                                                              scale["maxY"]!,
-                                                              scale["minY"]!,
-                                                            ),
-                                                          ),
-                                                          maxY: scale['maxY'],
-                                                          minY: (scale['minY'] != null && scale['minY']! < 0) ? scale['minY'] : 0.0,
-                                                          alignment: BarChartAlignment.spaceAround,
-                                                          gridData: FlGridData(
-                                                            show: false,
-                                                            verticalInterval: scale['step'],
-                                                            getDrawingHorizontalLine: (value) {
-                                                              return const FlLine(
-                                                                strokeWidth: 1,
-                                                                color: Colors.grey,
-                                                              );
-                                                            },
-                                                          ),
-                                                          barTouchData: BarTouchData(
-                                                            handleBuiltInTouches: true,
-                                                            touchTooltipData: BarTouchTooltipData(
-                                                              maxContentWidth: 250.w,
-                                                              getTooltipColor: (group) => const Color(0xFFF7F9FA), // پس‌زمینه ملایم
-                                                              fitInsideHorizontally: true,
-                                                              fitInsideVertically: true,
-                                                              getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                                                                final int xIndex = group.x.toInt();
-                                                                if (xIndex < 0 || xIndex >= liveXLabels.length) return null;
-
-                                                                final double currentDate = liveYValues[xIndex];
-
-                                                                List<TextSpan> spans = [];
-
-                                                                // ۲. استخراج ساعت یا تاریخ اصلی (جدا کردن ساعت اگر شامل فاصله باشد)
-                                                                final String timeLabel = currentDate.toStringAsFixed(2).toString().toPersianDigit();
-
-                                                                spans.add(
-                                                                  TextSpan(
-                                                                    text: "حجم آب عبوری دبی سنج: $timeLabel",
-                                                                    style: const TextStyle(
-                                                                      color: Colors.black87,
-                                                                      fontWeight: FontWeight.bold,
-                                                                      fontSize: 12,
-                                                                    ),
-                                                                  ),
-                                                                );
-
-
-                                                                return BarTooltipItem(
-                                                                  textAlign: TextAlign.right,
-                                                                  "",
-                                                                  const TextStyle(),
-                                                                  children: spans,
+                                                            maxY: scale['maxY'],
+                                                            minY: (scale['minY'] != null && scale['minY']! < 0) ? scale['minY'] : 0.0,
+                                                            alignment: BarChartAlignment.spaceAround,
+                                                            gridData: FlGridData(
+                                                              show: false,
+                                                              verticalInterval: scale['step'],
+                                                              getDrawingHorizontalLine: (value) {
+                                                                return const FlLine(
+                                                                  strokeWidth: 1,
+                                                                  color: Colors.grey,
                                                                 );
                                                               },
                                                             ),
-                                                          ),
+                                                            barTouchData: BarTouchData(
+                                                              handleBuiltInTouches: true,
+                                                              touchTooltipData: BarTouchTooltipData(
+                                                                maxContentWidth: 250.w,
+                                                                getTooltipColor: (group) => const Color(0xFFF7F9FA), // پس‌زمینه ملایم
+                                                                fitInsideHorizontally: true,
+                                                                fitInsideVertically: true,
+                                                                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                                                                  final int xIndex = group.x.toInt();
+                                                                  if (xIndex < 0 || xIndex >= liveXLabels.length) return null;
 
-                                                          borderData: FlBorderData(
-                                                            border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
-                                                          ),
-                                                          titlesData: FlTitlesData(
-                                                            show: true,
-                                                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                                            bottomTitles: Constants().axisBottomTitles(liveXLabels, "week"),
-                                                            leftTitles: Constants().leftTitles(
-                                                              interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
-                                                              scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                                                  final double currentDate = liveYValues[xIndex];
+
+                                                                  List<TextSpan> spans = [];
+
+                                                                  // ۲. استخراج ساعت یا تاریخ اصلی (جدا کردن ساعت اگر شامل فاصله باشد)
+                                                                  final String timeLabel = currentDate.toStringAsFixed(2).toString().toPersianDigit();
+
+                                                                  spans.add(
+                                                                    TextSpan(
+                                                                      text: "حجم آب عبوری دبی سنج: $timeLabel",
+                                                                      style: const TextStyle(
+                                                                        color: Colors.black87,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        fontSize: 12,
+                                                                      ),
+                                                                    ),
+                                                                  );
+
+
+                                                                  return BarTooltipItem(
+                                                                    textAlign: TextAlign.right,
+                                                                    "",
+                                                                    const TextStyle(),
+                                                                    children: spans,
+                                                                  );
+                                                                },
+                                                              ),
                                                             ),
+
+                                                            borderData: FlBorderData(
+                                                              border:  Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
+                                                            ),
+                                                            titlesData: FlTitlesData(
+                                                              show: true,
+                                                              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                                              bottomTitles: Constants().axisBottomTitles(liveXLabels, "week"),
+                                                              leftTitles: Constants().leftTitles(
+                                                                interval: scale["maxY"]! > 1000 ? 65.w : 40.w,
+                                                                scale: scale['step'] == 0 ? 10 : scale['step']!,
+                                                              ),
+                                                            ),
+                                                            barGroups: chartGroups,
                                                           ),
-                                                          barGroups: chartGroups,
-                                                        ),
-                                                      )
+                                                        )
                                                     ),
                                                   ),
                                                 ),
@@ -722,14 +666,14 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   BarChartRodData(
                                                     // چک کردن لیست اول
                                                     toY: index < currentYValues.length ? currentYValues[index].toDouble() : 0.0,
-                                                    color: ColorPalette.orange,
+                                                    color: ColorPalette.chartBlue,
                                                     width: 15.w,
                                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(2)),
                                                   ),
                                                   if(successState.previousWellWorkEntity!=null) BarChartRodData(
                                                     // چک کردن لیست دوم
                                                     toY: index < previousYValues.length ? previousYValues[index].toDouble() : 0.0,
-                                                    color: ColorPalette.grey,
+                                                    color: ColorPalette.lightGrey,
                                                     width: 15.w,
                                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(0)),
                                                   ),
@@ -918,7 +862,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                         TextSpan(
                                                                           text: "●",
                                                                           style: TextStyle(
-                                                                            color: ColorPalette.orange,
+                                                                            color: ColorPalette.chartBlue,
                                                                             fontWeight: FontWeight.bold,
                                                                             fontSize: 11,
                                                                           ),
@@ -953,10 +897,10 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                           ),
                                                                         );
                                                                         spans.add(
-                                                                          const TextSpan(
+                                                                           TextSpan(
                                                                             text: "●",
                                                                             style: TextStyle(
-                                                                              color: Colors.grey,
+                                                                              color: ColorPalette.lightGrey,
                                                                               fontWeight: FontWeight.bold,
                                                                               fontSize: 11,
                                                                             ),
@@ -999,8 +943,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                         Row(
                                                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                           children:  [
-                                                            Indicator(color: ColorPalette.orange, text: 'هفته جاری', isSquare: true),
-                                                            Indicator(color: ColorPalette.grey, text: 'هفته گذشته', isSquare: true),
+                                                            Indicator(color: ColorPalette.chartBlue, text: 'هفته جاری', isSquare: true),
+                                                            Indicator(color: ColorPalette.lightGrey, text: 'هفته گذشته', isSquare: true),
                                                           ],
                                                         ),
                                                       ],
@@ -1335,7 +1279,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   _controller.forward();
                                                 }
                                               }
-                                          if (status is FingerRequestAccepted) {
+                                              if (status is FingerRequestAccepted) {
                                                 print("FingerRequestAccepted");
 
                                               }
@@ -1348,7 +1292,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   ),
                                                 );
                                               }
-                                               if (status is FingerSuccess || status is FingerError || status is FingerRequestFailed) {
+                                              if (status is FingerSuccess || status is FingerError || status is FingerRequestFailed) {
                                                 _controller.stop();
                                               }
 
@@ -1466,7 +1410,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                     SwitchPump(widget: widget),
                                     SizedBox(height: 32.h),
 
-                                      ///signal
+                                    ///signal
                                     SignalWidget(),
                                     SizedBox(height: 32.h),
 
@@ -1484,8 +1428,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                 ],
               ),
             )
-                ),
-        ),),
+        ),
+      )
     );
   }
 

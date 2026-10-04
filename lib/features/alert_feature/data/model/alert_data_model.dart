@@ -40,7 +40,6 @@ class AlertDataModel extends AlertDataEntity {
       clock: json["clock"],
       createdAt: json["created_at"],
 
-
     );
   }
 

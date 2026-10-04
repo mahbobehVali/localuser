@@ -13,7 +13,6 @@ import '../model/region_model.dart';
 
 class SignUpRepositoryImpl extends SignUpRepository {
   final SignUpApiProvider apiProvider;
-  // static ValueNotifier<AuthEntity?> authNotifier = ValueNotifier(null);
 
   SignUpRepositoryImpl({required this.apiProvider});
 
@@ -43,7 +42,6 @@ class SignUpRepositoryImpl extends SignUpRepository {
   Future<DataState> register(signUpParams) async {
     try {
       Response response = await apiProvider.register(signUpParams);
-      // AuthEntity authEntity = AuthModel.fromJson(response.data);
 
       return DataSuccess(response.data);
     } on AppException catch (e) {

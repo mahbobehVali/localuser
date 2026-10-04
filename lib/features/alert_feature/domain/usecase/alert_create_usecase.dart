@@ -10,8 +10,6 @@ class AlertCreateUseCase extends UseCase<DataState<dynamic>, SendNewSupportParam
 
   AlertCreateUseCase(this.alertRepository);
 
-  // static ValueNotifier<AuthEntity?> authNotifier=ValueNotifier(null);
-
   @override
   Future<DataState> call(SendNewSupportParams sendNewSupportParams) {
     return alertRepository.alertCreate(sendNewSupportParams);

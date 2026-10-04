@@ -68,76 +68,13 @@ class SharedPrefOperator {
   }
 
 
-  //
-  // Future<void> saveSwitch(bool value)  async {
-  //   // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //   sharedPreferences.setBool("switch",value) ;
-  // }
-
-
-
-  // Future<bool> getSSwitch()  async {
-  //   return sharedPreferences.getBool("switch")??false;
-  // }
-
-  //  changeTheme({String changeTheme = "light"}) async {
-  //   sharedPreferences.setString("changeTheme", changeTheme);
-  // }
-  //
-  //  getTheme({String changeTheme = "light"}) async {
-  //   sharedPreferences.getString("changeTheme")??"light";
-  // }
-
-  // ///get Type
-  //  Future<int?> signUpGetUserType() async {
-  //
-  //   return sharedPreferences.getInt("userType");
-  // }
-
-  ///set Type
-  //  loginChangeUserType(int loginUserType ) async {
-  //   sharedPreferences.setInt("loginUserType", loginUserType);
-  // }
-
-  ///get Type
-  //  Future<int?> loginGetUserType() async {
-  //
-  //   return sharedPreferences.getInt("loginUserType")??0;
-  // }
-
-
-
-  ///save splashScreen is seen
-  //  changeIntroState() async {
-  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //   sharedPreferences.setBool("shouldShowIntro", false);
-  // }
-  //
-  // ///check splashScreen is seen or not
-  //  Future<bool> getIntroState() async {
-  //
-  //   return sharedPreferences.getBool("shouldShowIntro") ?? true;
-  // }
-
   /// logout
-   Future<void> logout() async {
-    sharedPreferences.getString("token");
-    sharedPreferences.remove("token");
-    // sharedPreferences.clear();
-
+  Future<bool> logout() async {
+    await sharedPreferences.remove("userLocalId");
+    await sharedPreferences.remove("loggedIn");
+    await sharedPreferences.remove("userInformationEntity");
+    return await sharedPreferences.remove("token"); // 🔑 پاک‌سازی کامل توکن
   }
-
-
-  // static getUserRefreshToken() async {
-  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //   return sharedPreferences.getString("refreshToken") ?? "";
-  // }
-
-  // static Future<bool> getLoggedIn() async {
-  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //
-  //   return sharedPreferences.getBool("loggedIn") ?? false;
-  // }
 
   // static Future<void> changeTokenTemp() async {
   //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -146,12 +83,7 @@ class SharedPrefOperator {
   //   print("token changed");
   // }
 
-  // static saveUserRefreshToken(String token, String refreshToken) async {
-  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //
-  //   sharedPreferences.setString("token", token);
-  //   sharedPreferences.setString("refreshToken", refreshToken);
-  // }
+
   //
   // static saveUserInformation(UpdateUserEntity updateUserEntity) async {
   //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -169,21 +101,6 @@ class SharedPrefOperator {
   //   sharedPreferences.setBool("dataIsUpdated", true);
   // }
 
-  // static saveUserInformationInFetch(UserInfoEntity updateUserEntity) async {
-  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //
-  //   sharedPreferences.setString("userProfileImage", updateUserEntity.result!.profileImage ?? "");
-  //   sharedPreferences.setString("firstName", updateUserEntity.result!.firstName ?? "");
-  //   sharedPreferences.setString("lastName", updateUserEntity.result!.lastName ?? "");
-  //   sharedPreferences.setString("email", updateUserEntity.result!.email ?? "");
-  //   sharedPreferences.setString("mobileNumber", updateUserEntity.result!.mobileNumber ?? "");
-  //   sharedPreferences.setString("staticNumber", updateUserEntity.result!.phoneNumber ?? "");
-  //   sharedPreferences.setString("nationalId", updateUserEntity.result!.nationalId ?? "");
-  //   sharedPreferences.setString("provinceName", updateUserEntity.result!.provinceName ?? "");
-  //   sharedPreferences.setString("address", updateUserEntity.result!.addressLine ?? "");
-  //   // sharedPreferences.setString("postalCode", updateUserEntity.result!.po ?? "");
-  // }
-  //
   // static Future<UserInfoParam> getUserInformation() async {
   //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   //
@@ -201,10 +118,5 @@ class SharedPrefOperator {
   //   );
   // }
 
-  // static Future<bool> getDataIsUpdated() async {
-  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  //
-  //   return sharedPreferences.getBool("dataIsUpdated") ?? false;
-  // }
 
 }

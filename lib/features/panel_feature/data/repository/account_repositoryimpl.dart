@@ -10,7 +10,6 @@ import '../datasource/remote/account_provider.dart';
 
 class PanelRepositoryImpl extends PanelRepository {
   final PanelApiProvider panelApiProvider;
-  // static ValueNotifier<AuthEntity?> authNotifier = ValueNotifier(null);
 
   PanelRepositoryImpl({required this.panelApiProvider});
 

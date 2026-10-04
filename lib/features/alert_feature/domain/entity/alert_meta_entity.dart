@@ -4,6 +4,5 @@ class AlertMetaEntity {
   int? total;
   int? lastPage;
 
-
   AlertMetaEntity( this.page,this.limit,this.total, this.lastPage);
 }

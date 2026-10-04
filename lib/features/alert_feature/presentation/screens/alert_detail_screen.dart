@@ -38,7 +38,6 @@ class AlertDetailScreen extends StatelessWidget {
           locator<AlertDetailUseCase>(),
           locator<AlertCreateUseCase>(),
         );
-        print(alertDataEntity.status!);
         alertBloc.add(AlertDetailEvent(alertDataEntity.id!, alertDataEntity.status!));
         return alertBloc;
       },
@@ -350,7 +349,7 @@ class AlertDetailScreen extends StatelessWidget {
                      GlobalSnackBar.show(context, message: "ارسال شد");
                    }
                    if(state.alertCreateStatus is AlertCreateError){
-                     GlobalSnackBar.show(context, message: "خطایی رخ داده");
+                     GlobalSnackBar.show(context, message: "خطایی رخ داده",success: false);
                    }
 
                  },
@@ -382,11 +381,10 @@ class AlertDetailScreen extends StatelessWidget {
                                 onTap:
                                 createController.text.isEmpty ||
                                     (state.alert ==  null || state.alert==0)?(){
-                                      GlobalSnackBar.show(context, message: "متن پیام و وضعیت هشدار را مشخص کنید");
+                                      GlobalSnackBar.show(context, message: "متن پیام و وضعیت هشدار را مشخص کنید",success: false);
 
                                     }  :
                                     () {
-                                      print("sffdf");
                                       BlocProvider.of<AlertBloc>(context).add(
                                           AlertCreateEvent(SendNewSupportParams(
                                               status: state.alert,

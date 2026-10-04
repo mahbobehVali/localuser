@@ -1,17 +1,17 @@
 class AlertDataEntity {
   String? wellName;
-      int? id;
+  int? id;
   int? type;
-      int? status;
+  int? status;
   String? deviceId;
-      String? areaId;
+  String? areaId;
   String? regionId;
-      String? areaName;
+  String? areaName;
   String? regionName;
-      String? message;
+  String? message;
   String? date;
-      String? clock;
-      String? createdAt;
+  String? clock;
+  String? createdAt;
 
 
   AlertDataEntity( this.wellName,this.id,this.type, this.status,this.deviceId,this.areaId,this.regionId,

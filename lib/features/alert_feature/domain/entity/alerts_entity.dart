@@ -5,7 +5,5 @@ class AlertsEntity {
   List<AlertDataEntity>? data;
   AlertMetaEntity meta;
 
-
-
   AlertsEntity( this.data,this.meta);
 }
