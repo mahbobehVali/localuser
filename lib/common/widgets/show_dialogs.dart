@@ -167,7 +167,7 @@ class ShowDialogs {
                         listener: (context, state) {
                           if(state.changePasswordStatus is ChangePasswordSuccess){
                             Navigator.of(context).pop();
-                            GlobalSnackBar.show(context,message: "رمز عبور با موفقیت تغییر کرد");
+                            GlobalSnackBar.show(context,message: "رمز عبور با موفقیت تغییر کرد",success: true);
 
                           }
 
@@ -175,7 +175,7 @@ class ShowDialogs {
                             Navigator.of(context).pop();
 
                             ChangePasswordError changePasswordError=state.changePasswordStatus as ChangePasswordError;
-                            GlobalSnackBar.show(context,message: changePasswordError.error,success: false);
+                            GlobalSnackBar.show(context,message: changePasswordError.error,);
 
                           }
 
@@ -349,7 +349,7 @@ class ShowDialogs {
                                             ChangeEndClock("${p(picked.hour)}:${p(picked.minute)}"),
                                           );
                                         } else {
-                                          GlobalSnackBar.show(scaffoldContext, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",success: false);
+                                          GlobalSnackBar.show(scaffoldContext, message: "ساعت پایان باید بزرگتر از ساعت شروع باشد",);
                                         }
                                       }
                                     },
@@ -452,14 +452,14 @@ class ShowDialogs {
                                   CircularProgressIndicator(): Text("ثبت زمان",style: TextStyle(color: ColorPalette.black),),
                                     onTap:(state.daySelected.id==-1) ||
                                         state.startHour!.isEmpty || state.endHour!.isEmpty ? (){
-                                      GlobalSnackBar.show(scaffoldContext, message: "روز هفته و ساعت شروع و پایان را مشخص کنید",success: false);
+                                      GlobalSnackBar.show(scaffoldContext, message: "روز هفته و ساعت شروع و پایان را مشخص کنید",);
 
                                     }:isLoading? null:() {
                                       bool hasConflict = checkConflictForDay(programDayEntity: programDayEntity,
                                           targetDayName: state.daySelected.name, newStart: state.startHour!, newEnd: state.endHour!);
                                       if (hasConflict) {
                                         Navigator.of(context).pop();
-                                        GlobalSnackBar.show(scaffoldContext, message: "این زمان با برنامه‌های قبلی این روز تداخل دارد!",success: false);
+                                        GlobalSnackBar.show(scaffoldContext, message: "این زمان با برنامه‌های قبلی این روز تداخل دارد!",);
                                       } else {
                                         wellDetailBloc.add(CreateNewTime(CreateTimeParams(
                                             code: wellsDataEntity.code,
@@ -807,7 +807,7 @@ class ShowDialogs {
                     }
 
                     if (context.mounted) {
-                      GlobalSnackBar.show(context, message: errorMsg,success: false);
+                      GlobalSnackBar.show(context, message: errorMsg,);
                     }
                   }
                 }

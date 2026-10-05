@@ -346,10 +346,10 @@ class AlertDetailScreen extends StatelessWidget {
 
                 listener: (context, state) {
                    if(state.alertCreateStatus is AlertCreateSuccess){
-                     GlobalSnackBar.show(context, message: "ارسال شد");
+                     GlobalSnackBar.show(context, message: "ارسال شد",success: true);
                    }
                    if(state.alertCreateStatus is AlertCreateError){
-                     GlobalSnackBar.show(context, message: "خطایی رخ داده",success: false);
+                     GlobalSnackBar.show(context, message: "خطایی رخ داده",);
                    }
 
                  },
@@ -381,7 +381,7 @@ class AlertDetailScreen extends StatelessWidget {
                                 onTap:
                                 createController.text.isEmpty ||
                                     (state.alert ==  null || state.alert==0)?(){
-                                      GlobalSnackBar.show(context, message: "متن پیام و وضعیت هشدار را مشخص کنید",success: false);
+                                      GlobalSnackBar.show(context, message: "متن پیام و وضعیت هشدار را مشخص کنید",);
 
                                     }  :
                                     () {

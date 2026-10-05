@@ -55,7 +55,7 @@ Future<void> exportAlertToExcel(BuildContext context, List<dynamic> alertsList) 
 
     // در اندروید و iOS، همین که متد بالا با موفقیت اجرا شود و خروجی null نباشد، یعنی فایل ذخیره شده است
     if (outputFile != null) {
-      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد");
+      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد",success: true);
     } else {
       GlobalSnackBar.show(context, message: "ذخیره فایل لغو شد");
     }
@@ -112,7 +112,7 @@ Future<void> exportVolumeToExcel(BuildContext context, List<dynamic> reportList,
 
     // در اندروید و iOS، همین که متد بالا با موفقیت اجرا شود و خروجی null نباشد، یعنی فایل ذخیره شده است
     if (outputFile != null) {
-      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد");
+      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد",success: true);
     } else {
       GlobalSnackBar.show(context, message: "ذخیره فایل لغو شد");
     }
@@ -162,7 +162,7 @@ Future<void> exportPumpToExcel(BuildContext context, List<dynamic> pumpList,int 
 
     // در اندروید و iOS، همین که متد بالا با موفقیت اجرا شود و خروجی null نباشد، یعنی فایل ذخیره شده است
     if (outputFile != null) {
-      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد");
+      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد",success: true);
     } else {
       GlobalSnackBar.show(context, message: "ذخیره فایل لغو شد");
     }
@@ -212,7 +212,7 @@ Future<void> exportAlertReportToExcel(BuildContext context, List<dynamic> alertR
 
     // در اندروید و iOS، همین که متد بالا با موفقیت اجرا شود و خروجی null نباشد، یعنی فایل ذخیره شده است
     if (outputFile != null) {
-      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد");
+      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد",success: true);
     } else {
       GlobalSnackBar.show(context, message: "ذخیره فایل لغو شد");
     }
@@ -268,7 +268,7 @@ Future<void> exportActivityToExcel(BuildContext context, List<dynamic> activityL
 
     // در اندروید و iOS، همین که متد بالا با موفقیت اجرا شود و خروجی null نباشد، یعنی فایل ذخیره شده است
     if (outputFile != null) {
-      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد");
+      GlobalSnackBar.show(context, message: "فایل اکسل با موفقیت ذخیره شد",success: true);
     } else {
       GlobalSnackBar.show(context, message: "ذخیره فایل لغو شد");
     }

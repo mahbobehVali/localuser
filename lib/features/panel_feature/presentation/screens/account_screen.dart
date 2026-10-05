@@ -208,7 +208,7 @@ class _AccountScreenState extends State<AccountScreen>{
 
                                   if(state.sendSmsStatus is SendSmsError){
                                     SendSmsError sendSmsError=state.sendSmsStatus as SendSmsError;
-                                    GlobalSnackBar.show(context,message: sendSmsError.error,success: false);
+                                    GlobalSnackBar.show(context,message: sendSmsError.error,);
 
                                   }
                                 },

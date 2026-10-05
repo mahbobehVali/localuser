@@ -7,7 +7,7 @@ class GlobalSnackBar {
       BuildContext context, {
         required String message,
         int duration = 3,
-        bool success=true
+        bool success=false
       }) {
     final overlay = Overlay.of(context);
     late OverlayEntry overlayEntry;

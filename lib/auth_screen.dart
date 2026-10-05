@@ -20,8 +20,6 @@ class AuthScreen extends StatelessWidget {
               colors: [
             Color(0xff10389C),
             Color(0xff617CA1),
-
-            // ColorPalette.inverseGrey,
           ])
         ),
         child: Padding(
@@ -57,7 +55,6 @@ class AuthScreen extends StatelessWidget {
                       return SignUpScreen();
                     },));
                   }),
-
 
             ],
           ),

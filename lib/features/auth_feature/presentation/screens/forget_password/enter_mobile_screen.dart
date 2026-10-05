@@ -90,7 +90,7 @@ class _EnterMobileScreenState extends State<EnterMobileScreen> {
                     }
                     if(state.forgetClickedStatus is ForgetClickedError){
                       ForgetClickedError forgetClickedError=state.forgetClickedStatus as ForgetClickedError;
-                     GlobalSnackBar.show(context,message: forgetClickedError.error,success: false);
+                     GlobalSnackBar.show(context,message: forgetClickedError.error,);
                     }
                   },
                   builder: (context, state) {

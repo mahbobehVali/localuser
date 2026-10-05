@@ -222,7 +222,7 @@ class SupportAnswerScreen extends StatelessWidget {
                                            prefixIcon:  BlocConsumer<SupportBloc, SupportState>(
                                              listener: (context, state) {
                                                if(state.overImage==true) {
-                                                 GlobalSnackBar.show(context, message: "حجم فایل بیشتر از یک مگابایت نباشد.",success: false);
+                                                 GlobalSnackBar.show(context, message: "حجم فایل بیشتر از یک مگابایت نباشد.",);
                                                }
                                              },
                                              listenWhen: (previous, current) => state.overImage==true,
@@ -294,10 +294,10 @@ class SupportAnswerScreen extends StatelessWidget {
 
                                listener: (context, state) {
                                  if(state.sendAnswerStatus is SendAnswerSuccess){
-                                   GlobalSnackBar.show(context, message: "ارسال شد");
+                                   GlobalSnackBar.show(context, message: "ارسال شد",success: true);
                                  }
                                  if(state.sendAnswerStatus is SendAnswerError){
-                                   GlobalSnackBar.show(context, message: "خطایی رخ داده",success: false);
+                                   GlobalSnackBar.show(context, message: "خطایی رخ داده",);
                                  }
 
                                },
@@ -323,7 +323,7 @@ class SupportAnswerScreen extends StatelessWidget {
                                        }
                                      }
                                      if (state.supportCloseStatus is SupportCloseError) {
-                                       GlobalSnackBar.show(context, message: "خطایی رخ داده",success: false);
+                                       GlobalSnackBar.show(context, message: "خطایی رخ داده",);
                                      }
 
                                    },
