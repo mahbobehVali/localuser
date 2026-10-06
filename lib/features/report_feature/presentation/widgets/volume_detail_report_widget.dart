@@ -126,7 +126,6 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                 ],
               );
             }
-            print("status.capacityEntity.capacityListEntity${status.capacityEntity.capacityListEntity?.length}");
             final capacityItem = status.capacityEntity.capacityListEntity?.where((element) => element.name == xLabels[index])
                 .firstOrNull; // خروجی این روش به طور پیش‌فرض nullable است
             // final capacityItem = status.capacityEntity.capacityListEntity?[index];
@@ -216,7 +215,8 @@ class VolumeDetailReportChartWidget extends StatelessWidget {
                                   handleBuiltInTouches: true,
                                   touchTooltipData: BarTouchTooltipData(
                                     maxContentWidth: 200.w,
-                                    getTooltipColor: (group) => ColorPalette.lightGrey,
+                                    tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                                    getTooltipColor: (group) => ColorPalette.white,
                                     fitInsideHorizontally: true,
                                     fitInsideVertically: true,
                                     getTooltipItem: (group, groupIndex, rod, rodIndex) {

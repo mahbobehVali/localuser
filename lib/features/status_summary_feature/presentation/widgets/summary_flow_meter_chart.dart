@@ -328,7 +328,8 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                                           lineTouchData: LineTouchData(
                                             handleBuiltInTouches: true,
                                             touchTooltipData: LineTouchTooltipData(
-                                              getTooltipColor: (group) => ColorPalette.lightGrey,
+                                              tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                                              getTooltipColor: (group) => ColorPalette.white,
                                               fitInsideHorizontally: true,
                                               fitInsideVertically: true,
                                               maxContentWidth: 250.w,
@@ -531,7 +532,8 @@ class _SummaryFlowMeterChartState extends State<SummaryFlowMeterChart> with Rout
                                             handleBuiltInTouches: true,
                                             touchTooltipData: BarTouchTooltipData(
                                               maxContentWidth: 200.w,
-                                              getTooltipColor: (group) => ColorPalette.lightGrey,
+                                              tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                                              getTooltipColor: (group) => ColorPalette.white,
                                               fitInsideHorizontally: true,
                                               fitInsideVertically: true,
 

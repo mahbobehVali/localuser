@@ -612,7 +612,6 @@ class ShowDialogs {
                                 ),
                                 SizedBox(width: 10.w),
                                 Expanded(
-                                    flex: 2,
                                     child: GlobalElevatedButton(
                                       borderRadius: 2.5,
                                   onTap:isLoading?null: () {
@@ -818,6 +817,7 @@ class ShowDialogs {
                         Text(
                           "آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟",
                         ),
+                        SizedBox(height: 10.h,),
                         if (isLoading) ...[
                           const CountdownTimerWidget(durationInSeconds: 60),
                         ],
@@ -1314,6 +1314,11 @@ class ShowDialogs {
                             children: [
                               Expanded(
                                 child: RefuseButton(
+                                  onTap: () {
+                                    supportBloc.add(ResetSupportFile());
+                                    Navigator.of(context).pop();
+
+                                  },
 
                                   borderRadius: 2.5,
                                 ),
@@ -1322,7 +1327,7 @@ class ShowDialogs {
                                 width: 10.w,
                               ),
                               Expanded(
-                                flex: 2,
+
                                 child: BlocConsumer<SupportBloc, SupportState>(
 
                                   listenWhen: (previous, current) =>
@@ -1415,7 +1420,6 @@ class CountdownTimerWidget extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
-                // color: Colors.blueAccent,
               ),
             ),
           ],

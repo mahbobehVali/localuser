@@ -80,7 +80,8 @@ class AlertsReportChartWidget extends StatelessWidget {
                             barTouchData: BarTouchData(
                               handleBuiltInTouches: true,
                               touchTooltipData: BarTouchTooltipData(
-                                getTooltipColor: (group) => ColorPalette.lightGrey,
+                                tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                                getTooltipColor: (group) => ColorPalette.white,
                                 fitInsideHorizontally: true,
                                 fitInsideVertically: true,
                                 getTooltipItem: (group, groupIndex, rod, rodIndex) {

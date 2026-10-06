@@ -32,216 +32,203 @@ class AlertScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: BlocProvider<AlertBloc>(
-    create: (context) {
-    AlertBloc alertBloc=AlertBloc(
-      locator<AlertUseCase>(),
-      locator<RegionUseCase>(),
-      locator<AreaUseCase>(),
-      locator<WellsListUseCase>(),
-      locator<AlertDetailUseCase>(),
-      locator<AlertCreateUseCase>(),
-    );
-    alertBloc.add(AlertStart(alertFilterParams: AlertFilterParams(
-       page: 1
-    )));
-    return alertBloc;
-    },
-  child: Padding(
-          padding:  EdgeInsets.only(left: 16.w,right: 16.w,top: 50.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text( "هشدارها و اعلان‌ها",style: TextStyleP.f16Bold,),
-              SizedBox(height: 16.h),
-              Text("در این بخش تمامی هشدارهای ارسال شده از دستگاه را مشاهده میکنید.",style: TextStyleP.f12Regular),
-              SizedBox(height: 16.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  BlocBuilder<AlertBloc, AlertState>(
-                    builder: (context, state) {
-                      return AccountBoxTitle(title: "دانلود جدول",titleIcon: "assets/icons/edit.png",
-                    divider: false,onTap:state.alertStatus is AlertEmpty?null: () {
-
-                      if (state.alertStatus is AlertSuccess) {
-                        final alertSuccess = state.alertStatus as AlertSuccess;
-                        final allData = alertSuccess.alertsEntity.data!;
-
-                        if (allData.isNotEmpty) exportAlertToExcel(context,allData);
-                      }
-                    });
-                      },
-                    ),
-                ],
-              ),
-
-              SizedBox(height: 24.h),
-              Expanded(
-                child: Container(
-                  decoration: Constants().whiteFiveRadiusDecoration,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        FilterWidget(),
-                        SizedBox(height: 10,),
-
-                        Expanded(
-                          child: BlocConsumer<AlertBloc, AlertState>(
-                            listenWhen: (previous, current) => current.alertStatus!=previous.alertStatus,
-                            listener: (context, state) {
-                              if(state.alertStatus is AlertExit){
-                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
-                                  return LoginScreen();
-                                },));
-                              }
-                            },
-                            buildWhen: (previous, current) => current.alertStatus!=previous.alertStatus,
-                            builder: (context, state) {
-                              if(state.alertStatus is AlertSuccess){
-                                AlertSuccess alertSuccess=state.alertStatus as AlertSuccess;
-
-                                return (alertSuccess.alertsEntity.data?.isEmpty ?? true)?
-                                Constants.noAlert():
-                                Column(
-                                  children: [
-                                    Expanded(
-                                      child: SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: SizedBox(
-                                          width: 500,
-
-                                          child: ListView.builder(
-                                            // physics: NeverScrollableScrollPhysics(),
-                                            shrinkWrap: true,
-                                            padding: EdgeInsets.zero, // این خط فاصله اضافه را حذف می‌کند
-
-                                            itemCount: alertSuccess.alertsEntity.data!.length+1,
-                                            itemBuilder: (context, index) {
-                                              List<AlertDataEntity> data=[];
-                                              if(index>0) data=alertSuccess.alertsEntity.data!;
-
-                                              return index==0? Container(
-                                                padding:  EdgeInsets.all(12.sp),
-
-                                                decoration:  Constants().boxDecoration,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(flex: 5,child: Text("نام چاه", textAlign: TextAlign.center)),
-                                                    Expanded(flex: 5,child: Text("نوع هشدار", textAlign: TextAlign.center)),
-                                                    Expanded(flex: 2,child: Text("ساعت", textAlign: TextAlign.center)),
-                                                    Expanded(flex: 3,child: Text("تاریخ", textAlign: TextAlign.center)),
-                                                    Expanded(flex: 4,child: Text("وضعیت", textAlign: TextAlign.center)),
-                                                  ],
-                                                ),
-                                              ):GestureDetector(
-                                                onTap: () {
-                                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                                                    return AlertDetailScreen(alertDataEntity: data[index-1]);
-                                                  },));
-                                                },
-                                                child: Container(
-                                                  padding:  EdgeInsets.all(12.sp),
-
-                                                  decoration: BoxDecoration(
-                                                    border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.tGrey)),
-
-                                                  ),child: Row(
-                                                  children: [
-                                                    Expanded(flex: 5,child: Text(data[index-1].wellName!, textAlign: TextAlign.center)),
-
-                                                    Expanded(flex: 5,child: Text(data[index-1].message!, textAlign: TextAlign.center)),
-                                                    Expanded(flex: 2,child: Text(data[index-1].clock!.toPersianDigit(), textAlign: TextAlign.center)),
-
-                                                    Expanded(flex: 3,child: Text(data[index-1].date!.toPersianDigit(), textAlign: TextAlign.center)),
-                                                    Expanded(flex: 4,child: Align(
-                                                      alignment: Alignment.center,
-                                                      child: Container(
-                                                          padding: const EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 5),
-                                                        decoration: BoxDecoration(
-                                                          color: data[index-1].status==0 ?ColorPalette.lightBlue:
-                                                          data[index-1].status==1?ColorPalette.analysingColor:
-                                                          ColorPalette.solvedColor,
-                                                          borderRadius: BorderRadius.circular(5)
-                                                        ),
-                                                        child: Text(data[index-1].status==2 ?"رفع شده":
-                                                        data[index-1].status==1?"در حال بررسی":
-                                                        "جدید",textAlign: TextAlign.center,
-                                                        style: TextStyle(color: data[index-1].status==0 ?ColorPalette.newTextColor:
-                                                        data[index-1].status==1?ColorPalette.analysingTextColor:
-                                                        ColorPalette.solvedTextColor),),
-                                                      ),
-                                                    )),
-
-                                                  ],
-                                                ),),
-                                              );
-                                            },),
-                                        ),
-                                      ),
-                                    ),
-                                    PaginationWidget(
-                                      selected: state.selectedAlertPage ?? 1,
-                                      lastPage: alertSuccess.alertsEntity.meta.lastPage!,
-                                      onPageChanged: (newPage) {
-
-                                        BlocProvider.of<AlertBloc>(context).add(
-                                          AlertStart(
-                                            alertFilterParams: AlertFilterParams(
-                                              page: newPage,
-                                              type: state.alertFilterModel!.filterType == true
-                                                  ? state.selectedAlertType
-                                                  : null,
-                                              status: state.alertFilterModel!.filterStatus == true
-                                                  ? state.selectedAlertStatus
-                                                  : null,
-                                              wellName: state.alertFilterModel!.filterWellName == true
-                                                  ? state.wellName
-                                                  : null,
-                                              startDate: state.alertFilterModel!.filterDate == true
-                                                  ? state.alertStartDate
-                                                  : null,
-                                              endDate: state.alertFilterModel!.filterDate == true
-                                                  ? state.alertEndDate
-                                                  : null,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    )
-                                  ],
-                                );
-                              }
-                              else if(state.alertStatus is AlertLoading){
-                                return ShimmerClass.shimmerListviewVertical(height: 50);
-
-                              }else if(state.alertStatus is AlertEmpty){
-                                return Constants.noAlert();
-
-                              }else if(state.alertStatus is AlertError){
-                                AlertError alertError=state.alertStatus as AlertError;
-                                return Center(child:Text(alertError.error));
-
-                              }else{
-                                return SizedBox();
-                              }
-
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+        body: SingleChildScrollView(
+          child: BlocProvider<AlertBloc>(
+              create: (context) {
+              AlertBloc alertBloc=AlertBloc(
+                locator<AlertUseCase>(),
+                locator<RegionUseCase>(),
+                locator<AreaUseCase>(),
+                locator<WellsListUseCase>(),
+                locator<AlertDetailUseCase>(),
+                locator<AlertCreateUseCase>(),
+              );
+              alertBloc.add(AlertStart(alertFilterParams: AlertFilterParams(
+                 page: 1
+              )));
+              return alertBloc;
+              },
+            child: Padding(
+            padding:  EdgeInsets.only(left: 16.w,right: 16.w,top: 50.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text( "هشدارها و اعلان‌ها",style: TextStyleP.f16Bold,),
+                SizedBox(height: 16.h),
+                Text("در این بخش تمامی هشدارهای ارسال شده از دستگاه را مشاهده میکنید.",style: TextStyleP.f12Regular),
+                SizedBox(height: 16.h),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    BlocBuilder<AlertBloc, AlertState>(
+                      builder: (context, state) {
+                        return AccountBoxTitle(title: "دانلود جدول",titleIcon: "assets/icons/edit.png",
+                      divider: false,onTap:state.alertStatus is AlertEmpty?null: () {
+          
+                        if (state.alertStatus is AlertSuccess) {
+                          final alertSuccess = state.alertStatus as AlertSuccess;
+                          final allData = alertSuccess.alertsEntity.data!;
+          
+                          if (allData.isNotEmpty) exportAlertToExcel(context,allData);
+                        }
+                      });
+                        },
+                      ),
+                  ],
                 ),
-              ),
+          
+                SizedBox(height: 8.h),
+                FilterWidget(),
+                SizedBox(height: 10,),
+          
+                BlocConsumer<AlertBloc, AlertState>(
+                  listenWhen: (previous, current) => current.alertStatus!=previous.alertStatus,
+                  listener: (context, state) {
+                    if(state.alertStatus is AlertExit){
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) {
+                        return LoginScreen();
+                      },));
+                    }
+                  },
+                  buildWhen: (previous, current) => current.alertStatus!=previous.alertStatus,
+                  builder: (context, state) {
+                    if(state.alertStatus is AlertSuccess){
+                      AlertSuccess alertSuccess=state.alertStatus as AlertSuccess;
+          
+                      return (alertSuccess.alertsEntity.data?.isEmpty ?? true)?
+                      Constants.noAlert():
+                      Column(
+                        children: [
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: SizedBox(
+                              width: 500,
 
-            ],
+                              child: ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                padding: EdgeInsets.zero, // این خط فاصله اضافه را حذف می‌کند
+
+                                itemCount: alertSuccess.alertsEntity.data!.length+1,
+                                itemBuilder: (context, index) {
+                                  List<AlertDataEntity> data=[];
+                                  if(index>0) data=alertSuccess.alertsEntity.data!;
+
+                                  return index==0? Container(
+                                    padding:  EdgeInsets.all(12.sp),
+
+                                    decoration:  Constants().boxDecoration,
+                                    child: Row(
+                                      children: [
+                                        Expanded(flex: 5,child: Text("نام چاه", textAlign: TextAlign.center)),
+                                        Expanded(flex: 5,child: Text("نوع هشدار", textAlign: TextAlign.center)),
+                                        Expanded(flex: 2,child: Text("ساعت", textAlign: TextAlign.center)),
+                                        Expanded(flex: 3,child: Text("تاریخ", textAlign: TextAlign.center)),
+                                        Expanded(flex: 4,child: Text("وضعیت", textAlign: TextAlign.center)),
+                                      ],
+                                    ),
+                                  ):GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                        return AlertDetailScreen(alertDataEntity: data[index-1]);
+                                      },));
+                                    },
+                                    child: Container(
+                                      padding:  EdgeInsets.all(12.sp),
+
+                                      decoration: BoxDecoration(
+                                        border: BoxBorder.fromLTRB(bottom: BorderSide(color: ColorPalette.tGrey)),
+
+                                      ),child: Row(
+                                      children: [
+                                        Expanded(flex: 5,child: Text(data[index-1].wellName!, textAlign: TextAlign.center)),
+
+                                        Expanded(flex: 5,child: Text(data[index-1].message!, textAlign: TextAlign.center)),
+                                        Expanded(flex: 2,child: Text(data[index-1].clock!.toPersianDigit(), textAlign: TextAlign.center)),
+
+                                        Expanded(flex: 3,child: Text(data[index-1].date!.toPersianDigit(), textAlign: TextAlign.center)),
+                                        Expanded(flex: 4,child: Align(
+                                          alignment: Alignment.center,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 5),
+                                            decoration: BoxDecoration(
+                                                color: data[index-1].status==0 ?ColorPalette.lightBlue:
+                                                data[index-1].status==1?ColorPalette.analysingColor:
+                                                ColorPalette.solvedColor,
+                                                borderRadius: BorderRadius.circular(5)
+                                            ),
+                                            child: Text(data[index-1].status==2 ?"رفع شده":
+                                            data[index-1].status==1?"در حال بررسی":
+                                            "جدید",textAlign: TextAlign.center,
+                                              style: TextStyle(color: data[index-1].status==0 ?ColorPalette.newTextColor:
+                                              data[index-1].status==1?ColorPalette.analysingTextColor:
+                                              ColorPalette.solvedTextColor),),
+                                          ),
+                                        )),
+
+                                      ],
+                                    ),),
+                                  );
+                                },),
+                            ),
+                          ),
+                          SizedBox(height: 10.h,),
+                          PaginationWidget(
+                            selected: state.selectedAlertPage ?? 1,
+                            lastPage: alertSuccess.alertsEntity.meta.lastPage!,
+                            onPageChanged: (newPage) {
+          
+                              BlocProvider.of<AlertBloc>(context).add(
+                                AlertStart(
+                                  alertFilterParams: AlertFilterParams(
+                                    page: newPage,
+                                    type: state.alertFilterModel!.filterType == true
+                                        ? state.selectedAlertType
+                                        : null,
+                                    status: state.alertFilterModel!.filterStatus == true
+                                        ? state.selectedAlertStatus
+                                        : null,
+                                    wellName: state.alertFilterModel!.filterWellName == true
+                                        ? state.wellName
+                                        : null,
+                                    startDate: state.alertFilterModel!.filterDate == true
+                                        ? state.alertStartDate
+                                        : null,
+                                    endDate: state.alertFilterModel!.filterDate == true
+                                        ? state.alertEndDate
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        ],
+                      );
+                    }
+                    else if(state.alertStatus is AlertLoading){
+                      return ShimmerClass.shimmerListviewVertical(height: 50);
+          
+                    }else if(state.alertStatus is AlertEmpty){
+                      return Constants.noAlert();
+          
+                    }else if(state.alertStatus is AlertError){
+                      AlertError alertError=state.alertStatus as AlertError;
+                      return Center(child:Text(alertError.error));
+          
+                    }else{
+                      return SizedBox();
+                    }
+          
+                  },
+                ),
+          
+              ],
+            ),
           ),
-        ),
-      ));
+                ),
+        ));
   }
 }
 

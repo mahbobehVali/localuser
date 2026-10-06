@@ -34,7 +34,7 @@ class SupportAnswerScreen extends StatelessWidget {
   final SupportDataEntity supportDataEntity;
   final GlobalKey<FormState> answerFormKey = GlobalKey();
   TextEditingController answerController=TextEditingController();
-
+   GlobalKey<FormState> supportKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,11 +212,16 @@ class SupportAnswerScreen extends StatelessWidget {
                                return Row(
                                  children: [
                                    Expanded(
-                                     child: SizedBox(
-                                       height: 40.h,
-
+                                     child: Form(
+                                       key: supportKey,
                                        child: TextFormField(
-                                         maxLines: 2,
+                                         maxLines: 1,
+                                         validator: (value) {
+                                           if(value!.isEmpty || value.length<4){
+                                             return "پیام خود را وارد کنید";
+                                           }
+                                           return null;
+                                         },
                                          controller: answerController,
                                          decoration: InputDecoration(
                                            prefixIcon:  BlocConsumer<SupportBloc, SupportState>(
@@ -239,49 +244,52 @@ class SupportAnswerScreen extends StatelessWidget {
                                            ),
 
 
-                                           suffixIcon: SizedBox(
-                                             width: 90.w,
-                                             height: double.infinity,
-                                             child: ValueListenableBuilder<TextEditingValue>(
-                                               valueListenable: answerController,
-                                               builder: (context, value, child) {
-                                                 final isTextEmpty = value.text.trim().isEmpty;
+                                           suffixIcon: Padding(
+                                             padding: EdgeInsets.all(4.r),
+                                             child: SizedBox(
+                                               width: 90.w,
+
+                                               // height: double.infinity,
+                                               child: ValueListenableBuilder<TextEditingValue>(
+                                                 valueListenable: answerController,
+                                                 builder: (context, value, child) {
+
+                                                   return  GlobalElevatedButton(
+                                                     borderRadius: 2.5,
+                                                     widget:state.sendAnswerStatus is SendAnswerLoading?
+                                                     Center(child: CircularProgressIndicator(),): Text(
+                                                       "ارسال",
+                                                       style: TextStyle(color: ColorPalette.white),
+                                                     ),
+                                                     backColor: ColorPalette.darkBlue,
+                                                     onTap:  () async {
+                                                       if (supportKey.currentState!.validate()) {
+                                                         dynamic file = await ImageConverter.getMultiPart(
+                                                             state.supportFile,
+                                                             state.supportFile.split("/").last);
 
 
-                                                 return  GlobalElevatedButton(
-                                                   borderRadius: 2.5,
-                                                   widget:state.sendAnswerStatus is SendAnswerLoading?
-                                                   Center(child: CircularProgressIndicator(),): Text(
-                                                     "ارسال",
-                                                     style: TextStyle(color: ColorPalette.white),
-                                                   ),
-                                                   backColor: ColorPalette.darkBlue,
-                                                   onTap: isTextEmpty
-                                                       ? null
-                                                       : () async {
-                                                     dynamic file = await ImageConverter.getMultiPart(
-                                                         state.supportFile,
-                                                         state.supportFile.split("/").last);
+                                                         BlocProvider.of<SupportBloc>(context).add(
+                                                           SendAnswer(
+                                                               SendNewSupportParams(
+                                                                   description: answerController.text,
+                                                                   id: supportDataEntity.id,
+                                                                   payVast:file
+                                                               )
+                                                           ),
+                                                         );
+                                                       }
 
-
-                                                     BlocProvider.of<SupportBloc>(context).add(
-                                                       SendAnswer(
-                                                           SendNewSupportParams(
-                                                               description: answerController.text,
-                                                               id: supportDataEntity.id,
-                                                               payVast:file
-                                                           )
-                                                       ),
-                                                     );
-                                                   },
-                                                 );
-                                               },
+                                                     },
+                                                   );
+                                                 },
+                                               ),
                                              ),
                                            ),
                                            hintText: "پیام خود را بنویسید",
 
 
-                                           errorBorder: InputBorder.none,
+                                           // errorBorder: InputBorder.none,
                                            disabledBorder: InputBorder.none,
                                          ),
                                        ),
@@ -309,10 +317,7 @@ class SupportAnswerScreen extends StatelessWidget {
                                    listenWhen: (previous, current) => previous.supportCloseStatus != current.supportCloseStatus,
                                    listener: (context, state) {
                                      if (state.supportCloseStatus is SupportCloseSuccess) {
-                                       print("Status is success");
 
-                                       // ۱. ابتدا رویداد جدید را برای دریافت لیست جدید اضافه کنید
-                                       // BlocProvider.of<SupportBloc>(context).add(GetSupportMessage(FlowMeterParams(page: 1)));
 
                                        // ۲. اسنک‌بار را نمایش دهید
                                        GlobalSnackBar.show(context, message: "بسته شد");

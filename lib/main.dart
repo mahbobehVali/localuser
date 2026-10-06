@@ -7,11 +7,11 @@ import 'package:mahaliii/common/widgets/wrapper.dart';
 import 'package:mahaliii/config/color_palette.dart';
 import 'package:persian_datetime_picker/persian_datetime_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'auth_screen.dart';
 import 'bottom_nav/wrapper_bloc.dart';
 import 'common/socket_repository.dart';
 import 'common/widgets/function_widgets.dart';
-import 'features/well_feature/presentation/bloc/well_detail_bloc/well_detail_bloc.dart';
 import 'locator.dart';
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =

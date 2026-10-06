@@ -142,6 +142,10 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
 
       }
     });
+    on<ResetSupportFile>((event, emit) async {
+      emit(state.copyWith(newSupportFile: ""));
+
+    });
 
     on<SendNewSupportClicked>((event, emit) async {
       emit(state.copyWith(newSendSupportStatus: SendSupportLoading(),newSelectedSupportStatus: event.sendNewRequestToSupportParams.status));
@@ -157,6 +161,7 @@ class SupportBloc extends Bloc<SupportEvent, SupportState> {
         emit(state.copyWith(
             newSendSupportStatus: SendSupportError(dataState.error!)));
       }
+      add(ResetSupportFile());
     });
 
     on<SendAnswer>((event, emit) async {

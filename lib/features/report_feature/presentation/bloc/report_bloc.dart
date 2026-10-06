@@ -75,7 +75,9 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     });
 
     on<ChangeDate>((event, emit) async {
-      emit(state.copyWith(newStartDate: event.startDate,newEndDate: event.endDate));
+      emit(state.copyWith(newStartDate: event.startDate,newEndDate: event.endDate,
+          newStartHour: "00:00",
+          newEndHour: "23:59"));
 
     });
 

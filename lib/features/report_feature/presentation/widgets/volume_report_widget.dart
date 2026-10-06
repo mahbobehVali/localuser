@@ -115,7 +115,8 @@ class VolumeReportChartWidget extends StatelessWidget {
                             handleBuiltInTouches: true,
                             touchTooltipData: LineTouchTooltipData(
                               maxContentWidth: 250.w,
-                              getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
+                              tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                              getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.white,
                               fitInsideHorizontally: true,
                               fitInsideVertically: true,
                               getTooltipItems: (touchedSpots) {

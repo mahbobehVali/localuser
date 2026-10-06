@@ -47,7 +47,14 @@ class SendNewSupportClicked extends SupportEvent {
   // TODO: implement props
   List<Object?> get props => [];
 }
+class ResetSupportFile extends SupportEvent {
 
+  ResetSupportFile();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
+}
 class SendAnswer extends SupportEvent {
   SendNewSupportParams sendNewRequestToSupportParams;
 

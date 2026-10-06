@@ -51,102 +51,99 @@ class PaginationWidget extends StatelessWidget {
 
     final pageItems = _buildPageItems();
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // متن وضعیت صفحه
-          Text(
-            "صفحه ${selected.toString().toPersianDigit()} از ${lastPage.toString().toPersianDigit()}",
-            style: TextStyleP.f10Regular,
-          ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // متن وضعیت صفحه
+        Text(
+          "صفحه ${selected.toString().toPersianDigit()} از ${lastPage.toString().toPersianDigit()}",
+          style: TextStyleP.f10Regular,
+        ),
 
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // ۱. دکمه رفتن به اولین صفحه (<<)
-              _buildIconButton(
-                icon: Icons.first_page,
-                isDisabled: selected == 1,
-                onTap: () => onPageChanged(1),
-              ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // ۱. دکمه رفتن به اولین صفحه (<<)
+            _buildIconButton(
+              icon: Icons.first_page,
+              isDisabled: selected == 1,
+              onTap: () => onPageChanged(1),
+            ),
 
-              // ۲. دکمه صفحه قبل (<)
-              _buildIconButton(
-                icon: Icons.navigate_before,
-                isDisabled: selected == 1,
-                onTap: () => onPageChanged(selected - 1),
-              ),
+            // ۲. دکمه صفحه قبل (<)
+            _buildIconButton(
+              icon: Icons.navigate_before,
+              isDisabled: selected == 1,
+              onTap: () => onPageChanged(selected - 1),
+            ),
 
-              const SizedBox(width: 4),
+            const SizedBox(width: 4),
 
-              // ۳. مربعات شماره صفحه و سه نقطه‌ها
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: pageItems.map((item) {
-                  // رندر کردن سه نقطه (...)
-                  if (item == "...") {
-                    return Container(
-                      width: 20.w,
-                      height: 30.h,
-                      alignment: Alignment.center,
-                      child: Text(
-                        "...",
-                        style: TextStyle(
-                          color: ColorPalette.black,
-                          fontSize: 14.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    );
-                  }
-
-                  // رندر کردن مربع اعداد
-                  final int page = item as int;
-                  final isSelected = selected == page;
-
-                  return GestureDetector(
-                    onTap: isSelected ? null : () => onPageChanged(page),
-                    child: Container(
-                      width: 30.w,
-                      height: 30.h,
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        color: isSelected ? const Color(0xff82A5D2) : Colors.transparent,
-                        border: Border.all(color: Colors.black),
-                      ),
-                      child: Center(
-                        child: Text(
-                          page.toString().toPersianDigit(),
-                          style: TextStyle(color: ColorPalette.black),
-                        ),
+            // ۳. مربعات شماره صفحه و سه نقطه‌ها
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: pageItems.map((item) {
+                // رندر کردن سه نقطه (...)
+                if (item == "...") {
+                  return Container(
+                    width: 20.w,
+                    height: 30.h,
+                    alignment: Alignment.center,
+                    child: Text(
+                      "...",
+                      style: TextStyle(
+                        color: ColorPalette.black,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   );
-                }).toList(),
-              ),
+                }
 
-              const SizedBox(width: 4),
+                // رندر کردن مربع اعداد
+                final int page = item as int;
+                final isSelected = selected == page;
 
-              // ۴. دکمه صفحه بعد (>)
-              _buildIconButton(
-                icon: Icons.navigate_next,
-                isDisabled: selected == lastPage,
-                onTap: () => onPageChanged(selected + 1),
-              ),
+                return GestureDetector(
+                  onTap: isSelected ? null : () => onPageChanged(page),
+                  child: Container(
+                    width: 30.w,
+                    height: 30.h,
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: isSelected ? const Color(0xff82A5D2) : Colors.transparent,
+                      border: Border.all(color: Colors.black),
+                    ),
+                    child: Center(
+                      child: Text(
+                        page.toString().toPersianDigit(),
+                        style: TextStyle(color: ColorPalette.black),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
 
-              // ۵. دکمه رفتن به آخرین صفحه (>>)
-              _buildIconButton(
-                icon: Icons.last_page,
-                isDisabled: selected == lastPage,
-                onTap: () => onPageChanged(lastPage),
-              ),
-            ],
-          ),
-        ],
-      ),
+            const SizedBox(width: 4),
+
+            // ۴. دکمه صفحه بعد (>)
+            _buildIconButton(
+              icon: Icons.navigate_next,
+              isDisabled: selected == lastPage,
+              onTap: () => onPageChanged(selected + 1),
+            ),
+
+            // ۵. دکمه رفتن به آخرین صفحه (>>)
+            _buildIconButton(
+              icon: Icons.last_page,
+              isDisabled: selected == lastPage,
+              onTap: () => onPageChanged(lastPage),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

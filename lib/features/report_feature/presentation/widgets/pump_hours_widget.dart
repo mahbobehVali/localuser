@@ -62,9 +62,6 @@ class PumpHoursChartWidget extends StatelessWidget {
             }
           }
 
-
-
-
           final scale = Constants().getScale(yValues);
           double chartWidth = (xLabels.length * 20.0).clamp(MediaQuery.sizeOf(context).width, double.infinity)+100;
 
@@ -89,74 +86,78 @@ class PumpHoursChartWidget extends StatelessWidget {
               state.oneWell.length==1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)==0?
               SizedBox(
                 height: 250.h,
-                child: AspectRatio(
-                  aspectRatio: 2,
-                  child: Padding(
-                    padding:  EdgeInsets.only(right: 20.0.w, left: 12.w,top: 10.h),
-                    child: LineChart(
-                      LineChartData(
-                        lineBarsData: [
-                          LineChartBarData(
-                            isStepLineChart: true,
-                            spots: yValues.asMap().entries.map((e) {
-                              return FlSpot(e.key.toDouble(), (e.value as int).toDouble());
-                            }).toList(),
-                            isCurved: false,
-                            dotData: const FlDotData(show: false),
-                            color: ColorPalette.darkGreen,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal, //  فعال‌سازی اسکرول افقی
+                  physics: const BouncingScrollPhysics(),
+                  child: SizedBox(
+                    width: (yValues.length * 40.w).clamp(MediaQuery.sizeOf(context).width, double.infinity),
+                    child: Padding(
+                      padding:  EdgeInsets.only(right: 20.0.w, left: 12.w,top: 10.h),
+                      child: LineChart(
+                        LineChartData(
+                          lineBarsData: [
+                            LineChartBarData(
+                              isStepLineChart: true,
+                              spots: yValues.asMap().entries.map((e) {
+                                return FlSpot(e.key.toDouble(), (e.value as int).toDouble());
+                              }).toList(),
+                              isCurved: false,
+                              dotData: const FlDotData(show: false),
+                              color: ColorPalette.darkGreen,
+                            ),
+                          ],
+                          minY: 0,
+                          gridData: FlGridData(
+                            show: false,
+                            verticalInterval: scale['step'],
+                            getDrawingHorizontalLine: (value) {
+                              return FlLine(
+                                strokeWidth: 1,
+                                color: Colors.grey,
+                              );
+                            },
                           ),
-                        ],
-                        minY: 0,
-                        gridData: FlGridData(
-                          show: false,
-                          verticalInterval: scale['step'],
-                          getDrawingHorizontalLine: (value) {
-                            return FlLine(
-                              strokeWidth: 1,
-                              color: Colors.grey,
-                            );
-                          },
-                        ),
-                        lineTouchData: LineTouchData(
-                          handleBuiltInTouches: false,
+                          lineTouchData: LineTouchData(
+                            handleBuiltInTouches: false,
 
-                        ),
+                          ),
 
-                        borderData: FlBorderData(
-                          border: Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
-                        ),
-                        titlesData: FlTitlesData(
-                          show: true,
-                          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                          bottomTitles: Constants().axisBottomTitles(xLabels, "clock"),
-                          leftTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              interval: 1, // فاصله ۱ برای نمایش دقیق ۰ و ۱
-                              reservedSize: 55.w, // فضای کافی برای کلمات
-                              getTitlesWidget: (value, meta) {
-                                String text = "";
-                                if (value == 0) {
-                                  text = "خاموش";
-                                } else if (value == 1) {
-                                  text = "روشن";
-                                } else {
-                                  return const SizedBox.shrink();
-                                }
+                          borderData: FlBorderData(
+                            border: Border(bottom: BorderSide(color: ColorPalette.lightGrey)),
+                          ),
+                          titlesData: FlTitlesData(
+                            show: true,
+                            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                            bottomTitles: Constants().axisBottomTitles(xLabels, "clock"),
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: 1, // فاصله ۱ برای نمایش دقیق ۰ و ۱
+                                reservedSize: 55.w, // فضای کافی برای کلمات
+                                getTitlesWidget: (value, meta) {
+                                  String text = "";
+                                  if (value == 0) {
+                                    text = "خاموش";
+                                  } else if (value == 1) {
+                                    text = "روشن";
+                                  } else {
+                                    return const SizedBox.shrink();
+                                  }
 
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 4),
-                                  child: Text(
-                                    text,
-                                    style: const TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                                    child: Text(
+                                      text,
+                                      style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black
+                                      ),
                                     ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
                           ),
                         ),
@@ -164,7 +165,8 @@ class PumpHoursChartWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-              ): SizedBox(
+              ):
+              SizedBox(
                 height: 300,
                 child: Directionality(
                   textDirection: TextDirection.ltr,
@@ -187,7 +189,8 @@ class PumpHoursChartWidget extends StatelessWidget {
                                 handleBuiltInTouches: true,
                                 touchTooltipData: BarTouchTooltipData(
                                   maxContentWidth: 250.w,
-                                  getTooltipColor: (group) => ColorPalette.lightGrey,
+                                  tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                                  getTooltipColor: (group) => ColorPalette.white,
                                   fitInsideHorizontally: true,
                                   fitInsideVertically: true,
                                   getTooltipItem: (group, groupIndex, rod, rodIndex) {
@@ -312,7 +315,12 @@ class PumpHoursChartWidget extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(flex: 2, child: Text( state.oneWell.length==1? "تاریخ":"چاه", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
-                            Expanded(flex: 2, child: Text("مجموع ساعات کارکرد پمپ", style: TextStyleP.f10Regular,textAlign: TextAlign.center)),
+                            Expanded(flex: 2, child:
+                            Text(
+                              state.oneWell.length==1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)==0?"وضعیت": "مجموع ساعات کارکرد پمپ",
+                              style: TextStyleP.f10Regular,
+                              textAlign: TextAlign.center,
+                            )),
                           ],
                         ),
                       );
@@ -326,7 +334,17 @@ class PumpHoursChartWidget extends StatelessWidget {
                         child: Row(
                           children: [
                             Expanded(flex: 2, child: Text(item.name.toString().toPersianDigit(),textAlign: TextAlign.center)),
-                            Expanded(flex: 2, child: Text('\u200E${item.amount}',textAlign: TextAlign.center)),
+                            Expanded(
+                              flex: 3,
+                              child: Text(
+                                state.oneWell.length==1 && Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)==0?
+                                // شکل تمیزتر بدون نقل‌قول‌های اضافی:
+                                item.amount.toString().toEnglishDigit() == "0" ? "خاموش" : "روشن":
+                                '\u200E${item.amount}',
+                                textAlign: TextAlign.center,
+                                style: TextStyleP.f10Regular,
+                              ),
+                            ),
                           ],
                         ),
                       );

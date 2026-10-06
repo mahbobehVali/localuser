@@ -427,7 +427,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                             lineTouchData: LineTouchData(
                                                               touchTooltipData: LineTouchTooltipData(
                                                                 maxContentWidth: 250.w,
-                                                                getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.lightGrey,
+                                                                tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                                                                getTooltipColor: (LineBarSpot touchedSpot) => ColorPalette.white,
                                                                 fitInsideHorizontally: true,
                                                                 fitInsideVertically: true,
                                                                 getTooltipItems: (List<LineBarSpot> touchedSpots) {
@@ -506,7 +507,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                               handleBuiltInTouches: true,
                                                               touchTooltipData: BarTouchTooltipData(
                                                                 maxContentWidth: 250.w,
-                                                                getTooltipColor: (group) => const Color(0xFFF7F9FA), // پس‌زمینه ملایم
+                                                                tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                                                                getTooltipColor: (group) => ColorPalette.white, // پس‌زمینه ملایم
                                                                 fitInsideHorizontally: true,
                                                                 fitInsideVertically: true,
                                                                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
@@ -805,7 +807,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                                   handleBuiltInTouches: true,
                                                                   touchTooltipData: BarTouchTooltipData(
                                                                     maxContentWidth: 250.w,
-                                                                    getTooltipColor: (group) => ColorPalette.lightGrey,
+                                                                    tooltipBorder: BorderSide(color: ColorPalette.lightGrey),
+                                                                    getTooltipColor: (group) => ColorPalette.white,
                                                                     fitInsideHorizontally: true,
                                                                     fitInsideVertically: true,
                                                                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
