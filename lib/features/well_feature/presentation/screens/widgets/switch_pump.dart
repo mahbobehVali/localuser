@@ -68,6 +68,7 @@ class SwitchPump extends StatelessWidget {
                     message: state.isSwitched == true
                         ? "${isSuccess.offEntity.name} روشن شد"
                         : "${isSuccess.offEntity.name} خاموش شد",
+                    success: state.isSwitched == true ? true : false,
                     duration: 2,
                   );
                 }

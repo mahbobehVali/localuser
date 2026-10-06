@@ -71,6 +71,7 @@ class _WrapperState extends State<Wrapper> {
             GlobalSnackBar.show(
               context,
               message: state.isSwitched == true ? "${isSuccess.offEntity.name} روشن شد" : "${isSuccess.offEntity.name} خاموش شد",
+              success: state.isSwitched == true ? true : false,
               duration: 2,
 
             );

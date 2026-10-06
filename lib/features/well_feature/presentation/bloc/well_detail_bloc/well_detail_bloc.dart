@@ -185,7 +185,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
             // اگر مربوط به چاه دیگری است، هیچ تغییری در استیت این صفحه ایجاد نکن
             return state;
           }
-          print("onOff ==== 1${onOff == 1}");
           final isSwitched = onOff.status == 1;
 
           // 🟢 اگر دیالوگ منتظر پاسخ است (در حالت Loading)، وضعیت Success فرستاده می‌شود
@@ -262,8 +261,6 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
       // مقدار استاتوس را دوباره به حالت اولیه (یا موفقیت قبلی/خالی) برمی‌گردانیم
       emit(state.copyWith(newOnOffStatus: OnOffInitial()));
     });
-
-
 
     on<WellWorkHourStart>((event, emit) async {
       emit(state.copyWith(newWeekWellWorkStatus: WeekWellWorkLoading(),
@@ -435,11 +432,11 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
       // ۲. مدیریت استریم با emit.forEach
       await emit.forEach<dynamic>(
-        socketRepository.createTimeStream.timeout(
+        socketRepository.createTimeStream.timeoutFirst(
           const Duration(seconds: 60),
-          onTimeout: (sink) {
-            sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
-          },
+          // onTimeout: (sink) {
+          //   sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
+          // },
         ).take(1),
         onData: (status) {
 
@@ -449,7 +446,14 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
           );
         },
         onError: (error, stackTrace) {
-          print("❌ BLoC Stream Error: $error");
+          if (error is TimeoutException) {
+            return state.copyWith(
+              newCreateTimeStatus: CreateTimeError(
+                error.message ?? " پاسخی از سمت دستگاه دریافت نشد.",
+              ),
+            );
+          }
+
           return state.copyWith(
             newCreateTimeStatus: CreateTimeError(error.toString()),
           );
@@ -465,21 +469,27 @@ class WellDetailBloc extends Bloc<WellDetailEvent, WellDetailState> {
 
       // ۲. مدیریت استریم با emit.forEach
       await emit.forEach<dynamic>(
-        socketRepository.deleteTimeStream.timeout(
+        socketRepository.deleteTimeStream.timeoutFirst(
           const Duration(seconds: 60),
-          onTimeout: (sink) {
-            sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
-          },
+          // onTimeout: (sink) {
+          //   sink.addError("زمان پاسخگویی پمپ به پایان رسید (Timeout)");
+          // },
         ).take(1),
         onData: (status) {
           add(GetProgram(event.createTimeParams.id??1));
-          print(status);
           return state.copyWith(
             newDeleteTimeStatus: DeleteTimeSuccess(status),
           );
         },
         onError: (error, stackTrace) {
-          print("❌ BLoC Stream Error: $error");
+          if (error is TimeoutException) {
+            return state.copyWith(
+              newDeleteTimeStatus: DeleteTimeError(
+                error.message ?? " پاسخی از سمت دستگاه دریافت نشد.",
+              ),
+            );
+          }
+
           return state.copyWith(
             newDeleteTimeStatus: DeleteTimeError(error.toString()),
           );

@@ -227,11 +227,14 @@ class ShowDialogs {
       barrierDismissible: false,
       context: context,
       builder: (dialogContext) {
+        bool isPoped = false;
         return BlocProvider.value(
           value: wellDetailBloc,
           child: Directionality(
             textDirection: TextDirection.rtl,
             child: AlertDialog(
+              insetPadding: EdgeInsets.all(10),
+              contentPadding: EdgeInsets.all(20),
 
               backgroundColor: Colors.white,
               content: SizedBox(
@@ -262,7 +265,7 @@ class ShowDialogs {
                                       : state.daySelected.id == Constants().weekDayNames[index].id;
 
                                   return Padding(
-                                    padding: const EdgeInsets.only(top: 5,left: 5),
+                                    padding: const EdgeInsets.only(top: 5,left: 3),
                                     child: GestureDetector(
                                         onTap: () {
                                           BlocProvider.of<WellDetailBloc>(context).add(
@@ -393,22 +396,19 @@ class ShowDialogs {
 
                               // 💡 ۲. در صورت خطا یا تایم‌اوت
                               if (state.createTimeStatus is CreateTimeError) {
-                                final errorState = state.createTimeStatus as CreateTimeError;
+                                if (!isPoped) {
+                                  isPoped = true;
+                                  final errorMsg = (state.createTimeStatus as CreateTimeError).error;
+                                  wellDetailBloc.add(ResetCreateTimeStatus());
 
-                                // پاک کردن اسنک‌بارهای قبلی
-                                ScaffoldMessenger.of(context).clearSnackBars();
+                                  if (Navigator.canPop(dialogContext)) {
+                                    Navigator.of(dialogContext).pop();
+                                  }
 
-                                // نمایش اسنک‌بار قرمز خطا
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(errorState.error),
-                                    backgroundColor: Colors.red,
-                                    duration: const Duration(seconds: 3),
-                                  ),
-                                );
-
-                                // // ریست کردن استاتوس جهت جلوگیری از اجرای تکراری
-                                wellDetailBloc.add(ResetCreateTimeStatus());
+                                  if (context.mounted) {
+                                    GlobalSnackBar.show(context, message: errorMsg,);
+                                  }
+                                }
                               }
                             },
                           builder: (context, state) {
@@ -444,12 +444,12 @@ class ShowDialogs {
                                   ),
                                   SizedBox(width: 10.w),
                                   Expanded(
-                                      flex:2,
+                                      // flex:2,
                                       child: GlobalElevatedButton(
                                         borderRadius: 2.5,
                                     backColor: ColorPalette.darkBlue,
                                     widget: state.createTimeStatus is CreateTimeLoading?
-                                  CircularProgressIndicator(): Text("ثبت زمان",style: TextStyle(color: ColorPalette.black),),
+                                  CircularProgressIndicator(): Text("تایید",style: TextStyle(color: ColorPalette.black),),
                                     onTap:(state.daySelected.id==-1) ||
                                         state.startHour!.isEmpty || state.endHour!.isEmpty ? (){
                                       GlobalSnackBar.show(scaffoldContext, message: "روز هفته و ساعت شروع و پایان را مشخص کنید",);
@@ -512,13 +512,14 @@ class ShowDialogs {
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (context, setState) {
-
+            bool isPoped = false;
             return BlocProvider.value(
               value: wellDetailBloc,
               child: Directionality(
                 textDirection: TextDirection.rtl,
                 child: AlertDialog(
-
+                  insetPadding: EdgeInsets.all(10),
+                  contentPadding: EdgeInsets.all(20),
                   backgroundColor: Colors.white,
 
                   content: SizedBox(
@@ -556,15 +557,6 @@ class ShowDialogs {
                               // پاک کردن اسنک‌بارهای قبلی
                               ScaffoldMessenger.of(context).clearSnackBars();
 
-                              // نمایش اسنک‌بار سبز موفقیت
-                              // ScaffoldMessenger.of(context).showSnackBar(
-                              //   SnackBar(
-                              //
-                              //     content: Text(deleteTimeSuccess.status==1?  "برنامه با موفقیت حذف شد":"پاسخی از سمت دستگاه دریافت نشد"),
-                              //     backgroundColor:deleteTimeSuccess.status==1? ColorPalette.darkGreen:ColorPalette.darkRed,
-                              //     duration: const Duration(seconds: 3),
-                              //   ),
-                              // );
                               GlobalSnackBar.show(context,
                                   message: deleteTimeSuccess.status==1?  "برنامه با موفقیت حذف شد":"پاسخی از سمت دستگاه دریافت نشد",
                                   success: deleteTimeSuccess.status==1?  true:false,
@@ -577,22 +569,20 @@ class ShowDialogs {
 
                             // 💡 ۲. در صورت خطا یا تایم‌اوت
                             if (state.deleteTimeStatus is DeleteTimeError) {
-                              final errorState = state.deleteTimeStatus as DeleteTimeError;
+                              if (!isPoped) {
+                                isPoped = true;
+                                final errorMsg = (state.deleteTimeStatus as DeleteTimeError).error;
+                                wellDetailBloc.add(ResetDeleteStatus());
 
-                              // پاک کردن اسنک‌بارهای قبلی
-                              ScaffoldMessenger.of(context).clearSnackBars();
+                                if (Navigator.canPop(dialogContext)) {
+                                  Navigator.of(dialogContext).pop();
+                                }
 
-                              // نمایش اسنک‌بار قرمز خطا
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(errorState.error),
-                                  backgroundColor: Colors.red,
-                                  duration: const Duration(seconds: 3),
-                                ),
-                              );
+                                if (context.mounted) {
+                                  GlobalSnackBar.show(context, message: errorMsg,);
+                                }
+                              }
 
-                              // // ریست کردن استاتوس جهت جلوگیری از اجرای تکراری
-                              wellDetailBloc.add(ResetCreateTimeStatus());
                             }
                           },
                           builder: (context, state) {
@@ -779,104 +769,117 @@ class ShowDialogs {
           value: wellDetailBloc,
           child: Directionality(
             textDirection: TextDirection.rtl,
-            child: BlocConsumer<WellDetailBloc, WellDetailState>(
-              listenWhen: (previous, current) => previous.onOffStatus != current.onOffStatus,
-              listener: (blocContext, state) {
-                if (state.onOffStatus is OnOffSuccess) {
-                  if (!isPoped) {
-                    isPoped = true;
+            child: AlertDialog(
+              insetPadding: EdgeInsets.all(5),
+              contentPadding: EdgeInsets.all(20),
+              backgroundColor: Colors.white,
+              content:SizedBox(
 
-                    // ۱. اول استیت عملیات دیالوگ ریست می‌شود
-                    wellDetailBloc.add(ResetOnOffStatus());
+                child: BlocConsumer<WellDetailBloc, WellDetailState>(
+                  listenWhen: (previous, current) => previous.onOffStatus != current.onOffStatus,
+                  listener: (blocContext, state) {
+                    if (state.onOffStatus is OnOffSuccess) {
+                      if (!isPoped) {
+                        isPoped = true;
 
-                    // ۲. فقط دیالوگ بسته می‌شود
-                    if (Navigator.canPop(dialogContext)) {
-                      Navigator.of(dialogContext).pop();
-                    }
-                  }
-                }
+                        // ۱. اول استیت عملیات دیالوگ ریست می‌شود
+                        wellDetailBloc.add(ResetOnOffStatus());
 
-                if (state.onOffStatus is OnOffError) {
-                  if (!isPoped) {
-                    isPoped = true;
-                    final errorMsg = (state.onOffStatus as OnOffError).error;
-                    wellDetailBloc.add(ResetOnOffStatus());
-
-                    if (Navigator.canPop(dialogContext)) {
-                      Navigator.of(dialogContext).pop();
+                        // ۲. فقط دیالوگ بسته می‌شود
+                        if (Navigator.canPop(dialogContext)) {
+                          Navigator.of(dialogContext).pop();
+                        }
+                      }
                     }
 
-                    if (context.mounted) {
-                      GlobalSnackBar.show(context, message: errorMsg,);
-                    }
-                  }
-                }
-              },
-              builder: (blocContext, state) {
-                final isLoading = state.onOffStatus is OnOffLoading;
+                    if (state.onOffStatus is OnOffError) {
+                      if (!isPoped) {
+                        isPoped = true;
+                        final errorMsg = (state.onOffStatus as OnOffError).error;
+                        wellDetailBloc.add(ResetOnOffStatus());
 
-                return AlertDialog(
-                  content: Text(
-                    "آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟",
-                  ),
-                  actions: [
-                    if (isLoading) ...[
-                      const CountdownTimerWidget(durationInSeconds: 60),
-                    ],
-                    Row(
+                        if (Navigator.canPop(dialogContext)) {
+                          Navigator.of(dialogContext).pop();
+                        }
+
+                        if (context.mounted) {
+                          GlobalSnackBar.show(context, message: errorMsg,);
+                        }
+                      }
+                    }
+                  },
+                  builder: (blocContext, state) {
+                    final isLoading = state.onOffStatus is OnOffLoading;
+
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: GlobalElevatedButton(
-                            borderRadius: 2.5,
-                            backColor: ColorPalette.darkBlue,
-                            onTap: isLoading
-                                ? null
-                                : () {
-                              wellDetailBloc.add(
-                                SwitchClicked(
-                                  value,
-                                  CreateTimeParams(
-                                    code: wellsDataEntity.code,
-                                    pin: wellsDataEntity.pin,
-                                    deviceID: wellsDataEntity.deviceId,
-                                    userLocalID: state.userLocalId,
-                                    status: value ? 1 : 0,
-                                  ),
-                                  wellsDataEntity.deviceId!
-                                ),
-
-                              );
-                            },
-                            widget: isLoading
-                                ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                                : const Text("تایید", style: TextStyle(color: Colors.black)),
-                          ),
+                        Text(
+                          "آیا از ${value ? "روشن" : "خاموش"} کردن پمپ مطمئن هستید؟",
                         ),
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: GlobalElevatedButton(
-                            borderRadius: 2.5,
-                            backColor: Colors.grey[300]!,
-                            onTap: () {
-                              wellDetailBloc.add(ResetOnOffStatus());
-                              if (!isPoped && Navigator.canPop(dialogContext)) {
-                                isPoped = true;
-                                Navigator.of(dialogContext).pop();
-                              }
-                            },
-                            widget: const Text("انصراف", style: TextStyle(color: Colors.black)),
-                          ),
+                        if (isLoading) ...[
+                          const CountdownTimerWidget(durationInSeconds: 60),
+                        ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: GlobalElevatedButton(
+                                borderRadius: 2.5,
+                                backColor: Colors.grey[300]!,
+                                onTap: () {
+                                  wellDetailBloc.add(ResetOnOffStatus());
+                                  if (!isPoped && Navigator.canPop(dialogContext)) {
+                                    isPoped = true;
+                                    Navigator.of(dialogContext).pop();
+                                  }
+                                },
+                                widget: const Text("انصراف", style: TextStyle(color: Colors.black)),
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: GlobalElevatedButton(
+                                borderRadius: 2.5,
+                                backColor: ColorPalette.darkBlue,
+                                onTap: isLoading
+                                    ? null
+                                    : () {
+                                  wellDetailBloc.add(
+                                    SwitchClicked(
+                                        value,
+                                        CreateTimeParams(
+                                          code: wellsDataEntity.code,
+                                          pin: wellsDataEntity.pin,
+                                          deviceID: wellsDataEntity.deviceId,
+                                          userLocalID: state.userLocalId,
+                                          status: value ? 1 : 0,
+                                        ),
+                                        wellsDataEntity.deviceId!
+                                    ),
+
+                                  );
+                                },
+                                widget: isLoading
+                                    ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                                    : const Text("تایید", style: TextStyle(color: Colors.black)),
+                              ),
+                            ),
+
+
+                          ],
                         ),
                       ],
-                    ),
-                  ],
-                );
-              },
+
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         );
@@ -1191,13 +1194,16 @@ class ShowDialogs {
                 child: Directionality(
                   textDirection: TextDirection.rtl,
                   child: AlertDialog(
+                    insetPadding: EdgeInsets.all(10),
+                    contentPadding: EdgeInsets.all(20),
                     backgroundColor: Colors.white,
                     content: SizedBox(
-                      height: 500.h,
-                      width: 550.w,
+                      // height: 500.h,
+                      // width: 550.w,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text("درخواست جدید به پشتیبانی"),
                           SizedBox(

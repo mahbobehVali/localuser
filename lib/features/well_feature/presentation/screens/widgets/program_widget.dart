@@ -104,7 +104,6 @@ class Program extends StatelessWidget {
                             return _header(day.name,width: 70);
                           }).toList(),
                         ),
-                        // SizedBox(height: 20.h,),
                         Padding(
                           padding: const EdgeInsets.all(20),
                           child: Text("برنامه ای وجود ندارد"),
@@ -116,13 +115,13 @@ class Program extends StatelessWidget {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Container(
-                    width:1100,
+                    width:1060,
                     decoration: BoxDecoration(
-                    color: ColorPalette.white,
+                    // color: ColorPalette.darkBlue,
                     borderRadius: BorderRadius.circular(8),
 
                     ),
-                    padding: EdgeInsets.all(10.sp),
+                    padding: EdgeInsets.all(5),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -144,6 +143,7 @@ class Program extends StatelessWidget {
                             itemCount: maxRows,
                             itemBuilder: (context, row) {
                               return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: List.generate(displayDays.length, (col) {
                                   final day = displayDays[col];
 
@@ -198,11 +198,11 @@ class Program extends StatelessWidget {
   Widget _header(String title, {double width = 150}) {
     return Container(
       width: width,
+      
       height: 50,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: ColorPalette.lightGrey,
-
         
       ),
       child: Text(
@@ -212,12 +212,13 @@ class Program extends StatelessWidget {
     );
   }
 
-  Widget _cell(String text,int empty,int d) {
+  Widget _cell(String text,int empty,int d,{double width = 140}) {
     return Container(
-      width: 150,
-      height: 70,
+      width: width,
+      height: 50,
       alignment: Alignment.center,
       decoration: BoxDecoration(
+        // color: Colors.red,
         border: BoxBorder.fromLTRB(bottom: BorderSide( color: ColorPalette.lightGrey),)
         // color: Colors.red
       ),
