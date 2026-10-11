@@ -105,8 +105,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<ReportFlowMeter>((event, emit) async {
 
       emit(state.copyWith(newReportFlowMeterStatus: ReportFlowMeterLoading(),
-                          newFlowMeterParams: event.flowMeterParams));
-      if(state.oneWell.length==1) emit(state.copyWith(newSelectedReportIndex:0));
+                          newFlowMeterParams: event.flowMeterParams,newSelectedReportIndex:0));
+      // if(state.oneWell.length==1) emit(state.copyWith(newSelectedReportIndex:0));
       DataState dataState = await wellFlowMeterUseCase(event.flowMeterParams,
           ignoreAllWell: true);
       DataState capacityDataState = await getCapacityUseCase(event.flowMeterParams);

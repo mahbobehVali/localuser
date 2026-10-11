@@ -191,7 +191,7 @@ class AlertScreen extends StatelessWidget {
                                         ? state.selectedAlertStatus
                                         : null,
                                     wellName: state.alertFilterModel!.filterWellName == true
-                                        ? state.wellName
+                                        ? state.alertFilterModel!.wellName
                                         : null,
                                     startDate: state.alertFilterModel!.filterDate == true
                                         ? state.alertStartDate

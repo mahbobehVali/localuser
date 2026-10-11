@@ -104,6 +104,7 @@ class AlertBloc extends Bloc<AlertEvent, AlertState> {
 
     });
     on<RemoveSingleFilterEvent>((event, emit) async {
+
       emit(state.copyWith(newAlertFilterModel: event.filter));
       add(AlertStart(filter: true,
           alertFilterParams: AlertFilterParams(

@@ -544,17 +544,19 @@ class Constants {
       displayText = titleString;
     }
 
-
-    final Widget text = Transform.rotate(
-      angle: -20 * math.pi / 180,
-      child: Padding(
-        // مقدار left را بیشتر کنید تا متن به سمت راست رانده شود
-        padding: const EdgeInsets.only(left: 10, top: 3, bottom: 3, right: 0),
-        child: Text(
-          displayText.toPersianDigit(),
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 12,
+    final Widget text = Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Transform.rotate(
+        angle: -40 * math.pi / 180,
+        child: Padding(
+          // مقدار left را بیشتر کنید تا متن به سمت راست رانده شود
+          padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 3),
+          child: Text(
+            displayText.toPersianDigit(),
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 12,
+            ),
           ),
         ),
       ),
@@ -605,9 +607,13 @@ class Constants {
   }
 
   AxisTitles axisBottomTitles(List<dynamic> xLabels,String selected,{int leng=0}) {
+    double calculatedInterval = 1;
+    if (xLabels.length > 15) {
+      calculatedInterval = (xLabels.length / 10).ceil().toDouble();
+    }
     return  AxisTitles(
       sideTitles: SideTitles(
-        interval: 1,
+        interval: calculatedInterval,
         showTitles: true,
         getTitlesWidget: (value, meta) {
           if (value < 0 || value >= xLabels.length || value % 1 != 0) {
@@ -615,7 +621,7 @@ class Constants {
           }
           return Constants().bottomTitles(value, meta, xLabels,selected,leng: leng);
         },
-        reservedSize: 40.h,
+        reservedSize: 45.h,
       ),
     );
   }

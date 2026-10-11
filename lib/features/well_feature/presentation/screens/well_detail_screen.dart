@@ -1226,7 +1226,9 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
                           ],
                         ):
-                        BlocBuilder<WellDetailBloc, WellDetailState>(
+                        widget.wellsDataEntity.statusWell==3?
+                            Center(child: Text("بنا به صلاح دید مدیر کل این چاه تا اطلاع ثانوی به جهت بهره‌برداری مسدود می باشد."),)
+                        : BlocBuilder<WellDetailBloc, WellDetailState>(
                           builder: (context, state) {
                             return Container(
                                 child: state.userLocalId == null
@@ -1282,13 +1284,8 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                                   _controller.forward();
                                                 }
                                               }
-                                              if (status is FingerRequestAccepted) {
-                                                print("FingerRequestAccepted");
-
-                                              }
 
                                               if (status is FingerSuccess) {
-                                                // print("status.userLocalID${status.userLocalID}");
                                                 BlocProvider.of<WellDetailBloc>(context).add(
                                                   ChangeUserLocalId(
                                                     status.userLocalID,

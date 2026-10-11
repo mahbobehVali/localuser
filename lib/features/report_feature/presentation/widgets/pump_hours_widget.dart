@@ -19,6 +19,7 @@ class PumpHoursChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ReportBloc, ReportState>(
+      buildWhen: (previous, current) => previous.reportCommandStatus!=current.reportCommandStatus,
       builder: (context, state) {
         final status = state.reportCommandStatus;
         if (status is ReportCommandSuccess) {
@@ -263,6 +264,7 @@ class PumpHoursChartWidget extends StatelessWidget {
                               topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                               bottomTitles: Constants().axisBottomTitles(xLabels,
                                   flowMeter.type=="all-well"?"nothing":flowMeter.type=="one-well"?"clock":"date",
+
                               leng: Constants().getDaysBetweenShamsiDates(state.startDate, state.endDate)+1),
 
                               leftTitles: Constants().leftTitles(

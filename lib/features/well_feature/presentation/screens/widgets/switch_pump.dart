@@ -78,7 +78,7 @@ class SwitchPump extends StatelessWidget {
             // 2. شرط برای ری‌بیلد شدن UI سوییچ
             buildWhen: (previous, current) => previous.isSwitched != current.isSwitched,
             builder: (context, state) {
-              // 🟢 اینجا state به راحتی در دسترس است
+              //  اینجا state به راحتی در دسترس است
               return Column(
                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
