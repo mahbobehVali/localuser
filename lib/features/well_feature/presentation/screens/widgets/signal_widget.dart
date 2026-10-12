@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mahaliii/config/texts_style.dart';
 
 import '../../../../../common/utils/constants.dart';
 import '../../../../../common/widgets/icon_container.dart';
@@ -36,7 +37,7 @@ class SignalWidget extends StatelessWidget {
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Row(
                         children: [
@@ -51,7 +52,16 @@ class SignalWidget extends StatelessWidget {
                         ],
                       ),
                       SizedBox(height: 4.h),
-                      Text(Constants().signalLevel[state.signal].name),
+                      Text(Constants().signalLevel[state.signal].name,
+                      style: TextStyleP.f16Medium.copyWith(
+                          color: Constants().signalLevel[state.signal].id>=4?
+                          ColorPalette.darkGreen:
+                          Constants().signalLevel[state.signal].id>=2?
+                          ColorPalette.orange:
+                          Constants().signalLevel[state.signal].id==1?
+                          ColorPalette.darkRed:
+                          ColorPalette.lightGrey
+                      ),),
                     ],
                   ),
                   SignalBarChart(value: state.signal),

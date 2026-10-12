@@ -545,7 +545,7 @@ class Constants {
     }
 
     final Widget text = Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.only(left: 25.w),
       child: Transform.rotate(
         angle: -40 * math.pi / 180,
         child: Padding(

@@ -37,7 +37,14 @@ class SignalBarChart extends StatelessWidget {
                 width: 12.w, // عرض هر میله
                 decoration: BoxDecoration(
                   color: isActive
-                      ? ColorPalette.darkGreen // سبز
+                      ? (
+                      value>=4?
+                      ColorPalette.darkGreen:
+                          value>=2?
+                      ColorPalette.orange:
+                              value==1?
+                              ColorPalette.darkRed:
+                              ColorPalette.lightGrey) // سبز
                       : ColorPalette.lightGrey, // طوسی
                   borderRadius: BorderRadius.circular(1), // گوشه‌های گرد میله
                 ),

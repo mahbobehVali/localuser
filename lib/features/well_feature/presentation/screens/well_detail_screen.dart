@@ -172,7 +172,6 @@ class _WellDetailScreenState extends State<WellDetailScreen>
             'userLocalId': _bloc.state.userLocalId, //  برگرداندن userLocalId واقعی که ثبت شده است
 
           });
-          // Navigator.of(context).pop( _bloc.state.userLocalId);
 
         },
         child: Scaffold(
@@ -1227,7 +1226,18 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                           ],
                         ):
                         widget.wellsDataEntity.statusWell==3?
-                            Center(child: Text("بنا به صلاح دید مدیر کل این چاه تا اطلاع ثانوی به جهت بهره‌برداری مسدود می باشد."),)
+                            Container(
+                              height: MediaQuery.sizeOf(context).height*0.8,
+                              child: Center(child: Container(
+                                margin: EdgeInsets.symmetric(horizontal: 5.w),
+                                padding: EdgeInsets.symmetric(horizontal: 5.w,vertical: 10.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withValues(alpha: 0.5),
+                                  borderRadius: BorderRadius.circular(5)
+                                ),
+                                child: Text("بنا به صلاح دید مدیر کل این چاه تا اطلاع ثانوی به جهت بهره‌برداری مسدود می باشد.",
+                                  textAlign: TextAlign.center,style: TextStyleP.f14Bold,),
+                              )))
                         : BlocBuilder<WellDetailBloc, WellDetailState>(
                           builder: (context, state) {
                             return Container(
@@ -1245,7 +1255,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
 
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        // color: wellsDataEntity.userLocalId==null?Colors.redAccent:Colors.blue,
+
                                         boxShadow: [
                                           BoxShadow(
                                               offset: Offset(1, 1),
@@ -1308,7 +1318,7 @@ class _WellDetailScreenState extends State<WellDetailScreen>
                                             },
                                             builder: (context, state) {
                                               final fingerStatus = state.fingerStatus;
-                                              print("fingerStatus$fingerStatus");
+
 
                                               // بررسی اینکه آیا فرآیند در حال اجراست یا خیر
                                               // final bool isLoading = fingerStatus is FingerLoading ||

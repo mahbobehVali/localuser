@@ -62,7 +62,7 @@ class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
                   // ۱. قطع سوکت و پاک‌سازی هدرها
                   await locator<SocketRepository>().logout();
 
-                  // ۲. 🔑 پاک کردن توکن و اطلاعات کاربر از SharedPreferences (بسیار مهم)
+                  // ۲.  پاک کردن توکن و اطلاعات کاربر از SharedPreferences (بسیار مهم)
                   await locator<SharedPrefOperator>().logout();
 
                   // ۳. هدایت به صفحه لاگین
@@ -115,7 +115,7 @@ class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
 
                             return GestureDetector(
                               onTap: () async {
-                                await Navigator.push(
+                                final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => WellDetailScreen(
@@ -123,6 +123,15 @@ class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
                                     ),
                                   ),
                                 );
+                                // بررسی اینکه آیا مقداری برگشته است یا خیر
+                                if (result != null && result is Map) {
+                                  final dynamic updatedUserLocalId = result['userLocalId'];
+
+                                  setState(() {
+                                    //  استفاده از مقدار واقعی و درستی که از صفحه دوم برگشته است
+                                    wellData!.userLocalId = updatedUserLocalId;
+                                  });
+                                }
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(10),
@@ -163,13 +172,17 @@ class _ManagementWellsWidgetState extends State<ManagementWellsWidget> {
                                                               ? 'خاموش'
                                                               : wellData?.statusWell == 1
                                                               ? 'روشن'
-                                                              : "غیر فعال",
+                                                              : wellData?.statusWell == 2
+                                                              ? "غیر فعال"
+                                                              : "مسدود",
                                                           style: TextStyle(
                                                             color: wellData?.statusWell == 0
-                                                                ? ColorPalette.darkRed
+                                                                ? ColorPalette.grey
                                                                 : wellData?.statusWell == 1
                                                                 ? ColorPalette.darkGreen
-                                                                : ColorPalette.orange,
+                                                                : wellData?.statusWell == 2
+                                                                ? ColorPalette.orange
+                                                                : ColorPalette.darkRed,
                                                           ),
                                                         ),
                                                       ],
