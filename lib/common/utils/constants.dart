@@ -266,6 +266,10 @@ class Constants {
     AlertTypeEntity("عدم دریافت اطلاعات", 6),
     AlertTypeEntity("مصرف غیر مجاز", 7),
     AlertTypeEntity("اتمام خدمت", 8),
+    AlertTypeEntity("قطع دستگاه", 9),
+    AlertTypeEntity("سیمکارت نامعتبر", 10),
+    AlertTypeEntity("مسدود",11 ),
+
 
   ];
 
@@ -277,8 +281,8 @@ class Constants {
 
   List<AlertTypeEntity> alertStatus = [
     AlertTypeEntity("جدید", 0),
-    AlertTypeEntity("در انتظار بررسی", 1),
-    AlertTypeEntity("پاسخ داده شده", 2),
+    AlertTypeEntity("در حال بررسی", 1),
+    AlertTypeEntity("رفع شده", 2),
 
   ];
 
