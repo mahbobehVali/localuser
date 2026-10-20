@@ -69,7 +69,22 @@ class Constants {
         child: Center(child: Text("هشداری وجود ندارد")));
   }
 
+  String formatToPersianCurrency(dynamic value) {
+    if (value == null) return '۰';
 
+    num number = 0;
+    if (value is num) {
+      number = value;
+    } else if (value is String) {
+      number = num.tryParse(value.replaceAll(',', '')) ?? 0;
+    }
+
+    // استفاده مستقیم از NumberFormat بدون پیشوند intl.
+    final formatter = NumberFormat('#,###', 'en_US');
+    String formatted = formatter.format(number);
+
+    return formatted.toPersianDigit();
+  }
   // static bool isValidEmail(String email) {
   //   if(email.isEmpty) {
   //     return true;
